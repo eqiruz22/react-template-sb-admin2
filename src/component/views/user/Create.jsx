@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -15,29 +15,54 @@ const Create = () => {
     } = useForm();
 
     const [email, setEmail] = useState('')
-    const [username, setUsername] = useState('')
+    const [name, setName] = useState('')
     const [password, setPassword] = useState('')
-    const [role, setRole] = useState('')
+    const [role, setRole] = useState([])
+    const [op, setOp] = useState('')
     const navigate = useNavigate()
 
     const submitData = async (data, e) => {
         e.preventDefault()
         Swal.fire({
             title: 'Success',
-            text: 'data has been created',
+            text: 'Success Create User',
             icon: 'success'
         }).then((result) => {
             if (result.isConfirmed === true) {
                 navigate('/user')
             }
         })
-        await axios.post(api + '/insert', {
+        await axios.post(api + '/create', {
             email: email,
-            username: username,
+            name: name,
             password: password,
-            role: role
+            role: op
+        }).then(res => {
+            console.log(res.data.message)
+        }).catch(error => {
+            if (error.response) {
+                console.log(error.response.data)
+            }
         })
     }
+
+    const getRole = async () => {
+        await axios.get(api + '/role')
+            .then(result => {
+                console.log(result.data.value)
+                setRole(result.data.value)
+            })
+    }
+    const handleChange = (e) => {
+        const id = e.target.value
+        setOp(id)
+    }
+
+    useEffect(() => {
+        getRole()
+    }, [])
+
+
 
     return (
         <div className='container'>
@@ -53,18 +78,18 @@ const Create = () => {
                         type="email"
                         className="form-control"
                     />
-                    {errors?.email?.type === "required" && <p className='text-danger'>Field email is required.</p>}
+                    {/* {errorEmail && <p className='text-danger'>{errorEmail}</p>} */}
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="username" className="form-label">Username </label>
+                    <label htmlFor="name" className="form-label">Full Name</label>
                     <input
-                        {...register('username', { required: true })}
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        name='username'
+                        {...register('name', { required: true })}
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        name='name'
                         type="text"
                         className="form-control" />
-                    {errors?.username?.type === "required" && <p className="text-danger">Field username is required.</p>}
+                    {/* {errorUsername && <p className='text-danger'>{errorUsername}</p>} */}
                 </div>
                 <div className="mb-3">
                     <label htmlFor="password" className="form-label">Password</label>
@@ -76,20 +101,21 @@ const Create = () => {
                         type="password"
                         className="form-control" />
 
-                    {errors?.password?.type === "required" && <p className="text-danger">Field password is required.</p>}
+                    {/* {errors?.password?.type === "required" && <p className="text-danger">Field password is required.</p>} */}
                 </div>
                 <div className='mb-3'>
                     <label htmlFor="role" className='form-label'>Role</label>
                     <select
-                        onChange={(e) => setRole(e.target.value)}
-                        name='role'
-                        value={role}
-                        className="form-select">
-                        <option defaultValue={''}>Open this select menu</option>
-                        <option value="1">Administrator</option>
-                        <option value="2">User</option>
+                        multiple={false}
+                        value={op}
+                        className='form-select'
+                        onChange={(e) => handleChange(e)}
+                    >
+                        <option defaultValue={''}>--Select--</option>
+                        {role.map((r, index) =>
+                            <option key={r.id} value={r.id}>{r.role_name}</option>
+                        )}
                     </select>
-                    {errors?.role?.type === "required" && <p className="text-danger">Field role is required.</p>}
                 </div>
                 <button type="submit" className="btn btn-primary mt-3">Submit</button>
             </form>

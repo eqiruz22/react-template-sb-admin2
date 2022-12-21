@@ -29,7 +29,7 @@ const Sidebar = () => {
                     <div id="collapseTwo" className="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                         <div className="bg-white py-2 collapse-inner rounded">
                             <h6 className="collapse-header">List</h6>
-                            <Link className="collapse-item" to="#">Data</Link>
+                            <Link className="collapse-item" to="/data">Data</Link>
                             <Link className="collapse-item" to="/user">User</Link>
                         </div>
                     </div>
