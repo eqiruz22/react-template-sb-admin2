@@ -1,7 +1,14 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 const Sidebar = () => {
+
+    const [activeNav, setActiveNav] = useState('')
+
+    const handleActive = (navItem) => {
+        setActiveNav(navItem)
+    }
+
     return (
         <div>
             <ul className="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
@@ -12,7 +19,9 @@ const Sidebar = () => {
                     <div className="sidebar-brand-text mx-3">SB Admin <sup>2</sup></div>
                 </Link>
                 <hr className="sidebar-divider my-0" />
-                <li className="nav-item active">
+                <li className={activeNav === '' ? 'nav-item active' : 'nav-item'}
+                    onClick={() => handleActive('')}
+                >
                     <Link className="nav-link" to="/">
                         <i className="fas fa-fw fa-tachometer-alt" />
                         <span>Dashboard</span></Link>
@@ -21,7 +30,7 @@ const Sidebar = () => {
                 <div className="sidebar-heading">
                     Interface
                 </div>
-                <li className="nav-item">
+                <li className='nav-item'>
                     <Link className="nav-link collapsed" to="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
                         <i className="fas fa-fw fa-cog" />
                         <span>Components</span>
@@ -29,10 +38,21 @@ const Sidebar = () => {
                     <div id="collapseTwo" className="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                         <div className="bg-white py-2 collapse-inner rounded">
                             <h6 className="collapse-header">List</h6>
-                            <Link className="collapse-item" to="/data">Data</Link>
-                            <Link className="collapse-item" to="/user">User</Link>
+                            <Link className={activeNav === '/data' ? 'collapse-item active' : 'collapse-item'}
+                                onClick={() => handleActive('/data')} to="/data">Data</Link>
+                            <Link className={activeNav === '/user' ? 'collapse-item active' : 'collapse-item'}
+                                onClick={() => handleActive('/user')} to="/user">User</Link>
+                            <Link className={activeNav === '/title' ? 'collapse-item active' : 'collapse-item'}
+                                onClick={() => handleActive('/title')} to="/title">Title</Link>
                         </div>
                     </div>
+                </li>
+                <li className={activeNav === '/list-perdin' ? 'nav-item active' : 'nav-item'}
+                    onClick={() => handleActive('/list-perdin')}
+                >
+                    <Link className="nav-link" to="/list-perdin">
+                        <i className="fas fa-solid fa-clipboard" />
+                        <span> Perdin</span></Link>
                 </li>
             </ul>
 

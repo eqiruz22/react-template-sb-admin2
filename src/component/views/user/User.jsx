@@ -5,17 +5,17 @@ import Swal from 'sweetalert2'
 import ReactPaginate from 'react-paginate'
 
 
-const api = 'http://localhost:4001/test'
+const api = 'http://localhost:4001/user'
 
 const User = () => {
 
     const [user, setUser] = useState([])
-    const [page, setPage] = useState(0)
     const [pages, setPages] = useState(0)
-    const [limit, setLimit] = useState(10)
     const [rows, setRows] = useState([])
-    const [keyword, setkeyword] = useState('')
     const [query, setQuery] = useState('')
+    const [page, setPage] = useState(0)
+    const [limit, setLimit] = useState(10)
+    const [keyword, setkeyword] = useState('')
 
     const getData = async () => {
         await axios.get(`http://localhost:4001/user/show?query=${keyword}&page=${page}&limit=${limit}`)
@@ -68,7 +68,7 @@ const User = () => {
 
 
     return (
-        <div className='px-5' >
+        <div className='px-5'>
             <div className="d-sm-flex align-items-center justify-content-between mb-4">
                 <h1 className="h3 mb-0 text-gray-800">Data User</h1>
                 <div className='d-sm-flex align-items-center mr-5'>
@@ -84,6 +84,7 @@ const User = () => {
                     <tr>
                         <th scope="colSpan">#</th>
                         <th scope="colSpan">Email</th>
+                        <th scope="colSpan">Name</th>
                         <th scope="colSpan">Role</th>
                         <th scope='colSpan'>Action</th>
                     </tr>
@@ -94,10 +95,15 @@ const User = () => {
                         <tr key={us.id}>
                             <th scope="row">{index + 1}</th>
                             <td>{us.email}</td>
-                            <td>{us.role}</td>
+                            <td>{us.name}</td>
+                            <td>{us.role_name}</td>
                             <td>
-                                <button className='btn btn-warning'>Edit</button>
-                                <button className='btn btn-danger ml-1'>Delete</button>
+                                <Link
+                                    to={`/user/edit/${us.id}`}
+                                >
+                                    <button className='btn btn-warning'>Edit</button>
+                                </Link>
+                                <button className='btn btn-danger ml-1' onClick={() => deleteUser(us.id)}>Delete</button>
                             </td>
                         </tr>
 
