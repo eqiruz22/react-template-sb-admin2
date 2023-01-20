@@ -1,3 +1,4 @@
+import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Swal from 'sweetalert2'
@@ -5,17 +6,17 @@ import Swal from 'sweetalert2'
 const Main = () => {
     const [perdin, setPerdin] = useState([])
 
+    const showPerdin = async () => {
+        await fetch('http://localhost:4001/user/waiting-approve-manager')
+            .then(res => res.json())
+            .then(result => {
+                console.log(result)
+                setPerdin(result.result)
+            }).catch(err => {
+                console.log(err)
+            })
+    }
     useEffect(() => {
-        const showPerdin = async () => {
-            await fetch('http://localhost:4001/user/list-perdin')
-                .then(res => res.json())
-                .then(result => {
-                    console.log(result.result)
-                    setPerdin(result.result)
-                }).catch(err => {
-                    console.log(err)
-                })
-        }
         showPerdin()
     }, [])
 
@@ -24,23 +25,27 @@ const Main = () => {
         currency: 'IDR'
     })
 
-    const updateApproval = () => {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire(
-                    'Success!',
-                    'Approved',
-                    'success'
-                )
-            }
+    const updateApproval = (id, perdin_id, prj_id, user_id) => {
+        axios.post('http://localhost:4001/user/approved-manager', {
+            id: id,
+            perdin_id: perdin_id,
+            prj_id: prj_id,
+            user_id: user_id
+        }).then(res => {
+            console.log(res)
+            Swal.fire({
+                title: 'Success',
+                text: 'Approved',
+                icon: 'success'
+            })
+            showPerdin()
+        }).catch(err => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong, please try again later!',
+            })
+            console.log(err)
         })
     }
 
@@ -53,8 +58,6 @@ const Main = () => {
                         <input type="text" className="form-control" placeholder="Search for" />
                     </form>
                 </div>
-                {/* <Link to="/data/create" className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                    className="fas fa-plus fa-sm text-white-50"></i> </Link> */}
                 <div></div>
             </div>
             <table className='table table-striped'>
@@ -79,7 +82,7 @@ const Main = () => {
                             <td>{IDRCurrency.format(item.total_received)}</td>
                             <td>{item.proses}</td>
                             <td>
-                                <button className='btn btn-success' onClick={() => updateApproval()}>Approve</button>
+                                <button className='btn btn-success' onClick={() => updateApproval(item.id, item.perdin_id, item.prj_id, item.user_id)}>Approve</button>
                             </td>
                         </tr>
                     )}

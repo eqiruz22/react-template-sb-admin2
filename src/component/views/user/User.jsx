@@ -3,34 +3,46 @@ import { Link } from 'react-router-dom'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import ReactPaginate from 'react-paginate'
-
+import { useAuthContext } from '../../../hooks/useAuthContext.js'
 
 const api = 'http://localhost:4001/user'
 
 const User = () => {
 
-    const [user, setUser] = useState([])
+    const [users, setUsers] = useState([])
     const [pages, setPages] = useState(0)
     const [rows, setRows] = useState([])
     const [query, setQuery] = useState('')
     const [page, setPage] = useState(0)
     const [limit, setLimit] = useState(10)
     const [keyword, setkeyword] = useState('')
+    const { user } = useAuthContext()
+    const [data, setData] = useState({})
 
     const getData = async () => {
-        await axios.get(`http://localhost:4001/user/show?query=${keyword}&page=${page}&limit=${limit}`)
-            .then(res => {
-                setUser(res.data.result)
-                setPage(res.data.page)
-                setLimit(res.data.limit)
-                setRows(res.data.row)
-                setPages(res.data.totalPage)
-            })
+        await axios.get(`http://localhost:4001/user/show?query=${keyword}&page=${page}&limit=${limit}`, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        }
+        ).then(res => {
+            console.log(res.data.result)
+            setUsers(res.data.result)
+            setPage(res.data.page)
+            setLimit(res.data.limit)
+            setRows(res.data.row)
+            setPages(res.data.totalPage)
+        }).catch(error => {
+            console.log(error.response)
+        })
     }
 
     useEffect(() => {
-        getData()
-    }, [page, keyword])
+
+        if (user) {
+            getData()
+        }
+    }, [page, keyword, user])
 
     const changePage = ({ selected }) => {
         setPage(selected)
@@ -40,9 +52,7 @@ const User = () => {
         e.preventDefault()
         setPage(0)
         setkeyword(query)
-
     }
-
 
     const deleteUser = async (id) => {
         Swal.fire({
@@ -90,7 +100,7 @@ const User = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {user.map((us, index) =>
+                    {users.map((us, index) =>
 
                         <tr key={us.id}>
                             <th scope="row">{index + 1}</th>

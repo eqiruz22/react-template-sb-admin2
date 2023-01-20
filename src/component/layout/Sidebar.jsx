@@ -47,10 +47,17 @@ const Sidebar = () => {
                         </div>
                     </div>
                 </li>
-                <li className={activeNav === '/list-perdin' ? 'nav-item active' : 'nav-item'}
-                    onClick={() => handleActive('/list-perdin')}
+                <li className={activeNav === '/waiting-to-approve-manager' ? 'nav-item active' : 'nav-item'}
+                    onClick={() => handleActive('/waiting-to-approve-manager')}
                 >
-                    <Link className="nav-link" to="/list-perdin">
+                    <Link className="nav-link" to="/waiting-to-approve-manager">
+                        <i className="fas fa-solid fa-clipboard" />
+                        <span> Perdin</span></Link>
+                </li>
+                <li className={activeNav === '/waiting-to-approve-director' ? 'nav-item active' : 'nav-item'}
+                    onClick={() => handleActive('/waiting-to-approve-director')}
+                >
+                    <Link className="nav-link" to="/waiting-to-approve-director">
                         <i className="fas fa-solid fa-clipboard" />
                         <span> Perdin</span></Link>
                 </li>
