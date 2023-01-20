@@ -1,4 +1,6 @@
+import axios from 'axios'
 import React, { useEffect, useState } from 'react'
+import Swal from 'sweetalert2'
 
 const DirectorView = () => {
 
@@ -8,6 +10,7 @@ const DirectorView = () => {
         await fetch('http://localhost:4001/user/waiting-approve-director')
             .then(res => res.json())
             .then(res => {
+                console.log(res.result)
                 setPerdin(res.result)
             }).catch(error => {
                 console.log(error)
@@ -21,6 +24,23 @@ const DirectorView = () => {
     useEffect(() => {
         getPerdin()
     }, [])
+
+    const handleApproval = (id, perdin_id) => {
+        axios.post('http://localhost:4001/user/approved-director', {
+            id: id,
+            perdin_id: perdin_id
+        }).then(res => {
+            console.log(res)
+            Swal.fire({
+                title: 'Success',
+                text: 'Approved',
+                icon: 'success'
+            })
+            getPerdin()
+        }).catch(error => {
+            console.log(error)
+        })
+    }
 
     return (
         <div className='px-5'>
@@ -55,7 +75,7 @@ const DirectorView = () => {
                             <td>{IDRCurrency.format(item.total_received)}</td>
                             <td>{item.proses}</td>
                             <td>
-                                <button className='btn btn-success'>Approve</button>
+                                <button disabled={item.status_id === 1 ? false : true} onClick={() => handleApproval(item.id, item.perdin_id)} className='btn btn-success'>Approve</button>
                             </td>
                         </tr>
                     )}

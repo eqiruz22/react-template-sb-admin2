@@ -17,7 +17,6 @@ const User = () => {
     const [limit, setLimit] = useState(10)
     const [keyword, setkeyword] = useState('')
     const { user } = useAuthContext()
-    const [data, setData] = useState({})
 
     const getData = async () => {
         await axios.get(`http://localhost:4001/user/show?query=${keyword}&page=${page}&limit=${limit}`, {
@@ -26,16 +25,17 @@ const User = () => {
             }
         }
         ).then(res => {
-            console.log(res.data.result)
             setUsers(res.data.result)
             setPage(res.data.page)
             setLimit(res.data.limit)
             setRows(res.data.row)
             setPages(res.data.totalPage)
         }).catch(error => {
-            console.log(error.response)
+            alert(error.response)
         })
     }
+
+
 
     useEffect(() => {
 

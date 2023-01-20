@@ -55,7 +55,8 @@ const Main = () => {
                             <td>{IDRCurrency.format(item.total_received)}</td>
                             <td>{item.proses}</td>
                             <td>
-                                <button className='btn btn-danger'>Delete</button>
+                                <button disabled={item.status_id === 1 ? false : true} className='btn btn-warning'>Edit</button>
+                                <button disabled={item.status_id !== 1 ? true : false} className='btn btn-danger ml-1'>Delete</button>
                             </td>
                         </tr>
                     )}

@@ -13,7 +13,7 @@ import ManagerView from "./component/views/approval/ManagerView";
 import DirectorView from "./component/views/approval/DirectorView";
 import Login from "./component/views/Login";
 import { useAuthContext } from "./hooks/useAuthContext";
-import { useEffect } from "react";
+
 
 function App() {
 

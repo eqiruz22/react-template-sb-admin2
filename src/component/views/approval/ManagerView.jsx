@@ -25,12 +25,13 @@ const Main = () => {
         currency: 'IDR'
     })
 
-    const updateApproval = (id, perdin_id, prj_id, user_id) => {
+    const updateApproval = (id, perdin_id, prj_id, user_id, status_id) => {
         axios.post('http://localhost:4001/user/approved-manager', {
             id: id,
             perdin_id: perdin_id,
             prj_id: prj_id,
-            user_id: user_id
+            user_id: user_id,
+            status_id: status_id
         }).then(res => {
             console.log(res)
             Swal.fire({
@@ -82,7 +83,7 @@ const Main = () => {
                             <td>{IDRCurrency.format(item.total_received)}</td>
                             <td>{item.proses}</td>
                             <td>
-                                <button className='btn btn-success' onClick={() => updateApproval(item.id, item.perdin_id, item.prj_id, item.user_id)}>Approve</button>
+                                <button disabled={item.status_id === 1 ? false : true} className='btn btn-success' onClick={() => updateApproval(item.id, item.perdin_id, item.prj_id, item.user_id, item.status_id)}>Approve</button>
                             </td>
                         </tr>
                     )}
