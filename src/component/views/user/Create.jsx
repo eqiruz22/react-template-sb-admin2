@@ -10,7 +10,9 @@ const Create = () => {
     const [email, setEmail] = useState('')
     const [name, setName] = useState('')
     const [password, setPassword] = useState('')
+    const [titles, setTitles] = useState('')
     const [role, setRole] = useState([])
+    const [title, setTitle] = useState([])
     const [op, setOp] = useState('')
     const [errRole, setErrRole] = useState('')
     const [errName, setErrName] = useState('')
@@ -18,26 +20,27 @@ const Create = () => {
     const [errPassword, setErrPassword] = useState('')
     const navigate = useNavigate()
 
-    const submitData = async (event) => {
-        event.preventDefault()
+    const submitData = async (e) => {
+        e.preventDefault()
         await axios.post(api + '/create', {
             email: email,
             name: name,
             password: password,
-            role: op
+            role: op,
+            title_id: titles
         }).then(res => {
+            console.log(res.data.message)
             if (res.status === 201) {
                 Swal.fire({
                     title: 'Success',
                     text: 'Success Create User',
                     icon: 'success'
                 }).then((result) => {
-                    if (result.isConfirmed === true) {
-                        navigate('/user')
-                    }
+                    navigate('/user')
                 })
             }
         }).catch(error => {
+            console.log(error)
             if (error.response.status === 500) {
                 setErrEmail('Email must be unique')
                 Swal.fire({
@@ -50,6 +53,19 @@ const Create = () => {
     }
 
 
+    const getTitle = async () => {
+        await axios.get('http://localhost:4001/user/title')
+            .then(res => {
+                setTitle(res.data.value)
+            }).catch(error => {
+                console.log(error)
+            })
+    }
+
+    useEffect(() => {
+        getTitle()
+    }, [])
+
     const getRole = async () => {
         await axios.get(api + '/role')
             .then(result => {
@@ -57,39 +73,38 @@ const Create = () => {
             })
     }
 
-    const handleEmailChange = async (event) => {
-        setEmail(event.target.value)
-        if (!event.target.value) {
+    const handleEmailChange = (e) => {
+        setEmail(e.target.value)
+        if (!e.target.value) {
             setErrEmail('Email is required')
         } else {
             setErrEmail('')
         }
     }
 
-    const handleNameChange = (event) => {
-        setName(event.target.value)
-        if (!event.target.value) {
+    const handleNameChange = (e) => {
+        setName(e.target.value)
+        if (!e.target.value) {
             setErrName('Full Name is required')
         } else {
             setErrName('')
         }
     }
 
-    const handlePassword = (event) => {
-        setPassword(event.target.value)
-        if (event.target.value < 5) {
+    const handlePassword = (e) => {
+        setPassword(e.target.value)
+        if (e.target.value < 5) {
             setErrPassword('Password must be more than 5 character')
-        } else if (!event.target.value) {
+        } else if (!e.target.value) {
             setErrPassword('Password is required')
         } else {
             setErrPassword('')
         }
     }
 
-    const handleRoleChange = (event) => {
-        const id = event.target.value
-        setOp(id)
-        if (event.target.value === null) {
+    const handleRoleChange = (e) => {
+        setOp(e.target.value)
+        if (e.target.value === '') {
             setErrRole('Role must be administrator or user')
         } else {
             setErrRole('')
@@ -100,6 +115,9 @@ const Create = () => {
         getRole()
     }, [])
 
+    const handleTitleChange = (e) => {
+        setTitles(e.target.value)
+    }
 
     return (
         <div className='container'>
@@ -136,19 +154,33 @@ const Create = () => {
                 <div className='mb-3'>
                     <label htmlFor="role" className='form-label'>Role</label>
                     <select
-                        multiple={false}
                         value={op}
                         className='form-select'
                         onChange={handleRoleChange}
                     >
-                        <option defaultValue={''}>--Select--</option>
-                        {role.map((r, index) =>
-                            <option key={r.id} value={r.id}>{r.role_name}</option>
+                        <option value=''>--Select--</option>
+                        {role.map((item, index) =>
+                            <option key={item.id} value={item.id}>{item.role_name}</option>
                         )}
                     </select>
                     {errRole && <span className='text-danger'>{errRole}</span>}
                 </div>
-                <button type="submit" className="btn btn-primary mt-3">Submit</button>
+                <div className='mb-3'>
+                    <label htmlFor="role" className='form-label'>Title</label>
+                    <select
+                        multiple={false}
+                        value={titles}
+                        className='form-select'
+                        onChange={handleTitleChange}
+                    >
+                        <option value=''>--Select--</option>
+                        {title.map((item, index) =>
+                            <option key={item.id} value={item.id}>{item.title_name}</option>
+                        )}
+                    </select>
+                    {errRole && <span className='text-danger'>{errRole}</span>}
+                </div>
+                <button type='submit' className="btn btn-primary mt-3">Submit</button>
             </form>
 
         </div>

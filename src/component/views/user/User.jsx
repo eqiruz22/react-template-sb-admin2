@@ -5,8 +5,6 @@ import Swal from 'sweetalert2'
 import ReactPaginate from 'react-paginate'
 import { useAuthContext } from '../../../hooks/useAuthContext.js'
 
-const api = 'http://localhost:4001/user'
-
 const User = () => {
 
     const [users, setUsers] = useState([])
@@ -35,10 +33,7 @@ const User = () => {
         })
     }
 
-
-
     useEffect(() => {
-
         if (user) {
             getData()
         }
@@ -73,7 +68,7 @@ const User = () => {
                 getData()
             }
         })
-        await axios.delete(api + `/delete/${id}`)
+        await axios.delete(`http://localhost:4001/user/delete/${id}`)
     }
 
 
@@ -96,24 +91,26 @@ const User = () => {
                         <th scope="colSpan">Email</th>
                         <th scope="colSpan">Name</th>
                         <th scope="colSpan">Role</th>
+                        <th scope="colSpan">Title</th>
                         <th scope='colSpan'>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {users.map((us, index) =>
+                    {users.map((item, index) =>
 
-                        <tr key={us.id}>
+                        <tr key={item.id}>
                             <th scope="row">{index + 1}</th>
-                            <td>{us.email}</td>
-                            <td>{us.name}</td>
-                            <td>{us.role_name}</td>
+                            <td>{item.email}</td>
+                            <td>{item.name}</td>
+                            <td>{item.role_name}</td>
+                            <td>{item.title_name}</td>
                             <td>
                                 <Link
-                                    to={`/user/edit/${us.id}`}
+                                    to={`/user/edit/${item.id}`}
                                 >
                                     <button className='btn btn-warning'>Edit</button>
                                 </Link>
-                                <button className='btn btn-danger ml-1' onClick={() => deleteUser(us.id)}>Delete</button>
+                                <button className='btn btn-danger ml-1' onClick={() => deleteUser(item.id)}>Delete</button>
                             </td>
                         </tr>
 

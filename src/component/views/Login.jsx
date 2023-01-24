@@ -8,9 +8,9 @@ const Login = () => {
   const navigate = useNavigate()
   const [error, setError] = useState('')
   const { dispatch } = useAuthContext()
+
   const handleLogin = async (e) => {
     e.preventDefault()
-
     await axios.post('http://localhost:4001/user/login', {
       email: email,
       password: password
@@ -49,14 +49,18 @@ const Login = () => {
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           className="form-control form-control-user"
-                          placeholder="Enter Email Address..." />
+                          placeholder="Enter Email Address..."
+                          required />
                       </div>
                       <div className="form-group">
-                        <input type="password"
+                        <input
+                          type="password"
                           className="form-control form-control-user"
                           placeholder="Password"
                           value={password}
-                          onChange={(e) => setPassword(e.target.value)} />
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                        />
                       </div>
                       <button className="btn btn-primary btn-user btn-block">
                         Login

@@ -26,16 +26,16 @@ function App() {
           <Route path="/login" element={!user ? <Login /> : <Navigate to='/' />} />
           <Route path="/" element={user ? <MainLayout /> : <Navigate to='/login' />}>
             <Route index element={<Dashboard />} />
-            <Route path='data' element={user ? <MainData /> : <Navigate to='/login' />} />
-            <Route path='data/create' element={user ? <CreateData /> : <Navigate to='/login' />} />
-            <Route path='user' element={user ? <User /> : <Navigate to='/login' />} />
-            <Route path='user/create' element={user ? <Create /> : <Navigate to='/login' />} />
-            <Route path='user/edit/:id' element={user ? <Edit /> : <Navigate to='/login' />} />
-            <Route path='title' element={user ? <MainTitle /> : <Navigate to='/login' />} />
-            <Route path='title/create' element={user ? <CreateTitle /> : <Navigate to='/login' />} />
-            <Route path='title/edit/:id' element={user ? <EditTitle /> : <Navigate to='/login' />} />
-            <Route path='waiting-to-approve-manager' element={user ? <ManagerView /> : <Navigate to='/login' />} />
-            <Route path='waiting-to-approve-director' element={user ? <DirectorView /> : <Navigate to='/login' />} />
+            <Route path='data' element={<MainData />} />
+            <Route path='data/create' element={<CreateData />} />
+            <Route path='user' element={<User />} />
+            <Route path='user/create' element={<Create />} />
+            <Route path='user/edit/:id' element={<Edit />} />
+            <Route path='title' element={<MainTitle />} />
+            <Route path='title/create' element={<CreateTitle />} />
+            <Route path='title/edit/:id' element={<EditTitle />} />
+            <Route path='waiting-to-approve-manager' element={<ManagerView />} />
+            <Route path='waiting-to-approve-director' element={<DirectorView />} />
           </Route>
         </Routes>
       </Router>
