@@ -7,7 +7,7 @@ const Main = () => {
 
     useEffect(() => {
         const showPerdin = async () => {
-            await fetch('http://localhost:4001/user/perdin-show')
+            await fetch('http://10.80.7.94:4001/user/perdin-show')
                 .then(res => res.json())
                 .then(result => {
                     setPerdin(result.result)

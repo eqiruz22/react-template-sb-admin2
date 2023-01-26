@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
-const api = 'http://localhost:4001/user'
+const api = 'http://10.80.7.94:4001/user'
 
 const Edit = () => {
 

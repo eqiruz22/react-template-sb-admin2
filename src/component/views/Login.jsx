@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from 'axios'
 import { useAuthContext } from "../../hooks/useAuthContext";
 import { useNavigate } from "react-router-dom";
+
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -11,22 +12,22 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault()
-    await axios.post('http://localhost:4001/user/login', {
-      email: email,
-      password: password
-    }).then(res => {
-      console.log(res)
-      if (res.status === 200) {
+    try {
+      await axios.post('http://10.80.7.94:4001/user/login', {
+        email: email,
+        password: password
+      }).then(res => {
+        console.log(res)
         localStorage.setItem('user', JSON.stringify(res.data))
         dispatch({ type: 'LOGIN', payload: res.data })
         navigate('/')
-      }
-    }).catch(error => {
+      })
+    } catch (error) {
       console.log(error)
       if (error.response.status === 404) {
         setError(error.response.data['message'])
       }
-    })
+    }
   }
 
   return (
@@ -41,7 +42,9 @@ const Login = () => {
                     <div className="text-center">
                       <h1 className="h4 text-gray-900 mb-4">Welcome Back!</h1>
                     </div>
-                    {error && <span className="text-danger">{error}</span>}
+                    <div className="text-center mb-3">
+                      {error && <span className="text-danger">{error}</span>}
+                    </div>
                     <form className="user" onSubmit={handleLogin}>
                       <div className="form-group">
                         <input

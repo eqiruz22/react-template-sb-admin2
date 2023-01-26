@@ -2,11 +2,13 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 import { useNavigate } from 'react-router-dom'
+import { useAuthContext } from '../../../hooks/useAuthContext'
 
 const CreateData = () => {
 
-    const [un, setUn] = useState([])
-    const [tn, setTn] = useState([])
+    const [userName, setUserName] = useState([])
+    const [name, setName] = useState('')
+    const [title, setTitle] = useState('')
     const [prj, setPrj] = useState([])
     const [userM, setUserM] = useState([])
     const [car, setCar] = useState(0)
@@ -27,10 +29,9 @@ const CreateData = () => {
     const [delegate, setDelegate] = useState('')
     const [travel, setTravel] = useState('')
     const [purposes, setPurposes] = useState('')
-    const [name, setName] = useState('')
-    const [getId, setGetId] = useState('')
     const [startDate, setStartDate] = useState('')
     const [endDate, setEndDate] = useState('')
+    const { user } = useAuthContext()
     const navigate = useNavigate()
 
     let IDRCurrency = new Intl.NumberFormat('id-ID', {
@@ -39,33 +40,8 @@ const CreateData = () => {
     })
 
     useEffect(() => {
-        const getUser = async () => {
-            await axios.get('http://localhost:4001/user/show')
-                .then(res => {
-                    setUn(res.data.result)
-                }).catch(error => {
-                    console.log(error)
-                })
-        }
-        getUser()
-    }, [])
-
-    useEffect(() => {
-        const getTitle = async () => {
-            await axios.get('http://localhost:4001/user/title')
-                .then(res => {
-                    setTn(res.data.value)
-                }).catch(error => {
-                    console.log(error)
-                })
-        }
-        getTitle()
-    }, [])
-
-
-    useEffect(() => {
         const getManager = async () => {
-            await axios.get('http://localhost:4001/user/show-manager')
+            await axios.get('http://10.80.7.94:4001/user/show-manager')
                 .then(res => {
                     setUserM(res.data.result)
                 }).catch(error => {
@@ -141,25 +117,10 @@ const CreateData = () => {
         setDelegate(data)
     }
 
-    const handleTitleChange = async (event) => {
-        const id = event.target.value
-        await axios.get(`http://localhost:4001/user/title/${id}`)
-            .then(res => {
-                setCar(res.data.value[0]['car_rent'])
-                setHardship(res.data.value[0]['hardship_allowance'])
-                setMeal(res.data.value[0]['meal_allowance'])
-                setPulsa(res.data.value[0]['pulsa_allowance'])
-                setRent(res.data.value[0]['rent_house'])
-                setGetId(id)
-            }).catch(error => {
-                console.log(error)
-            })
-
-    }
 
     useEffect(() => {
         const getPrj = async (event) => {
-            await axios.get(`http://localhost:4001/user/prj`)
+            await axios.get(`http://10.80.7.94:4001/user/prj`)
                 .then(res => {
                     setPrj(res.data.result)
                 })
@@ -181,17 +142,44 @@ const CreateData = () => {
         setHotel(event.target.value)
     }
 
-    const handleChangeName = (event) => {
-        const data = event.target.value
-        setName(data)
+    const handleUserChange = async (event) => {
+        const id = event.target.value
+        await axios.get(`http://10.80.7.94:4001/user/show/title-user/${id}`)
+            .then(res => {
+                setTitle(res.data['title_name'])
+                setCar(res.data['car_rent'])
+                setHardship(res.data['hardship_allowance'])
+                setMeal(res.data['meal_allowance'])
+                setPulsa(res.data['pulsa_allowance'])
+                setRent(res.data['rent_house'])
+                setName(id)
+            }).catch(error => {
+                console.log(error)
+            })
     }
+
+    useEffect(() => {
+        const getUser = async () => {
+            await axios.get('http://10.80.7.94:4001/user/show', {
+                headers: {
+                    'Authorization': `Bearer ${user['token']}`
+                }
+            })
+                .then(res => {
+                    setUserName(res.data.result)
+                }).catch(error => {
+                    console.log(error)
+                })
+        }
+        getUser()
+    }, [])
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        await axios.post('http://localhost:4001/user/perdin-create', {
+        await axios.post('http://10.80.7.94:4001/user/perdin-create', {
             prj_id: vlPrj,
             user_id: name,
-            title_id: getId,
+            title_name: title,
             delegate_approval: delegate,
             official_travel_site: travel,
             purposes: purposes,
@@ -221,7 +209,7 @@ const CreateData = () => {
                 })
             }
         }).catch(error => {
-            console.log(error)
+            console.log(error.response.data)
             if (error.response.status === 500) {
                 Swal.fire({
                     icon: 'error',
@@ -241,26 +229,17 @@ const CreateData = () => {
                         <label htmlFor="name" className="form-label">Name</label>
                         <select
                             value={name}
-                            onChange={handleChangeName}
+                            onChange={handleUserChange}
                             className='form-select'>
                             <option defaultValue={''}>Choose one</option>
-                            {un.map((item, index) =>
+                            {userName.map((item, index) =>
                                 <option key={item.id} value={item.id}>{item.name}</option>
                             )}
                         </select>
                     </div>
                     <div className="col-md-3">
                         <label htmlFor="title" className="form-label">Title</label>
-                        <select
-                            className='form-select'
-                            value={getId}
-                            onChange={handleTitleChange}
-                        >
-                            <option defaultValue={''}>Choose one</option>
-                            {tn.map((item, index) =>
-                                <option key={item.id} value={item.id}>{item.title_name}</option>
-                            )}
-                        </select>
+                        <input type="text" value={title} className='form-control' onChange={(e) => setTitle(e.target.value)} />
                     </div>
                     <div className="col-md-3">
                         <label htmlFor="prj" className="form-label">PRJ</label>

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
-const api = 'http://localhost:4001/user'
+const api = 'http://10.80.7.94:4001/user'
 
 const Create = () => {
 
@@ -54,7 +54,7 @@ const Create = () => {
 
 
     const getTitle = async () => {
-        await axios.get('http://localhost:4001/user/title')
+        await axios.get('http://10.80.7.94:4001/user/title')
             .then(res => {
                 setTitle(res.data.value)
             }).catch(error => {

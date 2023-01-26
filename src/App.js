@@ -25,7 +25,7 @@ function App() {
         <Routes>
           <Route path="/login" element={!user ? <Login /> : <Navigate to='/' />} />
           <Route path="/" element={user ? <MainLayout /> : <Navigate to='/login' />}>
-            <Route index element={<Dashboard />} />
+            <Route index element={user ? <Dashboard /> : <Navigate to='/login' />} />
             <Route path='data' element={<MainData />} />
             <Route path='data/create' element={<CreateData />} />
             <Route path='user' element={<User />} />

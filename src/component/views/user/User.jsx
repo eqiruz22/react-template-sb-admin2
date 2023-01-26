@@ -17,7 +17,7 @@ const User = () => {
     const { user } = useAuthContext()
 
     const getData = async () => {
-        await axios.get(`http://localhost:4001/user/show?query=${keyword}&page=${page}&limit=${limit}`, {
+        await axios.get(`http://10.80.7.94:4001/user/show?query=${keyword}&page=${page}&limit=${limit}`, {
             headers: {
                 'Authorization': `Bearer ${user['token']}`
             }
@@ -29,6 +29,7 @@ const User = () => {
             setRows(res.data.row)
             setPages(res.data.totalPage)
         }).catch(error => {
+            console.log(error)
             alert(error.response)
         })
     }
@@ -68,7 +69,7 @@ const User = () => {
                 getData()
             }
         })
-        await axios.delete(`http://localhost:4001/user/delete/${id}`)
+        await axios.delete(`http://10.80.7.94:4001/user/delete/${id}`)
     }
 
 
