@@ -186,6 +186,7 @@ const CreateData = () => {
                 }
             })
                 .then(res => {
+                    console.log(res.data.result)
                     setUserName(res.data.result)
                 }).catch(error => {
                     console.log(error)
@@ -193,8 +194,6 @@ const CreateData = () => {
         }
         getUser()
     }, [])
-
-    console.log(totals)
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -241,8 +240,6 @@ const CreateData = () => {
             }
         })
     }
-
-    console.log(days)
 
     return (
         <div>
@@ -318,7 +315,7 @@ const CreateData = () => {
                     </div>
                     <div className="col-md-3">
                         <label htmlFor="rented" className="form-label">Rented House</label>
-                        <input type="text" value={rent} onChange={(e) => setRent(e.target.value)} className="form-control" id="rented" />
+                        <input type="text" value={rent.toLocaleString().split(',').join('.')} onChange={(e) => setRent(e.target.value)} className="form-control" id="rented" />
                     </div>
                     <div className="col-md-3">
                         <label htmlFor="meals" className="form-label">Meal Allowance</label>

@@ -59,7 +59,25 @@ const Sidebar = () => {
                         </div>
                     </div>
                 </li>
-                {user['role'] === 1 && user['title_id'] === 3 && (
+                {user['role'] === 1 && (
+                    <div>
+                        <li className={activeNav === '/waiting-to-approve-manager' ? 'nav-item active' : 'nav-item'}
+                            onClick={() => handleActive('/waiting-to-approve-manager')}
+                        >
+                            <Link className="nav-link" to="/waiting-to-approve-manager">
+                                <i className="fas fa-solid fa-clipboard" />
+                                <span> Perdin list Manager</span></Link>
+                        </li>
+                        <li className={activeNav === '/waiting-to-approve-director' ? 'nav-item active' : 'nav-item'}
+                            onClick={() => handleActive('/waiting-to-approve-director')}
+                        >
+                            <Link className="nav-link" to="/waiting-to-approve-director">
+                                <i className="fas fa-solid fa-clipboard" />
+                                <span> Perdin list Director</span></Link>
+                        </li>
+                    </div>
+                )}
+                {user['role'] === 2 && user['title_id'] === 3 && (
                     <div>
                         <li className={activeNav === '/waiting-to-approve-manager' ? 'nav-item active' : 'nav-item'}
                             onClick={() => handleActive('/waiting-to-approve-manager')}
@@ -70,7 +88,18 @@ const Sidebar = () => {
                         </li>
                     </div>
                 )}
-                {user['role'] === 1 && user['title_id'] === 19 && (
+                {user['role'] === 2 && user['title_id'] === 4 && (
+                    <div>
+                        <li className={activeNav === '/waiting-to-approve-manager' ? 'nav-item active' : 'nav-item'}
+                            onClick={() => handleActive('/waiting-to-approve-manager')}
+                        >
+                            <Link className="nav-link" to="/waiting-to-approve-manager">
+                                <i className="fas fa-solid fa-clipboard" />
+                                <span> Perdin list Manager</span></Link>
+                        </li>
+                    </div>
+                )}
+                {user['role'] === 2 && user['title_id'] === 19 && (
                     <div>
                         <li className={activeNav === '/waiting-to-approve-director' ? 'nav-item active' : 'nav-item'}
                             onClick={() => handleActive('/waiting-to-approve-director')}

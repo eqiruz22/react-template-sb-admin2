@@ -4,8 +4,6 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import ReactPaginate from 'react-paginate'
 import { useAuthContext } from '../../../hooks/useAuthContext.js'
-import { PDFDownloadLink } from '@react-pdf/renderer'
-import Report from '../../Report.jsx'
 
 const User = ({ selectedUser }) => {
 

@@ -13,6 +13,7 @@ import ManagerView from "./component/views/approval/ManagerView";
 import DirectorView from "./component/views/approval/DirectorView";
 import Login from "./component/views/Login";
 import { useAuthContext } from "./hooks/useAuthContext";
+import CreateDataById from "./component/views/data/CreateDataById";
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
             <Route index element={user ? <Dashboard /> : <Navigate to='/login' />} />
             <Route path='data' element={<MainData />} />
             <Route path='data/create' element={<CreateData />} />
+            <Route path='data/create/:id' element={<CreateDataById />} />
             <Route path='user' element={<User />} />
             <Route path='user/create' element={<Create />} />
             <Route path='user/edit/:id' element={<Edit />} />

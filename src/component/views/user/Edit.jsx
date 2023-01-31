@@ -3,8 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
-const api = 'http://10.80.7.94:4001/user'
-
 const Edit = () => {
 
     const [email, setEmail] = useState('')
@@ -14,16 +12,21 @@ const Edit = () => {
     const [role, setRole] = useState('')
     const [errRole, setErrRole] = useState('')
     const [opt, setOpt] = useState([])
+    const [title, setTitle] = useState([])
+    const [optTitle, setOptTitle] = useState('')
     const { id } = useParams()
     const navigate = useNavigate()
 
     const showById = async () => {
-        const response = await axios.get(api + `/show/${id}`)
-        const response1 = await axios.get(api + '/role')
+        const response = await axios.get(`http://10.80.7.94:4001/user/show/${id}`)
+        const response1 = await axios.get('http://10.80.7.94:4001/user/role')
+        const response2 = await axios.get('http://10.80.7.94:4001/user/title')
         setEmail(response.data.value[0].email)
         setName(response.data.value[0].name)
         setRole(response.data.value[0].role)
+        setOptTitle(response.data.value[0].title_id)
         setOpt(response1.data.value)
+        setTitle(response2.data.value)
     }
 
     const handleEmailChange = (event) => {
@@ -54,6 +57,10 @@ const Edit = () => {
         }
     }
 
+    const handleTitleChange = (event) => {
+        setOptTitle(event.target.value)
+    }
+
 
     useEffect(() => {
         showById()
@@ -62,20 +69,28 @@ const Edit = () => {
 
     const updateData = async (event) => {
         event.preventDefault()
-        Swal.fire({
-            title: 'Success',
-            text: 'data has been updated',
-            icon: 'success'
-        }).then((result) => {
-            if (result.isConfirmed === true) {
-                navigate('/user')
-            }
-        })
-        await axios.patch(api + `/update/${id}`, {
-            email: email,
-            name: name,
-            role: role
-        })
+        // Swal.fire({
+        //     title: 'Success',
+        //     text: 'data has been updated',
+        //     icon: 'success'
+        // }).then((result) => {
+        //     if (result.isConfirmed === true) {
+        //         navigate('/user')
+        //     }
+        // })
+        try {
+            await axios.patch(`http://10.80.7.94:4001/user/update/${id}`, {
+                email: email,
+                name: name,
+                role: role,
+                title_id: optTitle
+            }).then(res => {
+                console.log(res)
+            })
+        } catch (error) {
+            console.log(error)
+        }
+
     }
 
     return (
@@ -113,6 +128,20 @@ const Edit = () => {
                         <option value=''>Open this select menu</option>
                         {opt.map((item, index) =>
                             <option key={item.id} value={item.id}>{item.role_name}</option>
+                        )}
+                    </select>
+                    {errRole && <span className='text-danger'>{errRole}</span>}
+                </div>
+                <div className='mb-3'>
+                    <label htmlFor="role" className='form-label'>Role</label>
+                    <select
+                        value={optTitle}
+                        onChange={handleTitleChange}
+                        name='role'
+                        className="form-select">
+                        <option value=''>Open this select menu</option>
+                        {title.map((item, index) =>
+                            <option key={item.id} value={item.id}>{item.title_name}</option>
                         )}
                     </select>
                     {errRole && <span className='text-danger'>{errRole}</span>}
