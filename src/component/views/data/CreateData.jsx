@@ -31,6 +31,7 @@ const CreateData = () => {
     const [purposes, setPurposes] = useState('')
     const [startDate, setStartDate] = useState('')
     const [endDate, setEndDate] = useState('')
+    const [days, setDays] = useState(0)
     const { user } = useAuthContext()
     const navigate = useNavigate()
 
@@ -51,7 +52,6 @@ const CreateData = () => {
         getManager()
     }, [])
 
-
     const handleChangeTravel = (event) => {
         const data = event.target.value
         setTravel(data)
@@ -63,13 +63,31 @@ const CreateData = () => {
     }
 
     const handleChangeStartDate = (event) => {
-        const data = event.target.value
-        setStartDate(data)
+        setStartDate(event.target.value)
+    }
+
+    const handleBlurStart = () => {
+        if (startDate !== '' && endDate !== '') {
+            const date1 = new Date(startDate)
+            const date2 = new Date(endDate)
+            const dtime = date2.getTime() - date1.getTime()
+            const diff = dtime / (1000 * 60 * 60 * 24)
+            setDays(diff)
+        }
     }
 
     const handleChangeEndDate = (event) => {
-        const data = event.target.value
-        setEndDate(data)
+        setEndDate(event.target.value)
+    }
+
+    const handleBlurEnd = () => {
+        if (startDate !== '' && endDate !== '') {
+            const date1 = new Date(startDate)
+            const date2 = new Date(endDate)
+            const dtime = date2.getTime() - date1.getTime()
+            const diff = dtime / (1000 * 60 * 60 * 24)
+            setDays(diff)
+        }
     }
 
     const handleChangeTransport = (event) => {
@@ -117,7 +135,6 @@ const CreateData = () => {
         setDelegate(data)
     }
 
-
     useEffect(() => {
         const getPrj = async (event) => {
             await axios.get(`http://10.80.7.94:4001/user/prj`)
@@ -140,6 +157,9 @@ const CreateData = () => {
 
     const handleHotelChange = (event) => {
         setHotel(event.target.value)
+        if (event.target.value === 'NaN') {
+            setHotel(0)
+        }
     }
 
     const handleUserChange = async (event) => {
@@ -173,6 +193,8 @@ const CreateData = () => {
         }
         getUser()
     }, [])
+
+    console.log(totals)
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -219,6 +241,8 @@ const CreateData = () => {
             }
         })
     }
+
+    console.log(days)
 
     return (
         <div>
@@ -273,11 +297,15 @@ const CreateData = () => {
                     </div>
                     <div className="col-md-3">
                         <label htmlFor="start_date" className="form-label">Start Date</label>
-                        <input type="date" value={startDate} onChange={handleChangeStartDate} className="form-control" id="start_date" />
+                        <input type="date" value={startDate} onChange={handleChangeStartDate} onBlur={handleBlurStart} className="form-control" id="start_date" />
                     </div>
                     <div className="col-md-3">
                         <label htmlFor="end_date" className="form-label">End Date</label>
-                        <input type="date" value={endDate} onChange={handleChangeEndDate} className="form-control" id="end_date" />
+                        <input type="date" value={endDate} onChange={handleChangeEndDate} onBlur={handleBlurEnd} className="form-control" id="end_date" />
+                    </div>
+                    <div className="col-md-3">
+                        <label htmlFor="end_date" className="form-label">Days</label>
+                        <input type="text" value={days} className="form-control" readOnly />
                     </div>
                     <div className="col-md-3">
                         <label htmlFor="purposes" className="form-label">Purposes Business Trip</label>
@@ -340,9 +368,9 @@ const CreateData = () => {
                         <label htmlFor="Others" className="form-label">Others</label>
                         <input type="text" value={others} onChange={handleChangeOthers} className="form-control" id="Others" />
                     </div>
-                    <div className='col-md-6'>
+                    <div className='col-md-3'>
                         <label htmlFor="Others" className="form-label">Total Received</label>
-                        <input type="text" value={IDRCurrency.format(totals)} className="form-control" id="Others" readOnly />
+                        <input type="text" value={totals.toLocaleString().split(',').join('.')} className="form-control" id="Others" readOnly />
                     </div>
                     <div>
                         <button type='submit' className='btn btn-primary'>Submit</button>

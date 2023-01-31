@@ -4,8 +4,10 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import ReactPaginate from 'react-paginate'
 import { useAuthContext } from '../../../hooks/useAuthContext.js'
+import { PDFDownloadLink } from '@react-pdf/renderer'
+import Report from '../../Report.jsx'
 
-const User = () => {
+const User = ({ selectedUser }) => {
 
     const [users, setUsers] = useState([])
     const [pages, setPages] = useState(0)
@@ -15,6 +17,12 @@ const User = () => {
     const [limit, setLimit] = useState(10)
     const [keyword, setkeyword] = useState('')
     const { user } = useAuthContext()
+
+    useEffect(() => {
+        if (user) {
+            getData()
+        }
+    }, [page, keyword, user])
 
     const getData = async () => {
         await axios.get(`http://10.80.7.94:4001/user/show?query=${keyword}&page=${page}&limit=${limit}`, {
@@ -33,12 +41,6 @@ const User = () => {
             alert(error.response)
         })
     }
-
-    useEffect(() => {
-        if (user) {
-            getData()
-        }
-    }, [page, keyword, user])
 
     const changePage = ({ selected }) => {
         setPage(selected)
@@ -71,7 +73,6 @@ const User = () => {
         })
         await axios.delete(`http://10.80.7.94:4001/user/delete/${id}`)
     }
-
 
     return (
         <div className='px-5'>
@@ -114,7 +115,6 @@ const User = () => {
                                 <button className='btn btn-danger ml-1' onClick={() => deleteUser(item.id)}>Delete</button>
                             </td>
                         </tr>
-
                     )}
                 </tbody>
             </table>

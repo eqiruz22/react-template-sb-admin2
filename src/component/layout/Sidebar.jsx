@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuthContext } from '../../hooks/useAuthContext'
 
 const Sidebar = () => {
 
     const [activeNav, setActiveNav] = useState('')
+    const { user } = useAuthContext()
 
     const handleActive = (navItem) => {
         setActiveNav(navItem)
@@ -38,29 +40,47 @@ const Sidebar = () => {
                     <div id="collapseTwo" className="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                         <div className="bg-white py-2 collapse-inner rounded">
                             <h6 className="collapse-header">List</h6>
-                            <Link className={activeNav === '/data' ? 'collapse-item active' : 'collapse-item'}
-                                onClick={() => handleActive('/data')} to="/data">Data</Link>
-                            <Link className={activeNav === '/user' ? 'collapse-item active' : 'collapse-item'}
-                                onClick={() => handleActive('/user')} to="/user">User</Link>
-                            <Link className={activeNav === '/title' ? 'collapse-item active' : 'collapse-item'}
-                                onClick={() => handleActive('/title')} to="/title">Title</Link>
+                            {user['role'] === 1 && (
+                                <div>
+                                    <Link className={activeNav === '/data' ? 'collapse-item active' : 'collapse-item'}
+                                        onClick={() => handleActive('/data')} to="/data">Data</Link>
+                                    <Link className={activeNav === '/user' ? 'collapse-item active' : 'collapse-item'}
+                                        onClick={() => handleActive('/user')} to="/user">User</Link>
+                                    <Link className={activeNav === '/title' ? 'collapse-item active' : 'collapse-item'}
+                                        onClick={() => handleActive('/title')} to="/title">Title</Link>
+                                </div>
+                            )}
+                            {user['role'] !== 1 && (
+                                <div>
+                                    <Link className={activeNav === '/data' ? 'collapse-item active' : 'collapse-item'}
+                                        onClick={() => handleActive('/data')} to="/data">Data</Link>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </li>
-                <li className={activeNav === '/waiting-to-approve-manager' ? 'nav-item active' : 'nav-item'}
-                    onClick={() => handleActive('/waiting-to-approve-manager')}
-                >
-                    <Link className="nav-link" to="/waiting-to-approve-manager">
-                        <i className="fas fa-solid fa-clipboard" />
-                        <span> Perdin</span></Link>
-                </li>
-                <li className={activeNav === '/waiting-to-approve-director' ? 'nav-item active' : 'nav-item'}
-                    onClick={() => handleActive('/waiting-to-approve-director')}
-                >
-                    <Link className="nav-link" to="/waiting-to-approve-director">
-                        <i className="fas fa-solid fa-clipboard" />
-                        <span> Perdin</span></Link>
-                </li>
+                {user['role'] === 1 && user['title_id'] === 3 && (
+                    <div>
+                        <li className={activeNav === '/waiting-to-approve-manager' ? 'nav-item active' : 'nav-item'}
+                            onClick={() => handleActive('/waiting-to-approve-manager')}
+                        >
+                            <Link className="nav-link" to="/waiting-to-approve-manager">
+                                <i className="fas fa-solid fa-clipboard" />
+                                <span> Perdin list Manager</span></Link>
+                        </li>
+                    </div>
+                )}
+                {user['role'] === 1 && user['title_id'] === 19 && (
+                    <div>
+                        <li className={activeNav === '/waiting-to-approve-director' ? 'nav-item active' : 'nav-item'}
+                            onClick={() => handleActive('/waiting-to-approve-director')}
+                        >
+                            <Link className="nav-link" to="/waiting-to-approve-director">
+                                <i className="fas fa-solid fa-clipboard" />
+                                <span> Perdin list Director</span></Link>
+                        </li>
+                    </div>
+                )}
             </ul>
 
         </div>

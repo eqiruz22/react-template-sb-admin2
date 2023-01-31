@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { PDFDownloadLink } from '@react-pdf/renderer'
+import Report from '../../Report'
 
-const Main = () => {
+const Main = ({ selectedUser }) => {
 
     const [perdin, setPerdin] = useState([])
 
@@ -10,6 +12,7 @@ const Main = () => {
             await fetch('http://10.80.7.94:4001/user/perdin-show')
                 .then(res => res.json())
                 .then(result => {
+                    console.log(result)
                     setPerdin(result.result)
                 }).catch(err => {
                     console.log(err)
@@ -56,7 +59,14 @@ const Main = () => {
                             <td>{item.proses}</td>
                             <td>
                                 <button disabled={item.status_id === 1 ? false : true} className='btn btn-warning'>Edit</button>
-                                <button disabled={item.status_id !== 1 ? true : false} className='btn btn-danger ml-1'>Delete</button>
+                                <button disabled={item.status_id !== 1 ? true : false} className='btn btn-danger ml-1 mr-1'>Delete</button>
+                                <button className='btn btn-success'>
+                                    <PDFDownloadLink document={<Report key={item.id} selectedUser={item} />} fileName={`perdin_${item.name}-${item.prj_name}.pdf`}>
+                                        {({ blob, url, loading, error }) =>
+                                            loading ? 'Loading' : 'Download'
+                                        }
+                                    </PDFDownloadLink>
+                                </button>
                             </td>
                         </tr>
                     )}
