@@ -2,12 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PDFDownloadLink } from '@react-pdf/renderer'
 import Report from '../../Report'
-import { useAuthContext } from '../../../hooks/useAuthContext'
 
 const Main = ({ selectedUser }) => {
 
     const [perdin, setPerdin] = useState([])
-    const { user } = useAuthContext()
 
     useEffect(() => {
         const showPerdin = async () => {
@@ -37,14 +35,8 @@ const Main = ({ selectedUser }) => {
                         <input type="text" className="form-control" placeholder="Search for" />
                     </form>
                 </div>
-                {user['role'] === 1 && (
-                    <Link to="/data/create" className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                        className="fas fa-plus fa-sm text-white-50"></i> Create Data</Link>
-                )}
-                {user['role'] === 2 && (
-                    <Link to={`/data/create/${user['id']}`} className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                        className="fas fa-plus fa-sm text-white-50"></i> Create Data</Link>
-                )}
+                <Link to="/data/create" className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                    className="fas fa-plus fa-sm text-white-50"></i> Create Perdin</Link>
             </div>
             <table className='table table-striped'>
                 <thead>

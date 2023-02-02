@@ -43,7 +43,9 @@ const Sidebar = () => {
                             {user['role'] === 1 && (
                                 <div>
                                     <Link className={activeNav === '/data' ? 'collapse-item active' : 'collapse-item'}
-                                        onClick={() => handleActive('/data')} to="/data">Data</Link>
+                                        onClick={() => handleActive('/data')} to="/data">Perdin Bulanan</Link>
+                                    <Link className={activeNav === '/data/harian' ? 'collapse-item active' : 'collapse-item'}
+                                        onClick={() => handleActive('/data/harian')} to="/data/harian">Perdin Harian</Link>
                                     <Link className={activeNav === '/user' ? 'collapse-item active' : 'collapse-item'}
                                         onClick={() => handleActive('/user')} to="/user">User</Link>
                                     <Link className={activeNav === '/title' ? 'collapse-item active' : 'collapse-item'}
@@ -52,8 +54,8 @@ const Sidebar = () => {
                             )}
                             {user['role'] !== 1 && (
                                 <div>
-                                    <Link className={activeNav === '/data' ? 'collapse-item active' : 'collapse-item'}
-                                        onClick={() => handleActive('/data')} to="/data">Data</Link>
+                                    <Link className={activeNav === '/data/harian' ? 'collapse-item active' : 'collapse-item'}
+                                        onClick={() => handleActive('/data/harian')} to="/data/harian">Perdin Harian</Link>
                                 </div>
                             )}
                         </div>

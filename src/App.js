@@ -14,6 +14,7 @@ import DirectorView from "./component/views/approval/DirectorView";
 import Login from "./component/views/Login";
 import { useAuthContext } from "./hooks/useAuthContext";
 import CreateDataById from "./component/views/data/CreateDataById";
+import MainDaily from "./component/views/data/MainDaily";
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
           <Route path="/" element={user ? <MainLayout /> : <Navigate to='/login' />}>
             <Route index element={user ? <Dashboard /> : <Navigate to='/login' />} />
             <Route path='data' element={<MainData />} />
+            <Route path='data/harian' element={<MainDaily />} />
             <Route path='data/create' element={<CreateData />} />
             <Route path='data/create/:id' element={<CreateDataById />} />
             <Route path='user' element={<User />} />
