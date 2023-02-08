@@ -4,25 +4,32 @@ import { Link } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import axios from 'axios'
 import Spinner from '../../layout/Spinner'
+import ReactPaginate from 'react-paginate'
 
 const Main = () => {
 
     const [title, setTitle] = useState([])
     const [loading, setLoading] = useState(true)
-
+    const [keyword, setkeyword] = useState('')
+    const [page, setPage] = useState(0)
+    const [limit, setLimit] = useState(10)
+    const [query, setQuery] = useState('')
+    const [row, setRow] = useState([])
 
     const showTitle = async () => {
-        await axios('http://localhost:4001/user/title')
+        await axios(`http://localhost:4001/user/title?query=${keyword}&page=${page}&limit=${limit}`)
             .then(res => {
                 setTitle(res.data.value)
                 setLoading(false)
+                setLimit(res.data.limit)
+                setRow(res.data.row)
             }).catch(err => {
                 console.log(err)
             })
     }
     useEffect(() => {
         showTitle()
-    }, [])
+    }, [keyword, page])
 
     let IDRCurrency = new Intl.NumberFormat('id-ID', {
         style: 'currency',
@@ -55,13 +62,23 @@ const Main = () => {
         return <Spinner />
     }
 
+    const changePage = ({ selected }) => {
+        setPage(selected)
+    }
+
+    const search = (e) => {
+        e.preventDefault()
+        setPage(0)
+        setkeyword(query)
+    }
+
     return (
         <div className='px-5'>
             <div className="d-sm-flex align-items-center justify-content-between mb-4">
                 <h1 className="h3 mb-0 text-gray-800">Title</h1>
                 <div className='d-sm-flex align-items-center mr-5'>
-                    <form>
-                        <input type="text" className="form-control" placeholder="Search for" />
+                    <form onSubmit={search}>
+                        <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} className="form-control" placeholder="Search for" />
                     </form>
                 </div>
                 <Link to='/title/create'>
@@ -104,12 +121,12 @@ const Main = () => {
                 </tbody>
             </Table>
             <div className='d-sm-flex align-items-center justify-content-between'>
-                <p>Total Data : </p>
-                {/* <nav aria-label="Page navigation example" key={rows}>
+                <p>Total Data : {row}</p>
+                <nav aria-label="Page navigation example" key={row}>
                     <ReactPaginate
                         previousLabel={"<<"}
                         nextLabel={">>"}
-                        pageCount={pages}
+                        pageCount={page}
                         onPageChange={changePage}
                         containerClassName={"pagination"}
                         pageLinkClassName={"page-link"}
@@ -118,7 +135,7 @@ const Main = () => {
                         activeLinkClassName={"page-item active"}
                         disabledLinkClassName={"page-item disabled"}
                     />
-                </nav> */}
+                </nav>
             </div>
 
         </div>

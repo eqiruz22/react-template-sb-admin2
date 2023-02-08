@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 import axios from 'axios'
 import Swal from "sweetalert2";
+import ReactPaginate from 'react-paginate'
 
 const MainPrj = () => {
     const [show, setShow] = useState(false)
@@ -14,6 +15,11 @@ const MainPrj = () => {
     const [valPrj, setValPrj] = useState('')
     const [valStatus, setValStatus] = useState('')
     const [idPrj, setIdPrj] = useState('')
+    const [keyword, setkeyword] = useState('')
+    const [page, setPage] = useState(0)
+    const [limit, setLimit] = useState(10)
+    const [query, setQuery] = useState('')
+    const [row, setRow] = useState([])
     const handleClose = () => setShow(false)
     const handleOpen = () => setShow(true)
 
@@ -32,14 +38,17 @@ const MainPrj = () => {
 
     useEffect(() => {
         getPrj()
-    }, [])
+    }, [page, keyword])
 
 
     const getPrj = async () => {
-        await axios.get('http://localhost:4001/user/prj')
+        await axios.get(`http://localhost:4001/user/prj?query=${keyword}&page=${page}&limit=${limit}`)
             .then(res => {
                 console.log(res)
                 setData(res.data.result)
+                setPage(res.data.page)
+                setLimit(res.data.limit)
+                setRow(res.data.row)
             }).catch(error => {
                 console.log(error)
             })
@@ -88,13 +97,68 @@ const MainPrj = () => {
 
     }
 
+    const handleUpdatePrj = async (e) => {
+        e.preventDefault()
+        await axios.patch(`http://localhost:4001/user/prj/update/${idPrj}`, {
+            prj_name: valPrj,
+            status: valStatus
+        }).then(res => {
+            console.log(res)
+            Swal.fire({
+                title: 'Success',
+                text: `${res.data.message}`,
+                icon: 'success'
+            })
+            handleEditClose()
+            getPrj()
+        }).catch(error => {
+            console.log(error)
+        })
+    }
+
+    const handleDeletePrj = async (id) => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire(
+                    'Deleted!',
+                    'Your data has been deleted.',
+                    'success'
+                )
+                getPrj()
+            }
+        })
+        await axios.delete(`http://localhost:4001/user/prj/delete/${id}`)
+            .then(res => {
+                console.log(res)
+            }).catch(error => {
+                console.log(error)
+            })
+    }
+    const changePage = ({ selected }) => {
+        setPage(selected)
+    }
+
+    const searchData = (e) => {
+        e.preventDefault()
+        setPage(0)
+        setkeyword(query)
+    }
+
     return (
         <div className='px-5'>
             <div className="d-sm-flex align-items-center justify-content-between mb-4">
                 <h1 className="h3 mb-0 text-gray-800">Data PRJ</h1>
                 <div className='d-sm-flex align-items-center mr-5'>
-                    <form>
-                        <input type="text" className="form-control" placeholder="Search for" />
+                    <form onSubmit={searchData}>
+                        <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} className="form-control" placeholder="Search for" />
                     </form>
                 </div>
                 <button onClick={handleOpen} className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
@@ -118,12 +182,29 @@ const MainPrj = () => {
                                 <td>{item.status}</td>
                                 <td>
                                     <button className='btn btn-warning' onClick={() => handleEdit(item.id)}>Edit</button>
-                                    <button className='btn btn-danger ml-1'>Delete</button>
+                                    <button className='btn btn-danger ml-1' onClick={() => handleDeletePrj(item.id)}>Delete</button>
                                 </td>
                             </tr>
                         )}
                     </tbody>
                 </table>
+                <div className='d-sm-flex align-items-center justify-content-between'>
+                    <p>Total Data : {row}</p>
+                    <nav aria-label="Page navigation example" key={row}>
+                        <ReactPaginate
+                            previousLabel={"<<"}
+                            nextLabel={">>"}
+                            pageCount={page}
+                            onPageChange={changePage}
+                            containerClassName={"pagination"}
+                            pageLinkClassName={"page-link"}
+                            previousLinkClassName={"page-link"}
+                            nextLinkClassName={"page-link"}
+                            activeLinkClassName={"page-item active"}
+                            disabledLinkClassName={"page-item disabled"}
+                        />
+                    </nav>
+                </div>
             </div>
 
             {/* Modal Create */}
@@ -166,7 +247,7 @@ const MainPrj = () => {
                 <Modal.Header closeButton>
                     <Modal.Title>Edit PRJ</Modal.Title>
                 </Modal.Header>
-                <form onSubmit={handleSubmitPrj}>
+                <form onSubmit={handleUpdatePrj}>
                     <Modal.Body>
                         <div className="mb-3 mt-3">
                             <label>PRJ Name</label>
