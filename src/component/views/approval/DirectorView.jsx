@@ -7,7 +7,7 @@ const DirectorView = () => {
     const [perdin, setPerdin] = useState([])
 
     const getPerdin = async () => {
-        await fetch('http://10.80.7.94:4001/user/waiting-approve-director')
+        await fetch('http://localhost:4001/user/waiting-approve-director')
             .then(res => res.json())
             .then(res => {
                 console.log(res.result)
@@ -26,7 +26,7 @@ const DirectorView = () => {
     }, [])
 
     const handleApproval = (id, perdin_id) => {
-        axios.post('http://10.80.7.94:4001/user/approved-director', {
+        axios.post('http://localhost:4001/user/approved-director', {
             id: id,
             perdin_id: perdin_id
         }).then(res => {

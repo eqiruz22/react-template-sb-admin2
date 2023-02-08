@@ -23,7 +23,7 @@ const User = ({ selectedUser }) => {
     }, [page, keyword, user])
 
     const getData = async () => {
-        await axios.get(`http://10.80.7.94:4001/user/show?query=${keyword}&page=${page}&limit=${limit}`, {
+        await axios.get(`http://localhost:4001/user/show?query=${keyword}&page=${page}&limit=${limit}`, {
             headers: {
                 'Authorization': `Bearer ${user['token']}`
             }
@@ -69,7 +69,7 @@ const User = ({ selectedUser }) => {
                 getData()
             }
         })
-        await axios.delete(`http://10.80.7.94:4001/user/delete/${id}`)
+        await axios.delete(`http://localhost:4001/user/delete/${id}`)
     }
 
     return (

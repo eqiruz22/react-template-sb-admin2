@@ -12,7 +12,7 @@ const Main = () => {
 
 
     const showTitle = async () => {
-        await axios('http://10.80.7.94:4001/user/title')
+        await axios('http://localhost:4001/user/title')
             .then(res => {
                 setTitle(res.data.value)
                 setLoading(false)
@@ -48,7 +48,7 @@ const Main = () => {
                 showTitle()
             }
         })
-        await axios.delete(`http://10.80.7.94:4001/user/title/delete/${id}`)
+        await axios.delete(`http://localhost:4001/user/title/delete/${id}`)
     }
 
     if (loading) {

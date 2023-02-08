@@ -13,7 +13,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault()
     try {
-      await axios.post('http://10.80.7.94:4001/user/login', {
+      await axios.post('http://localhost:4001/user/login', {
         email: email,
         password: password
       }).then(res => {

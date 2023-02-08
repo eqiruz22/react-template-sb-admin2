@@ -2,6 +2,7 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useAuthContext } from '../../../hooks/useAuthContext'
+import Select from 'react-select'
 
 const CreateDataById = () => {
     const [title, setTitle] = useState('')
@@ -29,6 +30,8 @@ const CreateDataById = () => {
     const [manager, setManager] = useState([])
     const [prj, setPrj] = useState([])
     const { id } = useParams()
+    const [first, setFirst] = useState('')
+    const [second, setSecond] = useState('')
     const [errHotel, setErrHotel] = useState('')
     const [errPurposes, setErrPurposes] = useState('')
     const [errStart, setErrStart] = useState('')
@@ -71,7 +74,9 @@ const CreateDataById = () => {
         try {
             await axios.get('http://localhost:4001/user/show-manager')
                 .then(res => {
-                    setManager(res.data.result)
+                    const opt = res.data.result.map(item => ({ value: item.name, label: item.name }))
+                    console.log(opt)
+                    setManager(opt)
                 })
         } catch (error) {
             console.log(error)
@@ -82,7 +87,9 @@ const CreateDataById = () => {
         try {
             await axios.get('http://localhost:4001/user/prj')
                 .then(res => {
-                    setPrj(res.data.result)
+                    const opt = res.data.result.map(item => ({ value: item.id, label: item.prj_name }))
+
+                    setPrj(opt)
                 })
         } catch (error) {
             console.log(error)
@@ -110,22 +117,13 @@ const CreateDataById = () => {
         setTitle(e.target.value)
     }
 
-    const handleChangePrj = (e) => {
-        setPrjval(e.target.value)
-        if (e.target.value === 'Choose one') {
-            setErrPrj('this field is required')
-        } else {
-            setErrPrj('')
-        }
+    const handleChangePrj = (selectedOption) => {
+        setPrjval(selectedOption)
+        // console.log(selectedOption.value)
     }
 
-    const handleChangeApproval = (e) => {
-        setApproval(e.target.value)
-        if (e.target.value === 'Choose one') {
-            setErrApproval('this field is required')
-        } else {
-            setErrApproval('')
-        }
+    const handleChangeApproval = (selectedOption) => {
+        setApproval(selectedOption)
     }
 
     const handleChangeTravel = (e) => {
@@ -214,24 +212,35 @@ const CreateDataById = () => {
         setOther(e.target.value)
     }
 
-    const totals = parseFloat(meal) + parseFloat(car) + parseFloat(pulsa) + parseFloat(rent) + parseFloat(hardship) + parseFloat(hotel) + parseFloat(transportation) + parseFloat(local) + parseFloat(airfare) + parseFloat(airport) + parseFloat(entertainment) + parseFloat(tools) + parseFloat(other)
-
     const date1 = new Date(start)
     const date2 = new Date(end)
     const dtime = date2.getTime() - date1.getTime()
     const diff = dtime / (1000 * 60 * 60 * 24)
-    const days = diff
+    const days = Math.max(diff, 0)
+
+    var total = 0
+
+    if (days === 0) {
+        total = parseFloat(meal) + parseFloat(car) + parseFloat(pulsa) + parseFloat(rent) + parseFloat(hardship) + parseFloat(hotel) + parseFloat(transportation) + parseFloat(local) + parseFloat(airfare) + parseFloat(airport) + parseFloat(entertainment) + parseFloat(tools) + parseFloat(other)
+    } else {
+        total = parseFloat(meal * days) + parseFloat(car * days) + parseFloat(pulsa * days) + parseFloat(rent * days) + parseFloat(hardship * days) + parseFloat(hotel) + parseFloat(transportation) + parseFloat(local) + parseFloat(airfare) + parseFloat(airport) + parseFloat(entertainment) + parseFloat(tools) + parseFloat(other)
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         await axios.post('http://10.80.7.94:4001/user/perdin-daily', {
-            prj_id: prjval,
+            prj_id: prjval['value'],
             user_id: user['id'],
             title_name: title,
-            delegate_approval: approval,
+            delegate_approval: approval['value'],
             official_travel_site: travel,
             purposes: purposes,
             hotel: hotel,
+            rent_house: rent,
+            meal_allowance: meal,
+            hardship_allowance: hardship,
+            pulsa_allowance: pulsa,
+            car_rent: car,
             transport: transportation,
             local_transport: local,
             airfare: airfare,
@@ -243,13 +252,12 @@ const CreateDataById = () => {
             fee_support: fee,
             tools: tools,
             others: other,
-            total_received: totals
+            total_received: total
         }).then(res => {
             console.log(res)
         }).catch(err => {
             console.log(err)
         })
-        console.log(prjval, user['id'], title, approval, travel, purposes, hotel, transportation, local, airfare, airport, entertainment, start, end, days, fee, tools, other, totals)
     }
 
     return (
@@ -266,30 +274,12 @@ const CreateDataById = () => {
                     </div>
                     <div className="col-md-3">
                         <label htmlFor="prj" className="form-label">PRJ</label>
-                        <select
-                            className='form-select'
-                            value={prjval}
-                            onChange={handleChangePrj}
-                        >
-                            <option defaultValue={''}>Choose one</option>
-                            {prj.map((item, index) =>
-                                <option key={index} value={item.id}>{item.prj_name}</option>
-                            )}
-                        </select>
+                        <Select value={prjval} onChange={handleChangePrj} options={prj} />
                         {errPrj && <span className='text-danger'>{errPrj}</span>}
                     </div>
                     <div className="col-md-3">
                         <label htmlFor="prj" className="form-label">Delegate Approval</label>
-                        <select
-                            className='form-select'
-                            value={approval}
-                            onChange={handleChangeApproval}
-                        >
-                            <option defaultValue={''}>Choose one</option>
-                            {manager.map((item, index) =>
-                                <option key={index} value={item.id}>{item.name}</option>
-                            )}
-                        </select>
+                        <Select onChange={handleChangeApproval} options={manager} />
                         {errApproval && <span className='text-danger'>{errApproval}</span>}
                     </div>
                     <div className="col-md-3">
@@ -376,7 +366,7 @@ const CreateDataById = () => {
                     </div>
                     <div className='col-md-3'>
                         <label htmlFor="Others" className="form-label">Total Received</label>
-                        <input type="text" value={totals.toLocaleString().split(',').join('.')} className="form-control" id="Others" readOnly />
+                        <input type="text" value={total.toLocaleString().split(',').join('.')} className="form-control" id="Others" readOnly />
                     </div>
                     <div>
                         <button type='submit' className='btn btn-primary'>Submit</button>

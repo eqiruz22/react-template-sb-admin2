@@ -18,9 +18,9 @@ const Edit = () => {
     const navigate = useNavigate()
 
     const showById = async () => {
-        const response = await axios.get(`http://10.80.7.94:4001/user/show/${id}`)
-        const response1 = await axios.get('http://10.80.7.94:4001/user/role')
-        const response2 = await axios.get('http://10.80.7.94:4001/user/title')
+        const response = await axios.get(`http://localhost:4001/user/show/${id}`)
+        const response1 = await axios.get('http://localhost:4001/user/role')
+        const response2 = await axios.get('http://localhost:4001/user/title')
         setEmail(response.data.value[0].email)
         setName(response.data.value[0].name)
         setRole(response.data.value[0].role)
@@ -79,7 +79,7 @@ const Edit = () => {
         //     }
         // })
         try {
-            await axios.patch(`http://10.80.7.94:4001/user/update/${id}`, {
+            await axios.patch(`http://localhost:4001/user/update/${id}`, {
                 email: email,
                 name: name,
                 role: role,

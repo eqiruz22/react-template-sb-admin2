@@ -42,7 +42,7 @@ const CreateData = () => {
 
     useEffect(() => {
         const getManager = async () => {
-            await axios.get('http://10.80.7.94:4001/user/show-manager')
+            await axios.get('http://localhost:4001/user/show-manager')
                 .then(res => {
                     setUserM(res.data.result)
                 }).catch(error => {
@@ -137,7 +137,7 @@ const CreateData = () => {
 
     useEffect(() => {
         const getPrj = async (event) => {
-            await axios.get(`http://10.80.7.94:4001/user/prj`)
+            await axios.get(`http://localhost:4001/user/prj`)
                 .then(res => {
                     setPrj(res.data.result)
                 })
@@ -164,7 +164,7 @@ const CreateData = () => {
 
     const handleUserChange = async (event) => {
         const id = event.target.value
-        await axios.get(`http://10.80.7.94:4001/user/show/title-user/${id}`)
+        await axios.get(`http://localhost:4001/user/show/title-user/${id}`)
             .then(res => {
                 setTitle(res.data['title_name'])
                 setCar(res.data['car_rent'])
@@ -180,7 +180,7 @@ const CreateData = () => {
 
     useEffect(() => {
         const getUser = async () => {
-            await axios.get('http://10.80.7.94:4001/user/show', {
+            await axios.get('http://localhost:4001/user/show', {
                 headers: {
                     'Authorization': `Bearer ${user['token']}`
                 }
@@ -197,7 +197,7 @@ const CreateData = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        await axios.post('http://10.80.7.94:4001/user/perdin-create', {
+        await axios.post('http://localhost:4001/user/perdin-create', {
             prj_id: vlPrj,
             user_id: name,
             title_name: title,

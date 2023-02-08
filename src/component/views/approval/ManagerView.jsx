@@ -7,7 +7,7 @@ const Main = () => {
     const [perdin, setPerdin] = useState([])
 
     const showPerdin = async () => {
-        await fetch('http://10.80.7.94:4001/user/waiting-approve-manager')
+        await fetch('http://localhost:4001/user/waiting-approve-manager')
             .then(res => res.json())
             .then(result => {
                 console.log(result)
@@ -26,7 +26,7 @@ const Main = () => {
     })
 
     const updateApproval = (id, perdin_id, prj_id, user_id, status_id) => {
-        axios.post('http://10.80.7.94:4001/user/approved-manager', {
+        axios.post('http://localhost:4001/user/approved-manager', {
             id: id,
             perdin_id: perdin_id,
             prj_id: prj_id,

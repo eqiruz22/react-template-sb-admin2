@@ -76,7 +76,7 @@ const EditTitle = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault()
-        await axios.patch(`http://10.80.7.94:4001/user/title/update/${id}`, {
+        await axios.patch(`http://localhost:4001/user/title/update/${id}`, {
             title: title,
             meal: meal,
             rent: rent,
@@ -110,7 +110,7 @@ const EditTitle = () => {
 
     useEffect(() => {
         const getData = async () => {
-            await axios.get(`http://10.80.7.94:4001/user/title/${id}`)
+            await axios.get(`http://localhost:4001/user/title/${id}`)
                 .then(res => {
                     setTitle(res.data.value[0]['title_name'])
                     setMeal(res.data.value[0]['meal_allowance'])
