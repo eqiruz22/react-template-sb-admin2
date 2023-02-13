@@ -22,17 +22,9 @@ const Navbar = () => {
                         <img alt='' className="img-profile rounded-circle" src='img/undraw_profile.svg' />
                     </Link>
                     <div className="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                        <Link className="dropdown-item" to="#">
+                        <Link className="dropdown-item" to={`/user/edit/${user['id']}`}>
                             <i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400" />
                             Profile
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                            <i className="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400" />
-                            Settings
-                        </Link>
-                        <Link className="dropdown-item" to="#">
-                            <i className="fas fa-list fa-sm fa-fw mr-2 text-gray-400" />
-                            Activity Log
                         </Link>
                         <div className="dropdown-divider" />
                         <button onClick={handleLogout} className="dropdown-item">

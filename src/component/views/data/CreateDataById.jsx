@@ -119,7 +119,6 @@ const CreateDataById = () => {
 
     const handleChangePrj = (selectedOption) => {
         setPrjval(selectedOption)
-        // console.log(selectedOption.value)
     }
 
     const handleChangeApproval = (selectedOption) => {

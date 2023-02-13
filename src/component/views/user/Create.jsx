@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-
-const api = 'http://localhost:4001/user'
+import Select from 'react-select'
 
 const Create = () => {
 
@@ -20,14 +19,23 @@ const Create = () => {
     const [errPassword, setErrPassword] = useState('')
     const navigate = useNavigate()
 
+    useEffect(() => {
+        getTitle()
+    }, [])
+
+    useEffect(() => {
+        getRole()
+    }, [])
+
+
     const submitData = async (e) => {
         e.preventDefault()
-        await axios.post(api + '/create', {
+        await axios.post('http://localhost:4001/user/create', {
             email: email,
             name: name,
             password: password,
             role: op,
-            title_id: titles
+            title_id: titles,
         }).then(res => {
             console.log(res.data.message)
             if (res.status === 201) {
@@ -42,16 +50,18 @@ const Create = () => {
         }).catch(error => {
             console.log(error)
             if (error.response.status === 500) {
-                setErrEmail('Email must be unique')
+                if (error.response.data.error['errno'] === 1062) {
+                    setErrEmail('Email already created')
+                }
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
-                    text: 'Something went wrong, please check another field!',
+                    text: `${error.response.data.message}`,
                 })
             }
+
         })
     }
-
 
     const getTitle = async () => {
         await axios.get('http://localhost:4001/user/title')
@@ -62,12 +72,8 @@ const Create = () => {
             })
     }
 
-    useEffect(() => {
-        getTitle()
-    }, [])
-
     const getRole = async () => {
-        await axios.get(api + '/role')
+        await axios.get('http://localhost:4001/user/role')
             .then(result => {
                 setRole(result.data.value)
             })
@@ -110,10 +116,6 @@ const Create = () => {
             setErrRole('')
         }
     }
-
-    useEffect(() => {
-        getRole()
-    }, [])
 
     const handleTitleChange = (e) => {
         setTitles(e.target.value)

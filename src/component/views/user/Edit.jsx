@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { useAuthContext } from '../../../hooks/useAuthContext';
 
 const Edit = () => {
 
@@ -11,10 +12,12 @@ const Edit = () => {
     const [errName, setErrName] = useState('')
     const [role, setRole] = useState('')
     const [errRole, setErrRole] = useState('')
+    const [password, setPassword] = useState('')
     const [opt, setOpt] = useState([])
     const [title, setTitle] = useState([])
     const [optTitle, setOptTitle] = useState('')
     const { id } = useParams()
+    const { user } = useAuthContext()
     const navigate = useNavigate()
 
     const showById = async () => {
@@ -61,6 +64,10 @@ const Edit = () => {
         setOptTitle(event.target.value)
     }
 
+    const handlePasswordChange = (event) => {
+        setPassword(event.target.value)
+    }
+
 
     useEffect(() => {
         showById()
@@ -69,85 +76,124 @@ const Edit = () => {
 
     const updateData = async (event) => {
         event.preventDefault()
-        // Swal.fire({
-        //     title: 'Success',
-        //     text: 'data has been updated',
-        //     icon: 'success'
-        // }).then((result) => {
-        //     if (result.isConfirmed === true) {
-        //         navigate('/user')
-        //     }
-        // })
-        try {
-            await axios.patch(`http://localhost:4001/user/update/${id}`, {
-                email: email,
-                name: name,
-                role: role,
-                title_id: optTitle
-            }).then(res => {
-                console.log(res)
-            })
-        } catch (error) {
+        await axios.patch(`http://localhost:4001/user/update/${id}`, {
+            email: email,
+            name: name,
+            role: role,
+            title_id: optTitle,
+            password: password,
+            has_role: user['role']
+        }).then(res => {
+            console.log(res)
+        }).catch(error => {
             console.log(error)
-        }
-
+        })
     }
 
     return (
         <div className='container'>
             <h1>Edit User</h1>
             <form onSubmit={updateData}>
-                <div className="mb-3">
-                    <label htmlFor="email" className="form-label">Email address</label>
-                    <input
-                        value={email}
-                        onChange={handleEmailChange}
-                        name='email'
-                        type="email"
-                        className="form-control"
-                    />
-                    {errEmail && <span className='text-danger'>{errEmail}</span>}
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="name" className="form-label">Full Name</label>
-                    <input
-                        value={name}
-                        onChange={handleNameChange}
-                        name='name'
-                        type="text"
-                        className="form-control" />
-                    {errName && <span className='text-danger'>{errName}</span>}
-                </div>
-                <div className='mb-3'>
-                    <label htmlFor="role" className='form-label'>Role</label>
-                    <select
-                        value={role}
-                        onChange={handleRoleChange}
-                        name='role'
-                        className="form-select">
-                        <option value=''>Open this select menu</option>
-                        {opt.map((item, index) =>
-                            <option key={item.id} value={item.id}>{item.role_name}</option>
-                        )}
-                    </select>
-                    {errRole && <span className='text-danger'>{errRole}</span>}
-                </div>
-                <div className='mb-3'>
-                    <label htmlFor="role" className='form-label'>Role</label>
-                    <select
-                        value={optTitle}
-                        onChange={handleTitleChange}
-                        name='role'
-                        className="form-select">
-                        <option value=''>Open this select menu</option>
-                        {title.map((item, index) =>
-                            <option key={item.id} value={item.id}>{item.title_name}</option>
-                        )}
-                    </select>
-                    {errRole && <span className='text-danger'>{errRole}</span>}
-                </div>
-                <button type="submit" className="btn btn-primary mt-3">Submit</button>
+                {user['role'] === 1 && (
+                    <div>
+                        <div className="mb-3">
+                            <label htmlFor="email" className="form-label">Email address</label>
+                            <input
+                                value={email}
+                                onChange={handleEmailChange}
+                                name='email'
+                                type="email"
+                                className="form-control"
+                            />
+                            {errEmail && <span className='text-danger'>{errEmail}</span>}
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="name" className="form-label">Full Name</label>
+                            <input
+                                value={name}
+                                onChange={handleNameChange}
+                                name='name'
+                                type="text"
+                                className="form-control" />
+                            {errName && <span className='text-danger'>{errName}</span>}
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="password" className="form-label">Password</label>
+                            <input
+                                value={password}
+                                onChange={handlePasswordChange}
+                                name='password'
+                                type="password"
+                                className="form-control" />
+                        </div>
+                        <div className='mb-3'>
+                            <label htmlFor="role" className='form-label'>Role</label>
+                            <select
+                                value={role}
+                                onChange={handleRoleChange}
+                                name='role'
+                                className="form-select">
+                                <option value=''>Open this select menu</option>
+                                {opt.map((item, index) =>
+                                    <option key={item.id} value={item.id}>{item.role_name}</option>
+                                )}
+                            </select>
+                            {errRole && <span className='text-danger'>{errRole}</span>}
+                        </div>
+                        <div className='mb-3'>
+                            <label htmlFor="role" className='form-label'>Role</label>
+                            <select
+                                value={optTitle}
+                                onChange={handleTitleChange}
+                                name='role'
+                                className="form-select">
+                                <option value=''>Open this select menu</option>
+                                {title.map((item, index) =>
+                                    <option key={item.id} value={item.id}>{item.title_name}</option>
+                                )}
+                            </select>
+                            {errRole && <span className='text-danger'>{errRole}</span>}
+                        </div>
+                        <button type="submit" className="btn btn-primary mt-3">Submit</button>
+                    </div>
+                )}
+                {user['role'] !== 1 && (
+                    <div>
+                        <div className="mb-3">
+                            <label htmlFor="email" className="form-label">Email address</label>
+                            <input
+                                value={email}
+                                onChange={handleEmailChange}
+                                name='email'
+                                type="email"
+                                className="form-control"
+                            />
+                            {errEmail && <span className='text-danger'>{errEmail}</span>}
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="name" className="form-label">Full Name</label>
+                            <input
+                                value={name}
+                                onChange={handleNameChange}
+                                name='name'
+                                type="text"
+                                className="form-control" />
+                            {errName && <span className='text-danger'>{errName}</span>}
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="password" className="form-label">Password</label>
+                            <input
+                                value={password}
+                                onChange={handlePasswordChange}
+                                name='password'
+                                type="password"
+                                className="form-control" />
+                        </div>
+                        <button type="submit" className="btn btn-primary mt-3">Submit</button>
+                    </div>
+                )}
             </form>
+
         </div>
     )
 }
