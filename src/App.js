@@ -16,6 +16,7 @@ import { useAuthContext } from "./hooks/useAuthContext";
 import CreateDataById from "./component/views/data/CreateDataById";
 import MainDaily from "./component/views/data/MainDaily";
 import MainPrj from "./component/views/prj/MainPrj";
+import MainDivisi from "./component/views/divisi/MainDivisi";
 
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
             <Route path='prj' element={<MainPrj />} />
             <Route path='waiting-to-approve-manager' element={<ManagerView />} />
             <Route path='waiting-to-approve-director' element={<DirectorView />} />
+            <Route path='divisi' element={<MainDivisi />} />
           </Route>
         </Routes>
       </Router>
