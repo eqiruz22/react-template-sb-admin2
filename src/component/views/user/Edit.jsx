@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import Select from 'react-select'
 import { useAuthContext } from '../../../hooks/useAuthContext';
 
 const Edit = () => {
@@ -16,18 +17,40 @@ const Edit = () => {
     const [opt, setOpt] = useState([])
     const [title, setTitle] = useState([])
     const [optTitle, setOptTitle] = useState('')
+    const [divisiVal, setDivisiVal] = useState('')
+    const [divisi, setDivisi] = useState([])
     const { id } = useParams()
     const { user } = useAuthContext()
     const navigate = useNavigate()
+
+    useEffect(() => {
+        showById()
+    }, [])
+
+    useEffect(() => {
+        getDivisi()
+    }, [])
+
+    const getDivisi = async () => {
+        await axios.get('http://localhost:4001/user/divisi')
+            .then(res => {
+                const opt = res.data.result.map(item => ({ value: item.id, label: item.divisi_name }))
+                setDivisi(opt)
+            }).catch(error => {
+                console.log(error)
+            })
+    }
 
     const showById = async () => {
         const response = await axios.get(`http://localhost:4001/user/show/${id}`)
         const response1 = await axios.get('http://localhost:4001/user/role')
         const response2 = await axios.get('http://localhost:4001/user/title')
+        console.log(response)
         setEmail(response.data.value[0].email)
         setName(response.data.value[0].name)
         setRole(response.data.value[0].role)
         setOptTitle(response.data.value[0].title_id)
+        setDivisiVal({ value: response.data.value[0].divisi_id, label: response.data.value[0].divisi_name })
         setOpt(response1.data.value)
         setTitle(response2.data.value)
     }
@@ -68,12 +91,6 @@ const Edit = () => {
         setPassword(event.target.value)
     }
 
-
-    useEffect(() => {
-        showById()
-    }, [])
-
-
     const updateData = async (event) => {
         event.preventDefault()
         await axios.patch(`http://localhost:4001/user/update/${id}`, {
@@ -82,9 +99,15 @@ const Edit = () => {
             role: role,
             title_id: optTitle,
             password: password,
-            has_role: user['role']
+            has_role: user['role'],
+            divisi_id: divisiVal['value']
         }).then(res => {
-            console.log(res)
+            Swal.fire({
+                title: 'Success',
+                text: `${res.data.message}`,
+                icon: 'success'
+            })
+            navigate('/user')
         }).catch(error => {
             console.log(error)
         })
@@ -153,6 +176,10 @@ const Edit = () => {
                                 )}
                             </select>
                             {errRole && <span className='text-danger'>{errRole}</span>}
+                        </div>
+                        <div className='mb-3'>
+                            <label htmlFor='divisi' className='form-label'>Divisi</label>
+                            <Select options={divisi} value={divisiVal} onChange={(selectOption) => setDivisiVal(selectOption)} />
                         </div>
                         <button type="submit" className="btn btn-primary mt-3">Submit</button>
                     </div>

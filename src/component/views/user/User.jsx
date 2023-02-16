@@ -92,6 +92,7 @@ const User = ({ selectedUser }) => {
                         <th scope="colSpan">Name</th>
                         <th scope="colSpan">Role</th>
                         <th scope="colSpan">Title</th>
+                        <th scope="colSpan">Divisi</th>
                         <th scope='colSpan'>Action</th>
                     </tr>
                 </thead>
@@ -104,6 +105,7 @@ const User = ({ selectedUser }) => {
                             <td>{item.name}</td>
                             <td>{item.role_name}</td>
                             <td>{item.title_name}</td>
+                            <td>{item.divisi_name}</td>
                             <td>
                                 <Link
                                     to={`/user/edit/${item.id}`}

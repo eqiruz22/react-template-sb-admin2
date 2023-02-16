@@ -17,6 +17,8 @@ const Create = () => {
     const [errName, setErrName] = useState('')
     const [errEmail, setErrEmail] = useState('')
     const [errPassword, setErrPassword] = useState('')
+    const [divisi, setDivisi] = useState([])
+    const [divisiVal, setDivisiVal] = useState('')
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -27,6 +29,20 @@ const Create = () => {
         getRole()
     }, [])
 
+    useEffect(() => {
+        getDivisi()
+    }, [])
+
+    const getDivisi = async () => {
+        await axios.get('http://localhost:4001/user/divisi')
+            .then(res => {
+                console.log(res)
+                const opt = res.data.result.map(item => ({ value: item.id, label: item.divisi_name }))
+                setDivisi(opt)
+            }).catch(error => {
+                console.log(error)
+            })
+    }
 
     const submitData = async (e) => {
         e.preventDefault()
@@ -36,6 +52,7 @@ const Create = () => {
             password: password,
             role: op,
             title_id: titles,
+            divisi: divisiVal['value']
         }).then(res => {
             console.log(res.data.message)
             if (res.status === 201) {
@@ -43,9 +60,8 @@ const Create = () => {
                     title: 'Success',
                     text: 'Success Create User',
                     icon: 'success'
-                }).then((result) => {
-                    navigate('/user')
                 })
+                navigate('/user')
             }
         }).catch(error => {
             console.log(error)
@@ -121,6 +137,10 @@ const Create = () => {
         setTitles(e.target.value)
     }
 
+    const handleDivisiChange = (selectOption) => {
+        setDivisiVal(selectOption)
+    }
+
     return (
         <div className='container'>
             <h1>Create User</h1>
@@ -181,6 +201,10 @@ const Create = () => {
                         )}
                     </select>
                     {errRole && <span className='text-danger'>{errRole}</span>}
+                </div>
+                <div className='mb-3'>
+                    <label htmlFor='divisi' className='form-label'>Divisi</label>
+                    <Select value={divisiVal} options={divisi} onChange={handleDivisiChange} />
                 </div>
                 <button type='submit' className="btn btn-primary mt-3">Submit</button>
             </form>

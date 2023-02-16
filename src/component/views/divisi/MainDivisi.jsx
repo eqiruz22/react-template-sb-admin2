@@ -3,6 +3,8 @@ import { Modal } from 'react-bootstrap'
 import axios from 'axios'
 import Select from 'react-select'
 import Swal from 'sweetalert2'
+import ReactPaginate from 'react-paginate'
+
 
 const MainDivisi = () => {
     const [showCreate, setShowCreate] = useState(false)
@@ -14,10 +16,16 @@ const MainDivisi = () => {
     const [editName, setEditName] = useState('')
     const [editHead, setEditHead] = useState('')
     const [idDivisi, setIdDivisi] = useState('')
+    const [pages, setPages] = useState(0)
+    const [rows, setRows] = useState([])
+    const [query, setQuery] = useState('')
+    const [page, setPage] = useState(0)
+    const [limit, setLimit] = useState(10)
+    const [keyword, setkeyword] = useState('')
 
     useEffect(() => {
         getDivisiData()
-    }, [])
+    }, [page, keyword])
     useEffect(() => {
         getAllUser()
     }, [])
@@ -31,6 +39,7 @@ const MainDivisi = () => {
         setShowEdit(true)
         await axios.get(`http://localhost:4001/user/divisi/${id}`)
             .then(res => {
+                console.log(res)
                 setIdDivisi(res.data.result[0]['id'])
                 setEditName(res.data.result[0]['divisi_name'])
                 setEditHead({ value: res.data.result[0]['id'], label: res.data.result[0]['name'] })
@@ -40,7 +49,7 @@ const MainDivisi = () => {
     }
 
     const handleDivisiName = (event) => {
-        setDivisiName(event.target.value)
+        setDivisiName(event.target.value.toUpperCase())
     }
 
     const handleDivisiHead = (selectedOption) => {
@@ -58,9 +67,13 @@ const MainDivisi = () => {
     }
 
     const getDivisiData = async () => {
-        await axios.get('http://localhost:4001/user/divisi')
+        await axios.get(`http://localhost:4001/user/divisi-head?query=${keyword}&page=${page}&limit=${limit}`)
             .then(res => {
                 setGetDivisi(res.data.result)
+                setPage(res.data.page)
+                setLimit(res.data.limit)
+                setRows(res.data.row)
+                setPages(res.data.totalPage)
             }).catch(error => {
                 console.log(error)
             })
@@ -131,13 +144,24 @@ const MainDivisi = () => {
         await axios.delete(`http://localhost:4001/user/divisi/${id}`)
     }
 
+    const changePage = ({ selected }) => {
+        setPage(selected)
+    }
+
+    const searchData = (e) => {
+        e.preventDefault()
+        setPage(0)
+        setkeyword(query)
+    }
+
+
     return (
         <div className='px-5'>
             <div className="d-sm-flex align-items-center justify-content-between mb-4">
                 <h1 className="h3 mb-0 text-gray-800">Data Divisi</h1>
                 <div className='d-sm-flex align-items-center mr-5'>
-                    <form>
-                        <input type="text" className="form-control" placeholder="Search for" />
+                    <form onSubmit={searchData}>
+                        <input type="text" className="form-control" placeholder="Search for" onChange={(e) => setQuery(e.target.value)} value={query} />
                     </form>
                 </div>
                 <button onClick={handleCreate} className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
@@ -167,6 +191,23 @@ const MainDivisi = () => {
                     )}
                 </tbody>
             </table>
+            <div className='d-sm-flex align-items-center justify-content-between'>
+                <p>Total Divisi : {rows}</p>
+                <nav aria-label="Page navigation example" key={rows}>
+                    <ReactPaginate
+                        previousLabel={"<<"}
+                        nextLabel={">>"}
+                        pageCount={pages}
+                        onPageChange={changePage}
+                        containerClassName={"pagination"}
+                        pageLinkClassName={"page-link"}
+                        previousLinkClassName={"page-link"}
+                        nextLinkClassName={"page-link"}
+                        activeLinkClassName={"page-item active"}
+                        disabledLinkClassName={"page-item disabled"}
+                    />
+                </nav>
+            </div>
 
             {/* Modal Create */}
             <Modal backdrop='static' show={showCreate} onHide={handleCloseCreate} centered>
