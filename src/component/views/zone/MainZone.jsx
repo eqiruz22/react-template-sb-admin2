@@ -2,6 +2,8 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { Modal } from "react-bootstrap";
 import Select from 'react-select'
+import { useNavigate } from 'react-router-dom'
+import Swal from 'sweetalert2';
 
 const MainZone = () => {
     const [showCreate, setShowCreate] = useState(false)
@@ -19,9 +21,25 @@ const MainZone = () => {
     const [errMealAllowance, setErrMealAllowance] = useState('')
     const [allowance, setAllowance] = useState(0)
     const [errAllowance, setErrAllowance] = useState('')
+    const [data, setData] = useState([])
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        getZone()
+    }, [])
+
     useEffect(() => {
         getLevel()
     }, [])
+
+    const getZone = async () => {
+        await axios.get('http://localhost:4001/user/zone')
+            .then(res => {
+                setData(res.data.result)
+            }).catch(error => {
+                console.log(error)
+            })
+    }
 
     const getLevel = async () => {
         await axios.get('http://localhost:4001/user/title-name')
@@ -111,13 +129,27 @@ const MainZone = () => {
         await axios.post('http://localhost:4001/user/zone', {
             zone_name: zone,
             title_id: levelVal['value'],
-            transport_non_airplane: transport,
-            transport_airplane: transport,
-            hotel: hotel,
-            meal_allowance: mealAllowance,
-            allowance: allowance
+            transport_non_airplane: transport.toString().split('.').join(''),
+            transport_airplane: transport.toString().split('.').join(''),
+            hotel: hotel.toString().split('.').join(''),
+            meal_allowance: mealAllowance.toString().split('.').join(''),
+            allowance: allowance.toString().split('.').join('')
         }).then(res => {
-            console.log(res)
+            setZone('')
+            setTransport('')
+            setTransportAirplane('')
+            setValLevel('')
+            setHotel('')
+            setMealAllowance('')
+            setAllowance('')
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: `${res.data.message}`
+            })
+            closeModalCreate()
+            getZone()
+            navigate('/zone')
         }).catch(err => {
             console.log(err)
         })
@@ -141,7 +173,7 @@ const MainZone = () => {
                         <th scope="colSpan">#</th>
                         <th scope="colSpan">Zone Name</th>
                         <th scope='colSpan'>Transport</th>
-                        <th scope='colSpan'>Transport(Airplane)</th>
+                        <th scope='colSpan'>Airplane</th>
                         <th scope="colSpan">Level</th>
                         <th scope='colSpan'>Hotel</th>
                         <th scope="colSpan">Meal Allowance</th>
@@ -149,8 +181,24 @@ const MainZone = () => {
                         <th scope='colSpan'>Action</th>
                     </tr>
                 </thead>
-
-
+                <tbody>
+                    {data.map((item, index) =>
+                        <tr key={item.id}>
+                            <th>{index + 1}</th>
+                            <td>{item.name}</td>
+                            <td>{item.airplane.toLocaleString().split(',').join('.')}</td>
+                            <td>{item.transport.toLocaleString().split(',').join('.')}</td>
+                            <td>{item.title}</td>
+                            <td>{item.hotel.toLocaleString().split(',').join('.')}</td>
+                            <td>{item.meal.toLocaleString().split(',').join('.')}</td>
+                            <td>{item.allowance.toLocaleString().split(',').join('.')}</td>
+                            <td>
+                                <button className='btn btn-warning'>Edit</button>
+                                <button className='btn btn-danger ml-1'>Delete</button>
+                            </td>
+                        </tr>
+                    )}
+                </tbody>
             </table>
 
             {/* Modal Create */}
