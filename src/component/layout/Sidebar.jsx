@@ -54,6 +54,8 @@ const Sidebar = () => {
                                         onClick={() => handleActive('/prj')} to="/prj">Prj</Link>
                                     <Link className={activeNav === '/divisi' ? 'collapse-item active' : 'collapse-item'}
                                         onClick={() => handleActive('/divisi')} to="/divisi">Divisi</Link>
+                                    <Link className={activeNav === '/zone' ? 'collapse-item active' : 'collapse-item'}
+                                        onClick={() => handleActive('/zone')} to="/zone">Zone</Link>
                                 </div>
                             )}
                             {user['role'] !== 1 && (

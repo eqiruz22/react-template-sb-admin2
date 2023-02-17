@@ -17,6 +17,7 @@ import CreateDataById from "./component/views/data/CreateDataById";
 import MainDaily from "./component/views/data/MainDaily";
 import MainPrj from "./component/views/prj/MainPrj";
 import MainDivisi from "./component/views/divisi/MainDivisi";
+import MainZone from "./component/views/zone/MainZone";
 
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
             <Route path='waiting-to-approve-manager' element={<ManagerView />} />
             <Route path='waiting-to-approve-director' element={<DirectorView />} />
             <Route path='divisi' element={<MainDivisi />} />
+            <Route path='zone' element={<MainZone />} />
           </Route>
         </Routes>
       </Router>
