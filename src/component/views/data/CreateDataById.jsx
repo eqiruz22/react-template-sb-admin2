@@ -277,11 +277,6 @@ const CreateDataById = () => {
                         {errPrj && <span className='text-danger'>{errPrj}</span>}
                     </div>
                     <div className="col-md-3">
-                        <label htmlFor="prj" className="form-label">Delegate Approval</label>
-                        <Select onChange={handleChangeApproval} options={manager} />
-                        {errApproval && <span className='text-danger'>{errApproval}</span>}
-                    </div>
-                    <div className="col-md-3">
                         <label htmlFor="official" className="form-label">Official Travel Site</label>
                         <input type="text" value={travel} onChange={handleChangeTravel} className="form-control" id="official" />
                         {errTravel && <span className='text-danger'>{errTravel}</span>}
