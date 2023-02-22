@@ -13,7 +13,6 @@ const CreateDataById = () => {
     const [rent, setRent] = useState(0)
     const [car, setCar] = useState(0)
     const [prjval, setPrjval] = useState('')
-    const [approval, setApproval] = useState('')
     const [hotel, setHotel] = useState(0)
     const [travel, setTravel] = useState('')
     const [start, setStart] = useState(null)
@@ -27,23 +26,14 @@ const CreateDataById = () => {
     const [fee, setFee] = useState(0)
     const [tools, setTools] = useState(0)
     const [other, setOther] = useState(0)
-    const [manager, setManager] = useState([])
     const [prj, setPrj] = useState([])
     const { id } = useParams()
-    const [first, setFirst] = useState('')
-    const [second, setSecond] = useState('')
     const [errHotel, setErrHotel] = useState('')
     const [errPurposes, setErrPurposes] = useState('')
     const [errStart, setErrStart] = useState('')
     const [errEnd, setErrEnd] = useState('')
     const [errTravel, setErrTravel] = useState('')
-    const [errPrj, setErrPrj] = useState('')
-    const [errApproval, setErrApproval] = useState('')
     const { user } = useAuthContext()
-    useEffect(() => {
-        getManager()
-    }, [])
-
     useEffect(() => {
         getPrj()
     }, [])
@@ -56,7 +46,6 @@ const CreateDataById = () => {
         try {
             await axios.get(`http://localhost:4001/user/show/title-user/${id}`)
                 .then(res => {
-                    console.log(res.data)
                     setName(res.data.name)
                     setHardship(res.data.meal_allowance)
                     setMeal(res.data.hardship_allowance)
@@ -70,25 +59,11 @@ const CreateDataById = () => {
         }
     }
 
-    const getManager = async () => {
-        try {
-            await axios.get('http://localhost:4001/user/show-manager')
-                .then(res => {
-                    const opt = res.data.result.map(item => ({ value: item.name, label: item.name }))
-                    console.log(opt)
-                    setManager(opt)
-                })
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
     const getPrj = async () => {
         try {
             await axios.get('http://localhost:4001/user/prj')
                 .then(res => {
                     const opt = res.data.result.map(item => ({ value: item.id, label: item.prj_name }))
-
                     setPrj(opt)
                 })
         } catch (error) {
@@ -96,9 +71,9 @@ const CreateDataById = () => {
         }
     }
 
-    const handleChangeHotel = (e) => {
-        setHotel(e.target.value)
-        if (!e.target.value) {
+    const handleChangeHotel = (event) => {
+        setHotel(event.target.value)
+        if (!event.target.value) {
             setErrHotel('this field is required')
         } else {
             setErrHotel('')
@@ -119,10 +94,6 @@ const CreateDataById = () => {
 
     const handleChangePrj = (selectedOption) => {
         setPrjval(selectedOption)
-    }
-
-    const handleChangeApproval = (selectedOption) => {
-        setApproval(selectedOption)
     }
 
     const handleChangeTravel = (e) => {
@@ -217,21 +188,18 @@ const CreateDataById = () => {
     const diff = dtime / (1000 * 60 * 60 * 24)
     const days = Math.max(diff, 0)
 
-    var total = 0
-
+    let total = 0
     if (days === 0) {
-        total = parseFloat(meal) + parseFloat(car) + parseFloat(pulsa) + parseFloat(rent) + parseFloat(hardship) + parseFloat(hotel) + parseFloat(transportation) + parseFloat(local) + parseFloat(airfare) + parseFloat(airport) + parseFloat(entertainment) + parseFloat(tools) + parseFloat(other)
+        total += parseFloat(meal) + parseFloat(car) + parseFloat(pulsa) + parseFloat(rent) + parseFloat(hardship) + parseFloat(hotel) + parseFloat(transportation) + parseFloat(local) + parseFloat(airfare) + parseFloat(airport) + parseFloat(entertainment) + parseFloat(tools) + parseFloat(other)
     } else {
-        total = parseFloat(meal * days) + parseFloat(car * days) + parseFloat(pulsa * days) + parseFloat(rent * days) + parseFloat(hardship * days) + parseFloat(hotel) + parseFloat(transportation) + parseFloat(local) + parseFloat(airfare) + parseFloat(airport) + parseFloat(entertainment) + parseFloat(tools) + parseFloat(other)
+        total += parseFloat(meal * days) + parseFloat(car * days) + parseFloat(pulsa * days) + parseFloat(rent * days) + parseFloat(hardship * days) + parseFloat(hotel * days) + parseFloat(transportation * days) + parseFloat(local * days) + parseFloat(airfare * days) + parseFloat(airport * days) + parseFloat(entertainment * days) + parseFloat(tools * days) + parseFloat(other * days)
     }
-
     const handleSubmit = async (e) => {
         e.preventDefault()
         await axios.post('http://10.80.7.94:4001/user/perdin-daily', {
             prj_id: prjval['value'],
             user_id: user['id'],
             title_name: title,
-            delegate_approval: approval['value'],
             official_travel_site: travel,
             purposes: purposes,
             hotel: hotel,
@@ -274,7 +242,6 @@ const CreateDataById = () => {
                     <div className="col-md-3">
                         <label htmlFor="prj" className="form-label">PRJ</label>
                         <Select value={prjval} onChange={handleChangePrj} options={prj} />
-                        {errPrj && <span className='text-danger'>{errPrj}</span>}
                     </div>
                     <div className="col-md-3">
                         <label htmlFor="official" className="form-label">Official Travel Site</label>
@@ -358,9 +325,9 @@ const CreateDataById = () => {
                         <label htmlFor="Others" className="form-label">Others</label>
                         <input type="text" value={other} onChange={handleChangeOther} className="form-control" id="Others" />
                     </div>
-                    <div className='col-md-3'>
+                    <div className="col-md-6">
                         <label htmlFor="Others" className="form-label">Total Received</label>
-                        <input type="text" value={total.toLocaleString().split(',').join('.')} className="form-control" id="Others" readOnly />
+                        <input type='text' className='form-control' value={total.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })} readOnly />
                     </div>
                     <div>
                         <button type='submit' className='btn btn-primary'>Submit</button>

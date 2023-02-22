@@ -10,11 +10,13 @@ const MainDivisi = () => {
     const [showCreate, setShowCreate] = useState(false)
     const [showEdit, setShowEdit] = useState(false)
     const [divisiName, setDivisiName] = useState('')
+    const [divisiManager, setDivisiManager] = useState('')
     const [divisiHead, setDivisiHead] = useState('')
     const [getDivisi, setGetDivisi] = useState([])
     const [getName, setGetName] = useState([])
     const [editName, setEditName] = useState('')
     const [editHead, setEditHead] = useState('')
+    const [editManager, setEditManager] = useState('')
     const [idDivisi, setIdDivisi] = useState('')
     const [pages, setPages] = useState(0)
     const [rows, setRows] = useState([])
@@ -42,7 +44,8 @@ const MainDivisi = () => {
                 console.log(res)
                 setIdDivisi(res.data.result[0]['id'])
                 setEditName(res.data.result[0]['divisi_name'])
-                setEditHead({ value: res.data.result[0]['id'], label: res.data.result[0]['name'] })
+                setEditManager({ value: res.data.result[0]['manager_id'], label: res.data.result[0]['divisi_manager'] })
+                setEditHead({ value: res.data.result[0]['head_id'], label: res.data.result[0]['divisi_of_head'] })
             }).catch(error => {
                 console.log(error)
             })
@@ -52,6 +55,10 @@ const MainDivisi = () => {
         setDivisiName(event.target.value.toUpperCase())
     }
 
+    const handleDivisiManager = (selectedOption) => {
+        setDivisiManager(selectedOption)
+    }
+
     const handleDivisiHead = (selectedOption) => {
         setDivisiHead(selectedOption)
     }
@@ -59,7 +66,7 @@ const MainDivisi = () => {
     const getAllUser = async () => {
         await axios.get('http://localhost:4001/user/name')
             .then(res => {
-                const opt = res.data.result.map(item => ({ value: item.id, label: item.name }))
+                const opt = res.data.result.map(item => ({ value: item.user_id, label: item.name }))
                 setGetName(opt)
             }).catch(error => {
                 console.log(error)
@@ -69,6 +76,7 @@ const MainDivisi = () => {
     const getDivisiData = async () => {
         await axios.get(`http://localhost:4001/user/divisi-head?query=${keyword}&page=${page}&limit=${limit}`)
             .then(res => {
+                console.log(res.data)
                 setGetDivisi(res.data.result)
                 setPage(res.data.page)
                 setLimit(res.data.limit)
@@ -83,6 +91,7 @@ const MainDivisi = () => {
         event.preventDefault()
         await axios.post('http://localhost:4001/user/divisi-create', {
             divisi_name: divisiName,
+            divisi_manager: divisiManager['value'],
             divisi_head: divisiHead['value']
         }).then(res => {
             setDivisiHead('')
@@ -108,8 +117,10 @@ const MainDivisi = () => {
         event.preventDefault()
         await axios.patch(`http://localhost:4001/user/divisi/${idDivisi}`, {
             divisi_name: editName,
+            divisi_manager: editManager['value'],
             divisi_head: editHead['value']
         }).then(res => {
+            console.log(res)
             getDivisiData()
             handleCloseEdit(true)
             Swal.fire({
@@ -154,6 +165,13 @@ const MainDivisi = () => {
         setkeyword(query)
     }
 
+    const handleEditManager = (selectedOption) => {
+        setEditManager(selectedOption)
+    }
+
+    const handleEditHead = (selectedOption) => {
+        setEditHead(selectedOption)
+    }
 
     return (
         <div className='px-5'>
@@ -172,6 +190,7 @@ const MainDivisi = () => {
                     <tr>
                         <th scope="colSpan">#</th>
                         <th scope="colSpan">Divisi Name</th>
+                        <th scope="colSpan">Divisi Manager</th>
                         <th scope="colSpan">Divisi Head</th>
                         <th scope='colSpan'>Action</th>
                     </tr>
@@ -182,6 +201,7 @@ const MainDivisi = () => {
                         <tr key={item.id}>
                             <th>{index + 1}</th>
                             <td>{item.divisi_name}</td>
+                            <td>{item.divisi_manager}</td>
                             <td>{item.name}</td>
                             <td>
                                 <button className='btn btn-warning' onClick={() => handleEdit(item.id)}>Edit</button>
@@ -221,6 +241,10 @@ const MainDivisi = () => {
                             <input className='form-control' value={divisiName} onChange={handleDivisiName} type="text" />
                             {/* {errorPrj && <span className="text-danger">{errorPrj}</span>} */}
                         </div>
+                        <div className='mb-3 mt-3'>
+                            <label className='form-label'>Divisi Manager</label>
+                            <Select options={getName} value={divisiManager} onChange={handleDivisiManager} placeholder='Choose one' />
+                        </div>
                         <div className="mb-3 mt-3">
                             <label htmlFor="role" className='form-label'>Divisi Head</label>
                             <Select options={getName} value={divisiHead} onChange={handleDivisiHead} placeholder='Choose one' />
@@ -243,14 +267,16 @@ const MainDivisi = () => {
                 <form onSubmit={handleUpdate}>
                     <Modal.Body>
                         <div className="mb-3 mt-3">
-                            <label>Divisi Name</label>
+                            <label className='form-label'>Divisi Name</label>
                             <input className='form-control' value={editName} onChange={handleEditName} type="text" />
-                            {/* {errorPrj && <span className="text-danger">{errorPrj}</span>} */}
+                        </div>
+                        <div className='mb-3 mt-3'>
+                            <label className='form-label'>Divisi Manager</label>
+                            <Select placeholder='Choose one' options={getName} value={editManager} onChange={handleEditManager} />
                         </div>
                         <div className="mb-3 mt-3">
                             <label htmlFor="role" className='form-label'>Divisi Head</label>
-                            <Select placeholder='Choose one' options={getName} value={editHead} onChange={(selectedOption) => setEditHead(selectedOption)} />
-                            {/* {errorStatus && <span className="text-danger">{errorStatus}</span>} */}
+                            <Select placeholder='Choose one' options={getName} value={editHead} onChange={handleEditHead} />
                         </div>
                     </Modal.Body>
                     <Modal.Footer>
