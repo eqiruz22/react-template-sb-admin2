@@ -2,24 +2,29 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PDFDownloadLink } from '@react-pdf/renderer'
 import Report from '../../Report'
+import { useAuthContext } from '../../../hooks/useAuthContext'
 
 const Main = ({ selectedUser }) => {
 
     const [perdin, setPerdin] = useState([])
-
+    const { user } = useAuthContext()
     useEffect(() => {
         const showPerdin = async () => {
-            await fetch('http://localhost:4001/user/perdin-show')
+            await fetch('http://localhost:4001/user/perdin-show', {
+                headers: {
+                    'Authorization': `Bearer ${user['token']}`
+                }
+            })
                 .then(res => res.json())
                 .then(result => {
                     console.log(result)
-                    setPerdin(result.result)
+                    setPerdin(result.result[0])
                 }).catch(err => {
                     console.log(err)
                 })
         }
         showPerdin()
-    }, [])
+    }, [user])
 
     let IDRCurrency = new Intl.NumberFormat('id-ID', {
         style: 'currency',

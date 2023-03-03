@@ -4,6 +4,7 @@ import axios from 'axios'
 import Select from 'react-select'
 import Swal from 'sweetalert2'
 import ReactPaginate from 'react-paginate'
+import { useAuthContext } from '../../../hooks/useAuthContext'
 
 
 const MainDivisi = () => {
@@ -24,7 +25,7 @@ const MainDivisi = () => {
     const [page, setPage] = useState(0)
     const [limit, setLimit] = useState(10)
     const [keyword, setkeyword] = useState('')
-
+    const { user } = useAuthContext()
     useEffect(() => {
         getDivisiData()
     }, [page, keyword])
@@ -39,7 +40,11 @@ const MainDivisi = () => {
     const handleCloseEdit = () => setShowEdit(false)
     const handleEdit = async (id) => {
         setShowEdit(true)
-        await axios.get(`http://localhost:4001/user/divisi/${id}`)
+        await axios.get(`http://localhost:4001/user/divisi/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
             .then(res => {
                 console.log(res)
                 setIdDivisi(res.data.result[0]['id'])
@@ -64,7 +69,11 @@ const MainDivisi = () => {
     }
 
     const getAllUser = async () => {
-        await axios.get('http://localhost:4001/user/name')
+        await axios.get('http://localhost:4001/user/name', {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
             .then(res => {
                 const opt = res.data.result.map(item => ({ value: item.user_id, label: item.name }))
                 setGetName(opt)
@@ -74,7 +83,11 @@ const MainDivisi = () => {
     }
 
     const getDivisiData = async () => {
-        await axios.get(`http://localhost:4001/user/divisi-head?query=${keyword}&page=${page}&limit=${limit}`)
+        await axios.get(`http://localhost:4001/user/divisi-head?query=${keyword}&page=${page}&limit=${limit}`, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
             .then(res => {
                 console.log(res.data)
                 setGetDivisi(res.data.result)
@@ -90,6 +103,10 @@ const MainDivisi = () => {
     const handleSubmit = async (event) => {
         event.preventDefault()
         await axios.post('http://localhost:4001/user/divisi-create', {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        }, {
             divisi_name: divisiName,
             divisi_manager: divisiManager['value'],
             divisi_head: divisiHead['value']
@@ -116,6 +133,10 @@ const MainDivisi = () => {
     const handleUpdate = async (event) => {
         event.preventDefault()
         await axios.patch(`http://localhost:4001/user/divisi/${idDivisi}`, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        }, {
             divisi_name: editName,
             divisi_manager: editManager['value'],
             divisi_head: editHead['value']
@@ -152,7 +173,11 @@ const MainDivisi = () => {
                 getDivisiData()
             }
         })
-        await axios.delete(`http://localhost:4001/user/divisi/${id}`)
+        await axios.delete(`http://localhost:4001/user/divisi/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
     }
 
     const changePage = ({ selected }) => {

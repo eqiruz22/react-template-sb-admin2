@@ -29,6 +29,7 @@ const User = ({ selectedUser }) => {
             }
         }
         ).then(res => {
+            console.log(res.data)
             setUsers(res.data.result)
             setPage(res.data.page)
             setLimit(res.data.limit)
@@ -84,7 +85,7 @@ const User = ({ selectedUser }) => {
                 <Link to="/user/create" className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
                     className="fas fa-plus fa-sm text-white-50"></i> Create User</Link>
             </div>
-            <table className='table table-striped'>
+            <table className='table table-hover'>
                 <thead>
                     <tr>
                         <th scope="colSpan">#</th>
@@ -96,27 +97,31 @@ const User = ({ selectedUser }) => {
                         <th scope='colSpan'>Action</th>
                     </tr>
                 </thead>
-                <tbody>
-                    {users.map((item, index) =>
-
-                        <tr key={item.id}>
-                            <th scope="row">{index + 1}</th>
-                            <td>{item.email}</td>
-                            <td>{item.name}</td>
-                            <td>{item.role_name}</td>
-                            <td>{item.title_name}</td>
-                            <td>{item.divisi_name}</td>
-                            <td>
-                                <Link
-                                    to={`/user/edit/${item.id}`}
-                                >
-                                    <button className='btn btn-warning'>Edit</button>
-                                </Link>
-                                <button className='btn btn-danger ml-1' onClick={() => deleteUser(item.id)}>Delete</button>
-                            </td>
+                {users.length > 0 ?
+                    users.map((item, index) =>
+                        <tbody>
+                            <tr key={item.id}>
+                                <th scope="row">{index + 1}</th>
+                                <td>{item.email}</td>
+                                <td>{item.name}</td>
+                                <td>{item.role_name}</td>
+                                <td>{item.title_name}</td>
+                                <td>{item.divisi_name}</td>
+                                <td>
+                                    <Link
+                                        to={`/user/edit/${item.id}`}
+                                    >
+                                        <button className='btn btn-warning'>Edit</button>
+                                    </Link>
+                                    <button className='btn btn-danger ml-1' onClick={() => deleteUser(item.id)}>Delete</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    ) : <tbody>
+                        <tr>
+                            <td className='text-center' colSpan='6'>Data tidak tersedia</td>
                         </tr>
-                    )}
-                </tbody>
+                    </tbody>}
             </table>
             <div className='d-sm-flex align-items-center justify-content-between'>
                 <p>Total User : {rows}</p>

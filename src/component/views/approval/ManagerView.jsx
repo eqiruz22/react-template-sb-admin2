@@ -2,12 +2,17 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Swal from 'sweetalert2'
+import { useAuthContext } from '../../../hooks/useAuthContext'
 
 const Main = () => {
     const [perdin, setPerdin] = useState([])
-
+    const { user } = useAuthContext()
     const showPerdin = async () => {
-        await fetch('http://localhost:4001/user/waiting-approve-manager')
+        await fetch('http://localhost:4001/user/waiting-approve-divisi', {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
             .then(res => res.json())
             .then(result => {
                 console.log(result)

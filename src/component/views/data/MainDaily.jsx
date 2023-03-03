@@ -22,39 +22,51 @@ const MainDaily = ({ selectedUser }) => {
     const [keyword, setkeyword] = useState('')
 
     useEffect(() => {
-        getPerdinUser()
-    }, [page, keyword])
+        const getPerdinAllUser = async () => {
+            await axios.get(`http://localhost:4001/user/perdin-show-daily?query=${keyword}&page=${page}&limit=${limit}`, {
+                headers: {
+                    'Authorization': `Bearer ${user['token']}`
+                }
+            })
+                .then(res => {
+                    console.log(res.data)
+                    setPerdin(res.data.result[0])
+                    setPage(res.data.page)
+                    setLimit(res.data.limit)
+                    setRows(res.data.row)
+                    setPages(res.data.totalPage)
+                }).catch(error => {
+                    console.log(error)
+                })
+        }
+        if (user['role'] === 1) {
+            getPerdinAllUser()
+        }
+    }, [page, keyword, user, limit])
 
     useEffect(() => {
-        getPerdinDaily()
-    }, [])
-
-    const getPerdinUser = async () => {
-        await axios.get(`http://localhost:4001/user/perdin-show-daily?query=${keyword}&page=${page}&limit=${limit}`)
-            .then(res => {
-                setPerdin(res.data.result)
-                setPage(res.data.page)
-                setLimit(res.data.limit)
-                setRows(res.data.row)
-                setPages(res.data.totalPage)
-            }).catch(error => {
-                console.log(error)
+        const getPerdinDailyById = async () => {
+            await axios.get(`http://localhost:4001/user/perdin-show-daily/${user['id']}?query=${keyword}&page=${page}&limit=${limit}`, {
+                headers: {
+                    'Authorization': `Bearer ${user['token']}`
+                }
             })
-    }
+                .then(res => {
+                    console.log(res.data)
+                    setUserdaily(res.data.result[0])
+                    setPage(res.data.page)
+                    setLimit(res.data.limit)
+                    setRows(res.data.row)
+                    setPages(res.data.totalPage)
+                }).catch(error => {
+                    console.log(error)
+                })
+        }
+        if (user['role'] !== 1) {
+            getPerdinDailyById()
+        }
+    }, [page, keyword, user, limit])
 
-    const getPerdinDaily = async () => {
-        await axios.get(`http://localhost:4001/user/perdin-show-daily/${user['id']}?query=${keyword}&page=${page}&limit=${limit}`)
-            .then(res => {
-                console.log(res.data)
-                setUserdaily(res.data.result)
-                setPage(res.data.page)
-                setLimit(res.data.limit)
-                setRows(res.data.row)
-                setPages(res.data.totalPage)
-            }).catch(error => {
-                console.log(error)
-            })
-    }
 
     const changePage = ({ selected }) => {
         setPage(selected)
@@ -90,52 +102,65 @@ const MainDaily = ({ selectedUser }) => {
                     </tr>
                 </thead>
                 {user['role'] === 1 && (
-                    <tbody>
-                        {perdin.map((item, index) =>
-                            <tr key={item.id}>
-                                <td>{index + 1}</td>
-                                <td>{item.name}</td>
-                                <td>{item.prj_name}</td>
-                                <td>{item.total_received}</td>
-                                <td>{item.proses}</td>
-                                <td>
-                                    <button disabled={item.status_id === 1 ? false : true} className='btn btn-warning'>Edit</button>
-                                    <button disabled={item.status_id !== 1 ? true : false} className='btn btn-danger ml-1 mr-1'>Delete</button>
-                                    <button className='btn btn-success'>
-                                        <PDFDownloadLink document={<ReportDaily key={item.id} selectedUser={item} />} fileName={`perdin_${item.name}-${item.prj_name}.pdf`}>
-                                            {({ blob, url, loading, error }) =>
-                                                loading ? 'Loading' : 'Download'
-                                            }
-                                        </PDFDownloadLink>
-                                    </button>
-                                </td>
+                    perdin.length > 0 ?
+                        perdin.map((item, index) =>
+                            <tbody>
+                                <tr key={item.id}>
+                                    <th scope='row'>{index + 1}</th>
+                                    <td>{item.name}</td>
+                                    <td>{item.prj_name}</td>
+                                    <td>{item.total_received}</td>
+                                    <td>{item.proses}</td>
+                                    <td>
+                                        <button disabled={item.status_id === 1 ? false : true} className='btn btn-warning'>Edit</button>
+                                        <button disabled={item.status_id !== 1 ? true : false} className='btn btn-danger ml-1 mr-1'>Delete</button>
+                                        {item.status_id === 3 && (
+                                            <button className='btn btn-success'>
+                                                <PDFDownloadLink document={<ReportDaily key={item.id} selectedUser={item} />} fileName={`perdin_${item.name}-${item.prj_name}.pdf`}>
+                                                    {({ blob, url, loading, error }) =>
+                                                        loading ? 'Loading' : 'Download'
+                                                    }
+                                                </PDFDownloadLink>
+                                            </button>
+                                        )}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        ) :
+                        <tbody>
+                            <tr>
+                                <td className='text-center' colSpan='6'>Data tidak tersedia</td>
                             </tr>
-                        )}
-                    </tbody>
+                        </tbody>
                 )}
                 {user['role'] !== 1 && (
-                    <tbody>
-                        {userdaily.map((item, index) =>
-                            <tr key={item.id}>
-                                <td>{index + 1}</td>
-                                <td>{item.name}</td>
-                                <td>{item.prj_name}</td>
-                                <td>{item.total_received}</td>
-                                <td>{item.proses}</td>
-                                <td>
-                                    <button disabled={item.status_id === 1 ? false : true} className='btn btn-warning'>Edit</button>
-                                    <button disabled={item.status_id !== 1 ? true : false} className='btn btn-danger ml-1 mr-1'>Delete</button>
-                                    <button className='btn btn-success'>
-                                        <PDFDownloadLink document={<ReportDaily key={item.id} selectedUser={item} />} fileName={`perdin_${item.name}-${item.prj_name}.pdf`}>
-                                            {({ blob, url, loading, error }) =>
-                                                loading ? 'Loading' : 'Download'
-                                            }
-                                        </PDFDownloadLink>
-                                    </button>
-                                </td>
+                    userdaily.length > 0 ?
+                        userdaily.map((item, index) =>
+                            <tbody>
+                                <tr key={item.id}>
+                                    <td>{index + 1}</td>
+                                    <td>{item.name}</td>
+                                    <td>{item.prj_name}</td>
+                                    <td>{item.total_received}</td>
+                                    <td>{item.proses}</td>
+                                    <td>
+                                        <button disabled={item.status_id === 1 ? false : true} className='btn btn-warning'>Edit</button>
+                                        <button disabled={item.status_id !== 1 ? true : false} className='btn btn-danger ml-1 mr-1'>Delete</button>
+                                        <button className='btn btn-success'>
+                                            <PDFDownloadLink document={<ReportDaily key={item.id} selectedUser={item} />} fileName={`perdin_${item.name}-${item.prj_name}.pdf`}>
+                                                {({ blob, url, loading, error }) =>
+                                                    loading ? 'Loading' : 'Download'
+                                                }
+                                            </PDFDownloadLink>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        ) : <tbody>
+                            <tr>
+                                <td className='text-center' colSpan='6'>Data tidak tersedia</td>
                             </tr>
-                        )}
-                    </tbody>
+                        </tbody>
                 )}
             </table>
             <div className='d-sm-flex align-items-center justify-content-between'>

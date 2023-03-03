@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import MainLayout from "./component/layout/MainLayout";
 import Create from "./component/views/user/Create";
 import Dashboard from "./component/views/Dashboard";
@@ -21,34 +21,31 @@ import MainZone from "./component/views/zone/MainZone";
 
 
 function App() {
-
   const { user } = useAuthContext()
 
   return (
     <div className="App">
-      <Router>
-        <Routes>
-          <Route path="/login" element={!user ? <Login /> : <Navigate to='/' />} />
-          <Route path="/" element={user ? <MainLayout /> : <Navigate to='/login' />}>
-            <Route index element={user ? <Dashboard /> : <Navigate to='/login' />} />
-            <Route path='data' element={<MainData />} />
-            <Route path='data/harian' element={<MainDaily />} />
-            <Route path='data/create' element={<CreateData />} />
-            <Route path='data/create/:id' element={<CreateDataById />} />
-            <Route path='user' element={<User />} />
-            <Route path='user/create' element={<Create />} />
-            <Route path='user/edit/:id' element={<Edit />} />
-            <Route path='title' element={<MainTitle />} />
-            <Route path='title/create' element={<CreateTitle />} />
-            <Route path='title/edit/:id' element={<EditTitle />} />
-            <Route path='prj' element={<MainPrj />} />
-            <Route path='waiting-to-approve-manager' element={<ManagerView />} />
-            <Route path='waiting-to-approve-director' element={<DirectorView />} />
-            <Route path='divisi' element={<MainDivisi />} />
-            <Route path='zone' element={<MainZone />} />
-          </Route>
-        </Routes>
-      </Router>
+      <Routes>
+        <Route path="/login" element={!user ? <Login /> : <Navigate to='/' />} />
+        <Route path="/" element={user ? <MainLayout /> : <Navigate to='/login' />}>
+          <Route index element={<Dashboard />} />
+          <Route path='data' element={user ? <MainData /> : <Navigate to='/login' />} />
+          <Route path='data/harian' element={user ? <MainDaily /> : <Navigate to='/login' />} />
+          <Route path='data/create' element={user ? <CreateData /> : <Navigate to='/login' />} />
+          <Route path='data/create/:id' element={user ? <CreateDataById /> : <Navigate to='/login' />} />
+          <Route path='user' element={user ? <User /> : <Navigate to='/login' />} />
+          <Route path='user/create' element={user ? <Create /> : <Navigate to='/login' />} />
+          <Route path='user/edit/:id' element={user ? <Edit /> : <Navigate to='/login' />} />
+          <Route path='title' element={user ? <MainTitle /> : <Navigate to='/login' />} />
+          <Route path='title/create' element={user ? <CreateTitle /> : <Navigate to='/login' />} />
+          <Route path='title/edit/:id' element={user ? <EditTitle /> : <Navigate to='/login' />} />
+          <Route path='prj' element={user ? <MainPrj /> : <Navigate to='/login' />} />
+          <Route path='waiting-to-approve-manager' element={user ? <ManagerView /> : <Navigate to='/login' />} />
+          <Route path='waiting-to-approve-director' element={user ? <DirectorView /> : <Navigate to='/login' />} />
+          <Route path='divisi' element={user ? <MainDivisi /> : <Navigate to='/login' />} />
+          <Route path='zone' element={user ? <MainZone /> : <Navigate to='/login' />} />
+        </Route>
+      </Routes>
     </div>
   );
 }

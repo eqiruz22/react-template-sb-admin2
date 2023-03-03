@@ -3,6 +3,7 @@ import { Modal } from "react-bootstrap";
 import axios from 'axios'
 import Swal from "sweetalert2";
 import ReactPaginate from 'react-paginate'
+import { useAuthContext } from "../../../hooks/useAuthContext";
 
 const MainPrj = () => {
     const [show, setShow] = useState(false)
@@ -22,10 +23,14 @@ const MainPrj = () => {
     const [row, setRow] = useState([])
     const handleClose = () => setShow(false)
     const handleOpen = () => setShow(true)
-
+    const { user } = useAuthContext()
     const handleEdit = async (id) => {
         setShowEdit(true)
-        await axios.get(`http://localhost:4001/user/prj/${id}`)
+        await axios.get(`http://localhost:4001/user/prj/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
             .then(res => {
                 setIdPrj(res.data.result[0]['id'])
                 setValPrj(res.data.result[0]['prj_name'])
@@ -38,11 +43,14 @@ const MainPrj = () => {
 
     useEffect(() => {
         getPrj()
-    }, [page, keyword])
-
+    }, [page, keyword, limit])
 
     const getPrj = async () => {
-        await axios.get(`http://localhost:4001/user/prj?query=${keyword}&page=${page}&limit=${limit}`)
+        await axios.get(`http://localhost:4001/user/prj?query=${keyword}&page=${page}&limit=${limit}`, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
             .then(res => {
                 console.log(res)
                 setData(res.data.result)
@@ -53,7 +61,6 @@ const MainPrj = () => {
                 console.log(error)
             })
     }
-
     const handlePrjName = (e) => {
         setPrjName(e.target.value)
         if (!e.target.value) {
@@ -75,6 +82,10 @@ const MainPrj = () => {
     const handleSubmitPrj = async (e) => {
         e.preventDefault()
         await axios.post('http://localhost:4001/user/prj/create', {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        }, {
             prj_name: prjName,
             status: status
         }).then(res => {
@@ -100,6 +111,10 @@ const MainPrj = () => {
     const handleUpdatePrj = async (e) => {
         e.preventDefault()
         await axios.patch(`http://localhost:4001/user/prj/update/${idPrj}`, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        }, {
             prj_name: valPrj,
             status: valStatus
         }).then(res => {
@@ -135,7 +150,11 @@ const MainPrj = () => {
                 getPrj()
             }
         })
-        await axios.delete(`http://localhost:4001/user/prj/delete/${id}`)
+        await axios.delete(`http://localhost:4001/user/prj/delete/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
             .then(res => {
                 console.log(res)
             }).catch(error => {

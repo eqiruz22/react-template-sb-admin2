@@ -4,6 +4,7 @@ import { Modal } from "react-bootstrap";
 import Select from 'react-select'
 import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2';
+import { useAuthContext } from '../../../hooks/useAuthContext';
 
 const MainZone = () => {
     const [showCreate, setShowCreate] = useState(false)
@@ -23,17 +24,21 @@ const MainZone = () => {
     const [errAllowance, setErrAllowance] = useState('')
     const [data, setData] = useState([])
     const navigate = useNavigate()
-
+    const { user } = useAuthContext()
     useEffect(() => {
         getZone()
-    }, [])
+    }, [user])
 
     useEffect(() => {
         getLevel()
-    }, [])
+    }, [user])
 
     const getZone = async () => {
-        await axios.get('http://localhost:4001/user/zone')
+        await axios.get('http://localhost:4001/user/zone', {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
             .then(res => {
                 setData(res.data.result)
             }).catch(error => {
@@ -42,7 +47,11 @@ const MainZone = () => {
     }
 
     const getLevel = async () => {
-        await axios.get('http://localhost:4001/user/title-name')
+        await axios.get('http://localhost:4001/user/title-name', {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
             .then(res => {
                 const opt = res.data.result.map(item => ({ value: item.id, label: item.title_name }))
                 setLevel(opt)
@@ -127,6 +136,10 @@ const MainZone = () => {
     const handleSubmit = async (event) => {
         event.preventDefault()
         await axios.post('http://localhost:4001/user/zone', {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        }, {
             zone_name: zone,
             title_id: levelVal['value'],
             transport_non_airplane: transport.toString().split('.').join(''),

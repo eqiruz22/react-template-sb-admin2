@@ -5,6 +5,7 @@ import Swal from 'sweetalert2'
 import axios from 'axios'
 import Spinner from '../../layout/Spinner'
 import ReactPaginate from 'react-paginate'
+import { useAuthContext } from '../../../hooks/useAuthContext'
 
 const Main = () => {
 
@@ -15,9 +16,14 @@ const Main = () => {
     const [limit, setLimit] = useState(10)
     const [query, setQuery] = useState('')
     const [row, setRow] = useState([])
+    const { user } = useAuthContext()
 
     const showTitle = async () => {
-        await axios(`http://localhost:4001/user/title?query=${keyword}&page=${page}&limit=${limit}`)
+        await axios(`http://localhost:4001/user/title?query=${keyword}&page=${page}&limit=${limit}`, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
             .then(res => {
                 setTitle(res.data.value)
                 setLoading(false)

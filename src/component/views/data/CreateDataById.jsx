@@ -1,8 +1,9 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useAuthContext } from '../../../hooks/useAuthContext'
 import Select from 'react-select'
+import Swal from 'sweetalert2'
 
 const CreateDataById = () => {
     const [title, setTitle] = useState('')
@@ -33,25 +34,33 @@ const CreateDataById = () => {
     const [errStart, setErrStart] = useState('')
     const [errEnd, setErrEnd] = useState('')
     const [errTravel, setErrTravel] = useState('')
+    const [zone, setZone] = useState('')
+    const [zoneByTitle, setZoneByTitle] = useState([])
     const { user } = useAuthContext()
+    const navigate = useNavigate()
     useEffect(() => {
         getPrj()
     }, [])
 
     useEffect(() => {
         getById()
-    }, [])
+    }, [id])
+
+    useEffect(() => {
+        getZone()
+    }, [title])
+
+    useEffect(() => {
+        if (zone !== '') {
+            getZoneById()
+        }
+    }, [zone['value']])
 
     const getById = async () => {
         try {
             await axios.get(`http://localhost:4001/user/show/title-user/${id}`)
                 .then(res => {
                     setName(res.data.name)
-                    setHardship(res.data.meal_allowance)
-                    setMeal(res.data.hardship_allowance)
-                    setPulsa(res.data.pulsa_allowance)
-                    setRent(res.data.rent_house)
-                    setCar(res.data.car_rent)
                     setTitle(res.data.title_name)
                 })
         } catch (error) {
@@ -71,6 +80,31 @@ const CreateDataById = () => {
         }
     }
 
+    const getZone = async () => {
+        await axios.get(`http://localhost:4001/user/zone/${title}`)
+            .then(res => {
+                console.log(res.data)
+                const opt = res.data.result.map(item => ({ value: item.id, label: item.zone_name }))
+                setZoneByTitle(opt)
+            }).catch(error => {
+                console.log(error)
+            })
+    }
+
+    const getZoneById = async () => {
+        await axios.get(`http://localhost:4001/user/zone-by/${zone['value']}`)
+            .then(res => {
+                console.log(res.data)
+                setHotel(res.data.result[0]['hotel'])
+                setMeal(res.data.result[0]['meal_allowance'])
+                setAirfare(res.data.result[0]['transport_airplane'])
+                setTransportation(res.data.result[0]['transport_non_airplane'])
+                setHardship(res.data.result[0]['allowance'])
+            }).catch(error => {
+                console.log(error)
+            })
+    }
+
     const handleChangeHotel = (event) => {
         setHotel(event.target.value)
         if (!event.target.value) {
@@ -78,6 +112,10 @@ const CreateDataById = () => {
         } else {
             setErrHotel('')
         }
+    }
+
+    const handleChangeZone = (selectedOption) => {
+        setZone(selectedOption)
     }
 
     const handleChangeRent = (e) => {
@@ -221,7 +259,12 @@ const CreateDataById = () => {
             others: other,
             total_received: total
         }).then(res => {
-            console.log(res)
+            Swal.fire({
+                title: 'Success',
+                text: `${res.data.message}`,
+                icon: 'success'
+            })
+            navigate('/data/harian')
         }).catch(err => {
             console.log(err)
         })
@@ -238,6 +281,10 @@ const CreateDataById = () => {
                     <div className="col-md-3">
                         <label htmlFor="title" className="form-label">Title</label>
                         <input type="text" value={title} className='form-control' onChange={handleChangeTitle} />
+                    </div>
+                    <div className='col-md-3'>
+                        <label htmlFor="zone" className='form-label'>ZONE</label>
+                        <Select options={zoneByTitle} value={zone} onChange={handleChangeZone} />
                     </div>
                     <div className="col-md-3">
                         <label htmlFor="prj" className="form-label">PRJ</label>
@@ -325,7 +372,7 @@ const CreateDataById = () => {
                         <label htmlFor="Others" className="form-label">Others</label>
                         <input type="text" value={other} onChange={handleChangeOther} className="form-control" id="Others" />
                     </div>
-                    <div className="col-md-6">
+                    <div className="col-md-3">
                         <label htmlFor="Others" className="form-label">Total Received</label>
                         <input type='text' className='form-control' value={total.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })} readOnly />
                     </div>
