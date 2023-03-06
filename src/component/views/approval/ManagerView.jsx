@@ -37,6 +37,10 @@ const Main = () => {
             prj_id: prj_id,
             user_id: user_id,
             status_id: status_id
+        }, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
         }).then(res => {
             console.log(res)
             Swal.fire({

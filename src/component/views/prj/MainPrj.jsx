@@ -111,12 +111,13 @@ const MainPrj = () => {
     const handleUpdatePrj = async (e) => {
         e.preventDefault()
         await axios.patch(`http://localhost:4001/user/prj/update/${idPrj}`, {
+            prj_name: valPrj,
+            status: valStatus
+
+        }, {
             headers: {
                 'Authorization': `Bearer ${user['token']}`
             }
-        }, {
-            prj_name: valPrj,
-            status: valStatus
         }).then(res => {
             console.log(res)
             Swal.fire({

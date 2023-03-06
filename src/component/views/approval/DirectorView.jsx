@@ -1,13 +1,18 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
+import { useAuthContext } from '../../../hooks/useAuthContext'
 
 const DirectorView = () => {
 
     const [perdin, setPerdin] = useState([])
-
+    const { user } = useAuthContext()
     const getPerdin = async () => {
-        await fetch('http://localhost:4001/user/waiting-approve-director')
+        await fetch('http://localhost:4001/user/waiting-approve-director', {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
             .then(res => res.json())
             .then(res => {
                 console.log(res.result)
@@ -27,6 +32,10 @@ const DirectorView = () => {
 
     const handleApproval = (id, perdin_id) => {
         axios.post('http://localhost:4001/user/approved-director', {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        }, {
             id: id,
             perdin_id: perdin_id
         }).then(res => {

@@ -32,7 +32,11 @@ const Edit = () => {
     }, [])
 
     const getDivisi = async () => {
-        await axios.get('http://localhost:4001/user/divisi')
+        await axios.get('http://localhost:4001/user/divisi', {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
             .then(res => {
                 const opt = res.data.result.map(item => ({ value: item.id, label: item.divisi_name }))
                 setDivisi(opt)
@@ -42,9 +46,21 @@ const Edit = () => {
     }
 
     const showById = async () => {
-        const response = await axios.get(`http://localhost:4001/user/show/${id}`)
-        const response1 = await axios.get('http://localhost:4001/user/role')
-        const response2 = await axios.get('http://localhost:4001/user/title')
+        const response = await axios.get(`http://localhost:4001/user/show/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
+        const response1 = await axios.get('http://localhost:4001/user/role', {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
+        const response2 = await axios.get('http://localhost:4001/user/title', {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
         console.log(response)
         setEmail(response.data.value[0].email)
         setName(response.data.value[0].name)
@@ -101,6 +117,10 @@ const Edit = () => {
             password: password,
             has_role: user['role'],
             divisi_id: divisiVal['value']
+        }, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
         }).then(res => {
             Swal.fire({
                 title: 'Success',
