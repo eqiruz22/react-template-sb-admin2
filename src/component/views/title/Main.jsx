@@ -6,6 +6,7 @@ import axios from 'axios'
 import Spinner from '../../layout/Spinner'
 import ReactPaginate from 'react-paginate'
 import { useAuthContext } from '../../../hooks/useAuthContext'
+import { showTitle } from '../../../http/HttpConsume'
 
 const Main = () => {
 
@@ -18,24 +19,10 @@ const Main = () => {
     const [row, setRow] = useState([])
     const { user } = useAuthContext()
 
-    const showTitle = async () => {
-        await axios(`http://localhost:4001/user/title?query=${keyword}&page=${page}&limit=${limit}`, {
-            headers: {
-                'Authorization': `Bearer ${user['token']}`
-            }
-        })
-            .then(res => {
-                setTitle(res.data.value)
-                setLoading(false)
-                setLimit(res.data.limit)
-                setRow(res.data.row)
-            }).catch(err => {
-                console.log(err)
-            })
-    }
+
     useEffect(() => {
-        showTitle()
-    }, [keyword, page])
+        showTitle(user, keyword, page, limit, setTitle, setLoading, setLimit, setRow)
+    }, [user, limit, keyword, page])
 
     let IDRCurrency = new Intl.NumberFormat('id-ID', {
         style: 'currency',
@@ -58,15 +45,12 @@ const Main = () => {
                     'Your data has been deleted.',
                     'success'
                 )
-                showTitle()
+                showTitle(user, keyword, page, limit, setTitle, setLoading, setLimit, setRow)
             }
         })
         await axios.delete(`http://localhost:4001/user/title/delete/${id}`)
     }
 
-    if (loading) {
-        return <Spinner />
-    }
 
     const changePage = ({ selected }) => {
         setPage(selected)
@@ -76,6 +60,9 @@ const Main = () => {
         e.preventDefault()
         setPage(0)
         setkeyword(query)
+    }
+    if (loading) {
+        return <Spinner />
     }
 
     return (

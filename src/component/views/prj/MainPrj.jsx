@@ -4,6 +4,8 @@ import axios from 'axios'
 import Swal from "sweetalert2";
 import ReactPaginate from 'react-paginate'
 import { useAuthContext } from "../../../hooks/useAuthContext";
+import Spinner from '../../layout/Spinner'
+import { getPrj } from "../../../http/HttpConsume";
 
 const MainPrj = () => {
     const [show, setShow] = useState(false)
@@ -24,6 +26,7 @@ const MainPrj = () => {
     const handleClose = () => setShow(false)
     const handleOpen = () => setShow(true)
     const { user } = useAuthContext()
+    const [loading, setLoading] = useState(true)
     const handleEdit = async (id) => {
         setShowEdit(true)
         await axios.get(`http://localhost:4001/user/prj/${id}`, {
@@ -42,25 +45,9 @@ const MainPrj = () => {
     const handleEditClose = () => setShowEdit(false)
 
     useEffect(() => {
-        getPrj()
-    }, [page, keyword, limit])
+        getPrj(user, keyword, page, limit, setData, setPage, setLimit, setRow, setLoading)
+    }, [user, page, keyword, limit])
 
-    const getPrj = async () => {
-        await axios.get(`http://localhost:4001/user/prj?query=${keyword}&page=${page}&limit=${limit}`, {
-            headers: {
-                'Authorization': `Bearer ${user['token']}`
-            }
-        })
-            .then(res => {
-                console.log(res)
-                setData(res.data.result)
-                setPage(res.data.page)
-                setLimit(res.data.limit)
-                setRow(res.data.row)
-            }).catch(error => {
-                console.log(error)
-            })
-    }
     const handlePrjName = (e) => {
         setPrjName(e.target.value)
         if (!e.target.value) {
@@ -98,7 +85,7 @@ const MainPrj = () => {
             setPrjName('')
             setStatus('')
             handleClose()
-            getPrj()
+            getPrj(user, keyword, page, limit, setData, setPage, setLimit, setRow, setLoading)
         }).catch(error => {
             console.log(error)
             if (error.response.status === 500) {
@@ -126,7 +113,7 @@ const MainPrj = () => {
                 icon: 'success'
             })
             handleEditClose()
-            getPrj()
+            getPrj(user, keyword, page, limit, setData, setPage, setLimit, setRow, setLoading)
         }).catch(error => {
             console.log(error)
         })
@@ -155,12 +142,11 @@ const MainPrj = () => {
             headers: {
                 'Authorization': `Bearer ${user['token']}`
             }
+        }).then(res => {
+            console.log(res)
+        }).catch(error => {
+            console.log(error)
         })
-            .then(res => {
-                console.log(res)
-            }).catch(error => {
-                console.log(error)
-            })
     }
     const changePage = ({ selected }) => {
         setPage(selected)
@@ -171,7 +157,9 @@ const MainPrj = () => {
         setPage(0)
         setkeyword(query)
     }
-
+    if (loading) {
+        return <Spinner />
+    }
     return (
         <div className='px-5'>
             <div className="d-sm-flex align-items-center justify-content-between mb-4">

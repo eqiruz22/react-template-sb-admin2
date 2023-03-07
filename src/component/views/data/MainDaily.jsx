@@ -1,4 +1,3 @@
-import axios from 'axios'
 import React from 'react'
 import { useEffect } from 'react'
 import { useState } from 'react'
@@ -7,7 +6,8 @@ import { useAuthContext } from '../../../hooks/useAuthContext'
 import { PDFDownloadLink } from '@react-pdf/renderer'
 import ReportDaily from '../../ReportDaily'
 import ReactPaginate from 'react-paginate'
-
+import Spinner from '../../layout/Spinner'
+import { getPerdinAllUser, getPerdinDailyById } from '../../../http/HttpConsume'
 
 const MainDaily = ({ selectedUser }) => {
 
@@ -20,53 +20,19 @@ const MainDaily = ({ selectedUser }) => {
     const [page, setPage] = useState(0)
     const [limit, setLimit] = useState(10)
     const [keyword, setkeyword] = useState('')
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        const getPerdinAllUser = async () => {
-            await axios.get(`http://localhost:4001/user/perdin-show-daily?query=${keyword}&page=${page}&limit=${limit}`, {
-                headers: {
-                    'Authorization': `Bearer ${user['token']}`
-                }
-            })
-                .then(res => {
-                    console.log(res.data)
-                    setPerdin(res.data.result[0])
-                    setPage(res.data.page)
-                    setLimit(res.data.limit)
-                    setRows(res.data.row)
-                    setPages(res.data.totalPage)
-                }).catch(error => {
-                    console.log(error)
-                })
-        }
         if (user['role'] === 1) {
-            getPerdinAllUser()
+            getPerdinAllUser(user, keyword, page, limit, setPerdin, setPage, setLimit, setRows, setPages, setLoading)
         }
     }, [page, keyword, user, limit])
 
     useEffect(() => {
-        const getPerdinDailyById = async () => {
-            await axios.get(`http://localhost:4001/user/perdin-show-daily/${user['id']}?query=${keyword}&page=${page}&limit=${limit}`, {
-                headers: {
-                    'Authorization': `Bearer ${user['token']}`
-                }
-            })
-                .then(res => {
-                    console.log(res.data)
-                    setUserdaily(res.data.result[0])
-                    setPage(res.data.page)
-                    setLimit(res.data.limit)
-                    setRows(res.data.row)
-                    setPages(res.data.totalPage)
-                }).catch(error => {
-                    console.log(error)
-                })
-        }
         if (user['role'] !== 1) {
-            getPerdinDailyById()
+            getPerdinDailyById(user, keyword, page, limit, setUserdaily, setPage, setLimit, setRows, setPages, setLoading)
         }
     }, [page, keyword, user, limit])
-
 
     const changePage = ({ selected }) => {
         setPage(selected)
@@ -77,7 +43,9 @@ const MainDaily = ({ selectedUser }) => {
         setPage(0)
         setkeyword(query)
     }
-
+    if (loading) {
+        return <Spinner />
+    }
     return (
         <div className='px-5'>
             <div className="d-sm-flex align-items-center justify-content-between mb-4">

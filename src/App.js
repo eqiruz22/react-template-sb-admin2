@@ -9,8 +9,8 @@ import CreateData from "./component/views/data/CreateData";
 import MainTitle from "./component/views/title/Main";
 import CreateTitle from "./component/views/title/CreateTitle";
 import EditTitle from "./component/views/title/EditTitle";
-import ManagerView from "./component/views/approval/ManagerView";
-import DirectorView from "./component/views/approval/DirectorView";
+import DivisiView from "./component/views/approval/DivisiView";
+import HcView from "./component/views/approval/HcView";
 import Login from "./component/views/Login";
 import { useAuthContext } from "./hooks/useAuthContext";
 import CreateDataById from "./component/views/data/CreateDataById";
@@ -40,8 +40,8 @@ function App() {
           <Route path='title/create' element={user ? <CreateTitle /> : <Navigate to='/login' />} />
           <Route path='title/edit/:id' element={user ? <EditTitle /> : <Navigate to='/login' />} />
           <Route path='prj' element={user ? <MainPrj /> : <Navigate to='/login' />} />
-          <Route path='waiting-to-approve-manager' element={user ? <ManagerView /> : <Navigate to='/login' />} />
-          <Route path='waiting-to-approve-director' element={user ? <DirectorView /> : <Navigate to='/login' />} />
+          <Route path='waiting-to-approve-divisi' element={user ? <DivisiView /> : <Navigate to='/login' />} />
+          <Route path='waiting-to-approve-hc' element={user ? <HcView /> : <Navigate to='/login' />} />
           <Route path='divisi' element={user ? <MainDivisi /> : <Navigate to='/login' />} />
           <Route path='zone' element={user ? <MainZone /> : <Navigate to='/login' />} />
         </Route>

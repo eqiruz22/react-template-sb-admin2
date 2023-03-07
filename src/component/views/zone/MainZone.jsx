@@ -2,10 +2,11 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { Modal } from "react-bootstrap";
 import Select from 'react-select'
-import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2';
 import { useAuthContext } from '../../../hooks/useAuthContext';
 import ReactPaginate from 'react-paginate';
+import Spinner from '../../layout/Spinner'
+import { getZone, getLevel } from '../../../http/HttpConsume';
 
 const MainZone = () => {
     const [showCreate, setShowCreate] = useState(false)
@@ -24,7 +25,6 @@ const MainZone = () => {
     const [allowance, setAllowance] = useState(0)
     const [errAllowance, setErrAllowance] = useState('')
     const [data, setData] = useState([])
-    const navigate = useNavigate()
     const { user } = useAuthContext()
     const [page, setPage] = useState(0)
     const [keyword, setKeyword] = useState('')
@@ -41,44 +41,15 @@ const MainZone = () => {
     const [editMeal, setEditMeal] = useState(0)
     const [editAllowance, setEditAllowance] = useState(0)
     const [editZoneId, setEditZoneId] = useState(0)
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        getZone()
+        getZone(user, keyword, page, limit, setData, setPage, setRows, setLimit, setPages, setLoading)
     }, [page, keyword, limit, user])
 
     useEffect(() => {
-        getLevel()
+        getLevel(user, setLevel)
     }, [user])
-
-    const getZone = async () => {
-        await axios.get(`http://localhost:4001/user/zone?query=${keyword}&page=${page}&limit=${limit}`, {
-            headers: {
-                'Authorization': `Bearer ${user['token']}`
-            }
-        }).then(res => {
-            console.log(res)
-            setData(res.data.result)
-            setPage(res.data.page)
-            setRows(res.data.row)
-            setLimit(res.data.limit)
-            setPages(res.data.totalPage)
-        }).catch(error => {
-            console.log(error)
-        })
-    }
-
-    const getLevel = async () => {
-        await axios.get('http://localhost:4001/user/title-name', {
-            headers: {
-                'Authorization': `Bearer ${user['token']}`
-            }
-        }).then(res => {
-            const opt = res.data.result.map(item => ({ value: item.id, label: item.title_name }))
-            setLevel(opt)
-        }).catch(error => {
-            console.log(error)
-        })
-    }
 
     const showModalCreate = () => {
         setShowCreate(true)
@@ -202,7 +173,7 @@ const MainZone = () => {
                 text: `${res.data.message}`
             })
             closeModalCreate()
-            getZone()
+            getZone(user, keyword, page, limit, setData, setPage, setRows, setLimit, setPages, setLoading)
         }).catch(err => {
             console.log(err)
         })
@@ -304,7 +275,7 @@ const MainZone = () => {
                 text: `${res.data.message}`
             })
             closeModalEdit()
-            getZone()
+            getZone(user, keyword, page, limit, setData, setPage, setRows, setLimit, setPages, setLoading)
         }).catch(error => {
             console.log(error)
         })
@@ -326,7 +297,7 @@ const MainZone = () => {
                     'Your data has been deleted.',
                     'success'
                 )
-                getZone()
+                getZone(user, keyword, page, limit, setData, setPage, setRows, setLimit, setPages, setLoading)
             }
         })
         await axios.delete(`http://localhost:4001/user/zone/${id}`, {
@@ -334,6 +305,10 @@ const MainZone = () => {
                 'Authorization': `Bearer ${user['token']}`
             }
         })
+    }
+
+    if (loading) {
+        return <Spinner />
     }
 
     return (

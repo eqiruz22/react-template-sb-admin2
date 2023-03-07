@@ -5,8 +5,8 @@ import Select from 'react-select'
 import Swal from 'sweetalert2'
 import ReactPaginate from 'react-paginate'
 import { useAuthContext } from '../../../hooks/useAuthContext'
-
-
+import Spinner from '../../layout/Spinner'
+import { getDivisiData, getAllUser } from '../../../http/HttpConsume'
 const MainDivisi = () => {
     const [showCreate, setShowCreate] = useState(false)
     const [showEdit, setShowEdit] = useState(false)
@@ -26,12 +26,13 @@ const MainDivisi = () => {
     const [limit, setLimit] = useState(10)
     const [keyword, setkeyword] = useState('')
     const { user } = useAuthContext()
+    const [loading, setLoading] = useState(true)
     useEffect(() => {
-        getDivisiData()
-    }, [page, keyword])
+        getDivisiData(user, keyword, page, limit, setGetDivisi, setPage, setLimit, setRows, setPages, setLoading)
+    }, [user, page, keyword, limit])
     useEffect(() => {
-        getAllUser()
-    }, [])
+        getAllUser(user, setGetName)
+    }, [user])
 
     const handleCloseCreate = () => setShowCreate(false)
     const handleCreate = () => {
@@ -68,38 +69,6 @@ const MainDivisi = () => {
         setDivisiHead(selectedOption)
     }
 
-    const getAllUser = async () => {
-        await axios.get('http://localhost:4001/user/name', {
-            headers: {
-                'Authorization': `Bearer ${user['token']}`
-            }
-        })
-            .then(res => {
-                const opt = res.data.result.map(item => ({ value: item.user_id, label: item.name }))
-                setGetName(opt)
-            }).catch(error => {
-                console.log(error)
-            })
-    }
-
-    const getDivisiData = async () => {
-        await axios.get(`http://localhost:4001/user/divisi-head?query=${keyword}&page=${page}&limit=${limit}`, {
-            headers: {
-                'Authorization': `Bearer ${user['token']}`
-            }
-        })
-            .then(res => {
-                console.log(res.data)
-                setGetDivisi(res.data.result)
-                setPage(res.data.page)
-                setLimit(res.data.limit)
-                setRows(res.data.row)
-                setPages(res.data.totalPage)
-            }).catch(error => {
-                console.log(error)
-            })
-    }
-
     const handleSubmit = async (event) => {
         event.preventDefault()
         await axios.post('http://localhost:4001/user/divisi-create', {
@@ -123,7 +92,6 @@ const MainDivisi = () => {
         }).catch(error => {
             console.log(error)
         })
-
     }
 
     const handleEditName = (event) => {
@@ -198,6 +166,9 @@ const MainDivisi = () => {
         setEditHead(selectedOption)
     }
 
+    if (loading) {
+        return <Spinner />
+    }
     return (
         <div className='px-5'>
             <div className="d-sm-flex align-items-center justify-content-between mb-4">

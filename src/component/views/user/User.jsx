@@ -4,6 +4,8 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import ReactPaginate from 'react-paginate'
 import { useAuthContext } from '../../../hooks/useAuthContext.js'
+import Spinner from '../../layout/Spinner'
+import { getData } from '../../../http/HttpConsume.js'
 
 const User = ({ selectedUser }) => {
 
@@ -15,31 +17,13 @@ const User = ({ selectedUser }) => {
     const [limit, setLimit] = useState(10)
     const [keyword, setkeyword] = useState('')
     const { user } = useAuthContext()
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         if (user) {
-            getData()
+            getData(user, keyword, page, limit, setUsers, setPage, setLimit, setRows, setPages, setLoading)
         }
-    }, [page, keyword, user])
-
-    const getData = async () => {
-        await axios.get(`http://localhost:4001/user/show?query=${keyword}&page=${page}&limit=${limit}`, {
-            headers: {
-                'Authorization': `Bearer ${user['token']}`
-            }
-        }
-        ).then(res => {
-            console.log(res.data)
-            setUsers(res.data.result)
-            setPage(res.data.page)
-            setLimit(res.data.limit)
-            setRows(res.data.row)
-            setPages(res.data.totalPage)
-        }).catch(error => {
-            console.log(error)
-            alert(error.response)
-        })
-    }
+    }, [page, keyword, user, limit])
 
     const changePage = ({ selected }) => {
         setPage(selected)
@@ -67,10 +51,14 @@ const User = ({ selectedUser }) => {
                     'Your data has been deleted.',
                     'success'
                 )
-                getData()
+                getData(user, keyword, page, limit, setUsers, setPage, setLimit, setRows, setPages, setLoading)
             }
         })
         await axios.delete(`http://localhost:4001/user/delete/${id}`)
+    }
+
+    if (loading) {
+        return <Spinner />
     }
 
     return (

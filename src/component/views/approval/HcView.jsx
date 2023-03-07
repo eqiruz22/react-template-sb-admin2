@@ -2,42 +2,32 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 import { useAuthContext } from '../../../hooks/useAuthContext'
+import Spinner from '../../layout/Spinner'
+import { getPerdin } from '../../../http/HttpConsume'
 
-const DirectorView = () => {
+const HcView = () => {
 
     const [perdin, setPerdin] = useState([])
+    const [loading, setLoading] = useState(true)
     const { user } = useAuthContext()
-    const getPerdin = async () => {
-        await fetch('http://localhost:4001/user/waiting-approve-director', {
-            headers: {
-                'Authorization': `Bearer ${user['token']}`
-            }
-        })
-            .then(res => res.json())
-            .then(res => {
-                console.log(res.result)
-                setPerdin(res.result)
-            }).catch(error => {
-                console.log(error)
-            })
-    }
+
     let IDRCurrency = new Intl.NumberFormat('id-ID', {
         style: 'currency',
         currency: 'IDR'
     })
 
     useEffect(() => {
-        getPerdin()
-    }, [])
+        getPerdin(user, setPerdin, setLoading)
+    }, [user])
 
     const handleApproval = (id, perdin_id) => {
-        axios.post('http://localhost:4001/user/approved-director', {
+        axios.post('http://localhost:4001/user/approved-hc', {
+            id: id,
+            perdin_id: perdin_id
+        }, {
             headers: {
                 'Authorization': `Bearer ${user['token']}`
             }
-        }, {
-            id: id,
-            perdin_id: perdin_id
         }).then(res => {
             console.log(res)
             Swal.fire({
@@ -45,10 +35,13 @@ const DirectorView = () => {
                 text: 'Approved',
                 icon: 'success'
             })
-            getPerdin()
+            getPerdin(user, setPerdin, setLoading)
         }).catch(error => {
             console.log(error)
         })
+    }
+    if (loading) {
+        return <Spinner />
     }
 
     return (
@@ -62,7 +55,7 @@ const DirectorView = () => {
                 </div>
                 <div></div>
             </div>
-            <table className='table table-striped'>
+            <table className='table table-hover'>
                 <thead>
                     <tr>
                         <th scope="colSpan">#</th>
@@ -74,24 +67,29 @@ const DirectorView = () => {
                         <th scope='colSpan'>Action</th>
                     </tr>
                 </thead>
-                <tbody>
-                    {perdin.map((item, index) =>
-                        <tr key={item.id}>
-                            <th scope='row'>{index + 1}</th>
-                            <td>{item.name}</td>
-                            <td>{item.prj_name}</td>
-                            <td>{item.official_travel_site}</td>
-                            <td>{IDRCurrency.format(item.total_received)}</td>
-                            <td>{item.proses}</td>
-                            <td>
-                                <button disabled={item.status_id === 1 ? false : true} onClick={() => handleApproval(item.id, item.perdin_id)} className='btn btn-success'>Approve</button>
-                            </td>
+                {perdin.length > 0 ?
+                    perdin.map((item, index) =>
+                        <tbody>
+                            <tr key={item.id}>
+                                <th scope='row'>{index + 1}</th>
+                                <td>{item.name}</td>
+                                <td>{item.prj_name}</td>
+                                <td>{item.official_travel_site}</td>
+                                <td>{IDRCurrency.format(item.total_received)}</td>
+                                <td>{item.proses}</td>
+                                <td>
+                                    <button disabled={item.status_id === 1 ? false : true} onClick={() => handleApproval(item.id, item.perdin_id)} className='btn btn-success'>Approve</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    ) : <tbody>
+                        <tr>
+                            <td className='text-center' colSpan='7'>Data tidak tersedia</td>
                         </tr>
-                    )}
-                </tbody>
+                    </tbody>}
             </table>
         </div>
     )
 }
 
-export default DirectorView
+export default HcView
