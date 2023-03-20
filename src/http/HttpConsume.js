@@ -134,11 +134,11 @@ export const getPerdinAllUser = async (user, keyword, page, limit, setPerdin, se
             }
         }).then(res => {
             console.log(res.data)
-            setPerdin(res.data.result[0])
-            setPage(res.data.page)
-            setLimit(res.data.limit)
-            setRows(res.data.row)
-            setPages(res.data.totalPage)
+            setPerdin(res?.data?.result[0])
+            setPage(res?.data?.page)
+            setLimit(res?.data?.limit)
+            setRows(res?.data?.row)
+            setPages(res?.data?.totalPage)
             setLoading(false)
         })
     } catch (error) {
@@ -153,8 +153,8 @@ export const getPerdinDailyById = async (user, keyword, page, limit, setUserdail
                 'Authorization': `Bearer ${user['token']}`
             }
         }).then(res => {
-            console.log(res.data)
-            setUserdaily(res.data.result[0])
+            console.log(res.data.result)
+            setUserdaily(res.data.result)
             setPage(res.data.page)
             setLimit(res.data.limit)
             setRows(res.data.row)
@@ -173,8 +173,8 @@ export const getPerdin = async (user, setPerdin, setLoading) => {
                 'Authorization': `Bearer ${user['token']}`
             }
         }).then(res => {
-            console.log(res.result)
-            setPerdin(res.result[0])
+
+            setPerdin(res.data.result[0])
             setLoading(false)
         })
     } catch (error) {
@@ -188,10 +188,107 @@ export const showPerdin = async (user, setPerdin, setLoading) => {
             headers: {
                 'Authorization': `Bearer ${user['token']}`
             }
-        }).then(result => {
-            console.log(result)
-            setPerdin(result.result[0])
+        }).then(res => {
+            console.log(res.data.result)
+            setPerdin(res.data.result)
             setLoading(false)
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const getById = async (user, id, setName, setTitle) => {
+    try {
+        await axios.get(`http://localhost:4001/user/show/title-user/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
+            .then(res => {
+                setName(res.data.name)
+                setTitle(res.data.title_name)
+            })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const getPrjList = async (user, setPrj) => {
+    try {
+        await axios.get('http://localhost:4001/user/prj', {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
+            .then(res => {
+                const opt = res.data.result.map(item => ({ value: item.id, label: item.prj_name }))
+                setPrj(opt)
+            })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const getZoneList = async (user, title, setZoneByTitle) => {
+    try {
+        await axios.get(`http://localhost:4001/user/zone/${title}`, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        }).then(res => {
+            console.log(res.data)
+            const opt = res.data.result.map(item => ({ value: item.id, label: item.zone_name }))
+            setZoneByTitle(opt)
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const getZoneById = async (user, zone, setHotel, setMeal, setAirfare, setTransportation, setHardship) => {
+    try {
+        await axios.get(`http://localhost:4001/user/zone-by/${zone['value']}`, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        }).then(res => {
+            console.log(res.data)
+            setHotel(res.data.result[0]['hotel'])
+            setMeal(res.data.result[0]['meal_allowance'])
+            setAirfare(res.data.result[0]['transport_airplane'])
+            setTransportation(res.data.result[0]['transport_non_airplane'])
+            setHardship(res.data.result[0]['allowance'])
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const perdinDetails = async (user, perdin_id, setName, setTitle, setOft, setPurposes, setHotel, setStart, setEnd, setDay, setTransport, setLocal, setAirfare, setAirport, setEntertainment, setTools, setOthers, setReceived) => {
+    try {
+        await axios.get(`http://localhost:4001/user/perdin-daily/${perdin_id}`, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        }).then(res => {
+            console.log(res.data.result)
+            setName(res.data.result['name'])
+            setTitle(res.data.result['title_name'])
+            setOft(res.data.result['official_travel_site'])
+            setPurposes(res.data.result['purposes'])
+            setHotel(res.data.result['hotel'])
+            setStart(res.data.result['start_date'])
+            setEnd(res.data.result['end_date'])
+            setDay(res.data.result['days'])
+            setTransport(res.data.result['transport'])
+            setLocal(res.data.result['local_transport'])
+            setAirfare(res.data.result['airfare'])
+            setAirport(res.data.result['airport_tax'])
+            setEntertainment(res.data.result['entertainment'])
+            setTools(res.data.result['tools'])
+            setOthers(res.data.result['others'])
+            setReceived(res.data.result['total_received'])
         })
     } catch (error) {
         console.log(error)

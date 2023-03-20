@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useAuthContext } from '../../../hooks/useAuthContext'
 import Select from 'react-select'
 import Swal from 'sweetalert2'
+import { getZoneList, getPrjList, getById, getZoneById } from '../../../http/HttpConsume'
 
 const CreateDataById = () => {
     const [title, setTitle] = useState('')
@@ -39,71 +40,22 @@ const CreateDataById = () => {
     const { user } = useAuthContext()
     const navigate = useNavigate()
     useEffect(() => {
-        getPrj()
-    }, [])
+        getPrjList(user, setPrj)
+    }, [user])
 
     useEffect(() => {
-        getById()
-    }, [id])
+        getById(user, id, setName, setTitle)
+    }, [user, id])
 
     useEffect(() => {
-        getZone()
-    }, [title])
+        getZoneList(user, title, setZoneByTitle)
+    }, [user, title])
 
     useEffect(() => {
         if (zone !== '') {
-            getZoneById()
+            getZoneById(user, zone, setHotel, setMeal, setAirfare, setTransportation, setHardship)
         }
-    }, [zone['value']])
-
-    const getById = async () => {
-        try {
-            await axios.get(`http://localhost:4001/user/show/title-user/${id}`)
-                .then(res => {
-                    setName(res.data.name)
-                    setTitle(res.data.title_name)
-                })
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    const getPrj = async () => {
-        try {
-            await axios.get('http://localhost:4001/user/prj')
-                .then(res => {
-                    const opt = res.data.result.map(item => ({ value: item.id, label: item.prj_name }))
-                    setPrj(opt)
-                })
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    const getZone = async () => {
-        await axios.get(`http://localhost:4001/user/zone/${title}`)
-            .then(res => {
-                console.log(res.data)
-                const opt = res.data.result.map(item => ({ value: item.id, label: item.zone_name }))
-                setZoneByTitle(opt)
-            }).catch(error => {
-                console.log(error)
-            })
-    }
-
-    const getZoneById = async () => {
-        await axios.get(`http://localhost:4001/user/zone-by/${zone['value']}`)
-            .then(res => {
-                console.log(res.data)
-                setHotel(res.data.result[0]['hotel'])
-                setMeal(res.data.result[0]['meal_allowance'])
-                setAirfare(res.data.result[0]['transport_airplane'])
-                setTransportation(res.data.result[0]['transport_non_airplane'])
-                setHardship(res.data.result[0]['allowance'])
-            }).catch(error => {
-                console.log(error)
-            })
-    }
+    }, [user, zone])
 
     const handleChangeHotel = (event) => {
         setHotel(event.target.value)
@@ -258,6 +210,10 @@ const CreateDataById = () => {
             tools: tools,
             others: other,
             total_received: total
+        }, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
         }).then(res => {
             Swal.fire({
                 title: 'Success',

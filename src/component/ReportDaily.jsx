@@ -1,17 +1,52 @@
 import React from 'react'
-import { Document, View, Text, Page, StyleSheet } from '@react-pdf/renderer'
+import { Document, View, Text, Page, StyleSheet, Image, Font } from '@react-pdf/renderer'
+
+Font.register({
+    family: 'Noto1',
+    src: '/fonts/Noto/NotoSans-Black.ttf'
+})
 
 const styles = StyleSheet.create({
     head: {
-        fontSize: 20,
+        fontSize: 15,
         textAlign: 'center',
-        marginTop: 20
+        marginTop: 20,
+        textDecoration: 'underline',
+        fontWeight: 'bold',
+        fontFamily: 'Noto1'
     },
-    body: {
+    tableRow: {
+        margin: "auto",
+        flexDirection: "row",
+        fontFamily: 'Noto1'
+    },
+    tableCol: {
+        margin: 'auto',
+        width: "50%",
+        marginTop: 10,
+        marginLeft: 5,
+        borderStyle: "solid",
+        borderWidth: 0,
+        borderLeftWidth: 0,
+        borderTopWidth: 0
+    },
+    tableCell: {
+        marginTop: 5,
         fontSize: 10
     },
-    total: {
-        marginLeft: 300
+    tableColm1: {
+        margin: 'auto',
+        marginTop: 25,
+        width: "25%",
+        borderStyle: "solid",
+        borderWidth: 0,
+        borderLeftWidth: 0,
+        borderTopWidth: 0
+    },
+    tableCell1: {
+        marginTop: 25,
+        fontSize: 10,
+        textDecoration: 'underline'
     }
 })
 
@@ -31,29 +66,143 @@ const ReportDaily = ({ selectedUser }) => {
             <Document>
                 <Page size="A4">
                     <View>
-                        <Text style={styles.head}>Report</Text>
-                        <Text style={styles.body}>Name: {selectedUser.name}</Text>
-                        <Text style={styles.body}>Level: {selectedUser.title_name}</Text>
-                        <Text style={styles.body}>PRJ NO: {selectedUser.prj_name}</Text>
-                        <Text style={styles.body}>Official Travel Site: {selectedUser.official_travel_site}</Text>
-                        <Text style={styles.body}>Long Tour Of Duty: {selectedUser.days} days/months</Text>
-                        <Text style={styles.body}>Date: {newDate} - {endDate}</Text>
-                        <Text style={styles.body}>Purposes Bussiness: {selectedUser.purposes}</Text>
-                        <Text style={styles.body}>Hotel: {selectedUser.hotel}</Text>
-                        <Text style={styles.body}>Rented House: </Text>
-                        <Text style={styles.body}>Meal Allowance: </Text>
-                        <Text style={styles.body}>Hardship Allowance: </Text>
-                        <Text style={styles.body}>Pulse / Comm. Allow.: </Text>
-                        <Text style={styles.body}>Local Transportation: {selectedUser.transport}</Text>
-                        <Text style={styles.body}>Local Transportation-Area: {selectedUser.local_transport}</Text>
-                        <Text style={styles.body}>Airfare/Bus/Travel/Train: {selectedUser.airfare}</Text>
-                        <Text style={styles.body}>Car/Motor Rental: </Text>
-                        <Text style={styles.body}>Airport Tax: {selectedUser.airport_tax}</Text>
-                        <Text style={styles.body}>Entertainment: {selectedUser.entertainment}</Text>
-                        <Text style={styles.body}>Fee Support Worker: {selectedUser.fee_support}</Text>
-                        <Text style={styles.body}>ATK: {selectedUser.tools}</Text>
-                        <Text style={styles.body}>Others: {selectedUser.others}</Text>
-                        <Text style={styles.total}>Total Received:Rp {selectedUser.total_received.toLocaleString().split(',').join('.')}</Text>
+                        <Image src={"/img/logo.png"} />
+                        <Text style={styles.head}>SURAT PERJALANAN DINAS</Text>
+                        <View style={styles.tableRow}>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}>Name : {selectedUser.name}</Text>
+                            </View>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}>Jabatan : {selectedUser.title_name}</Text>
+                            </View>
+                        </View>
+                        <View style={styles.tableRow}>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}>Departement : {selectedUser.divisi_name}</Text>
+                            </View>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}>Job Class : </Text>
+                            </View>
+                        </View>
+                        <View style={styles.tableRow}>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}>Maksud Perjalanan : {selectedUser.official_travel_site}</Text>
+                            </View>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}></Text>
+                            </View>
+                        </View>
+                        <View style={styles.tableRow}>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}>Tempat Tujuan : {selectedUser.purposes}</Text>
+                            </View>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}></Text>
+                            </View>
+                        </View>
+                        <View style={styles.tableRow}>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}>Tanggal Berangkat : {newDate} - {endDate}</Text>
+                            </View>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}></Text>
+                            </View>
+                        </View>
+                        <View style={styles.tableRow}>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}>Lama Perjalanan : {selectedUser.days} Hari {selectedUser.days} Malam</Text>
+                            </View>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}></Text>
+                            </View>
+                        </View>
+                        <Text style={styles.head}>PENERIMAAN DIMUKA(ADVANCE)</Text>
+                        <View style={styles.tableRow}>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}>Transport ke tujuan : {selectedUser.transport.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</Text>
+                            </View>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}></Text>
+                            </View>
+                        </View>
+                        <View style={styles.tableRow}>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}>Transport Local : {selectedUser.local_transport.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</Text>
+                            </View>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}></Text>
+                            </View>
+                        </View>
+                        <View style={styles.tableRow}>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}>Penginapan : {selectedUser.days} Malam {selectedUser.hotel.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</Text>
+                            </View>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}></Text>
+                            </View>
+                        </View>
+                        <View style={styles.tableRow}>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}>Meals : {selectedUser.days} Hari {selectedUser.meal_allowance.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</Text>
+                            </View>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}></Text>
+                            </View>
+                        </View>
+                        <View style={styles.tableRow}>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}>Allowance : {selectedUser.days} Hari {selectedUser.hardship_allowance.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</Text>
+                            </View>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}></Text>
+                            </View>
+                        </View>
+                        <View style={styles.tableRow}>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}>Rapid Test : Rp -</Text>
+                            </View>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}></Text>
+                            </View>
+                        </View>
+                        <View style={styles.tableRow}>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}>Lain-lain : {selectedUser.others.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</Text>
+                            </View>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}></Text>
+                            </View>
+                        </View>
+                        <View style={styles.tableRow}>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}></Text>
+                            </View>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCell}>Jumlah Advance : {selectedUser.total_received.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</Text>
+                            </View>
+                        </View>
+                        <View style={styles.tableRow}>
+                            <View style={styles.tableColm1}>
+                                <Text style={styles.tableCell}>Diintrusikan oleh</Text>
+                            </View>
+                            <View style={styles.tableColm1}>
+                                <Text style={styles.tableCell}>Disetujui oleh</Text>
+                            </View>
+                            <View style={styles.tableColm1}>
+                                <Text style={styles.tableCell}>Advance Diterima oleh</Text>
+                            </View>
+                        </View>
+                        <View style={styles.tableRow}>
+                            <View style={styles.tableColm1}>
+                                <Text style={styles.tableCell1}>{selectedUser.proses} {selectedUser.approved_divisi}</Text>
+                            </View>
+                            <View style={styles.tableColm1}>
+                                <Text style={styles.tableCell1}>{selectedUser.proses} {selectedUser.approved_hc}</Text>
+                            </View>
+                            <View style={styles.tableColm1}>
+                                <Text style={styles.tableCell1}>{selectedUser.name}</Text>
+                            </View>
+                        </View>
                     </View>
                 </Page>
             </Document>

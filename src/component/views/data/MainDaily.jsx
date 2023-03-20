@@ -43,6 +43,7 @@ const MainDaily = ({ selectedUser }) => {
         setPage(0)
         setkeyword(query)
     }
+
     if (loading) {
         return <Spinner />
     }
@@ -64,29 +65,50 @@ const MainDaily = ({ selectedUser }) => {
                         <th scope="colSpan">#</th>
                         <th scope="colSpan">Nama</th>
                         <th scope="colSpan">PRJ</th>
+                        <th scope='colSpan'>Divisi</th>
                         <th scope="colSpan">Total Cash</th>
                         <th scope='colSpan'>Status</th>
                         <th scope='colSpan'>Action</th>
                     </tr>
                 </thead>
                 {user['role'] === 1 && (
-                    perdin.length > 0 ?
-                        perdin.map((item, index) =>
-                            <tbody>
-                                <tr key={item.id}>
+                    perdin?.length > 0 ?
+                        perdin?.map((item, index) =>
+                            <tbody key={`tbody-${item.id}-${index}`}>
+                                <tr key={`tr-${item.id}-${index}`}>
                                     <th scope='row'>{index + 1}</th>
                                     <td>{item.name}</td>
                                     <td>{item.prj_name}</td>
+                                    <td>{item.divisi_name}</td>
                                     <td>{item.total_received}</td>
-                                    <td>{item.proses}</td>
+                                    <td>
+                                        {item.status_id === 1 ? (
+                                            <div>{item.proses}</div>
+                                        ) : (
+                                            <div>
+                                                {(item.approved_divisi !== 'waiting approval' || item.approved_hc !== 'waiting approval') ? (
+                                                    <div>
+                                                        {item.proses}
+                                                        {item.approved_hc !== 'waiting approval' ? item.approved_hc : item.approved_divisi}
+                                                    </div>
+                                                ) : (
+                                                    <div>{item.proses}</div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </td>
                                     <td>
                                         <button disabled={item.status_id === 1 ? false : true} className='btn btn-warning'>Edit</button>
                                         <button disabled={item.status_id !== 1 ? true : false} className='btn btn-danger ml-1 mr-1'>Delete</button>
-                                        {item.status_id === 3 && (
+                                        {item.status_id === 2 && item.approved_hc !== 'waiting approval' && (
                                             <button className='btn btn-success'>
-                                                <PDFDownloadLink document={<ReportDaily key={item.id} selectedUser={item} />} fileName={`perdin_${item.name}-${item.prj_name}.pdf`}>
+                                                <PDFDownloadLink key={`pdf-link-${item.id}-${index}`} document={<ReportDaily selectedUser={item} />} fileName={`perdin_${item.name}-${item.prj_name}.pdf`}>
                                                     {({ blob, url, loading, error }) =>
-                                                        loading ? 'Loading' : 'Download'
+                                                        loading ? (<span className='d-none d-sm-inline-block' style={{ color: 'white' }}>
+                                                            Loading
+                                                        </span>) : (<span className='d-none d-sm-inline-block' style={{ color: 'white' }}>
+                                                            Download
+                                                        </span>)
                                                     }
                                                 </PDFDownloadLink>
                                             </button>
@@ -95,7 +117,7 @@ const MainDaily = ({ selectedUser }) => {
                                 </tr>
                             </tbody>
                         ) :
-                        <tbody>
+                        <tbody key={'no-data'}>
                             <tr>
                                 <td className='text-center' colSpan='6'>Data tidak tersedia</td>
                             </tr>
@@ -105,22 +127,44 @@ const MainDaily = ({ selectedUser }) => {
                     userdaily.length > 0 ?
                         userdaily.map((item, index) =>
                             <tbody>
-                                <tr key={item.id}>
+                                <tr key={index}>
                                     <td>{index + 1}</td>
                                     <td>{item.name}</td>
                                     <td>{item.prj_name}</td>
+                                    <td>{item.divisi_name}</td>
                                     <td>{item.total_received}</td>
-                                    <td>{item.proses}</td>
+                                    <td>
+                                        {item.status_id === 1 ? (
+                                            <div>{item.proses}</div>
+                                        ) : (
+                                            <div>
+                                                {(item.approved_divisi !== 'waiting approval' || item.approved_hc !== 'waiting approval') ? (
+                                                    <div>
+                                                        {item.proses}
+                                                        {item.approved_hc !== 'waiting approval' ? item.approved_hc : item.approved_divisi}
+                                                    </div>
+                                                ) : (
+                                                    <div>{item.proses}</div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </td>
                                     <td>
                                         <button disabled={item.status_id === 1 ? false : true} className='btn btn-warning'>Edit</button>
                                         <button disabled={item.status_id !== 1 ? true : false} className='btn btn-danger ml-1 mr-1'>Delete</button>
-                                        <button className='btn btn-success'>
-                                            <PDFDownloadLink document={<ReportDaily key={item.id} selectedUser={item} />} fileName={`perdin_${item.name}-${item.prj_name}.pdf`}>
-                                                {({ blob, url, loading, error }) =>
-                                                    loading ? 'Loading' : 'Download'
-                                                }
-                                            </PDFDownloadLink>
-                                        </button>
+                                        {item.status_id === 3 && (
+                                            <button className='btn btn-success'>
+                                                <PDFDownloadLink key={`pdf_download_${item.id}`} document={<ReportDaily selectedUser={item} />} fileName={`perdin_${item.name}-${item.prj_name}.pdf`}>
+                                                    {({ blob, url, loading, error }) =>
+                                                        loading ? (<span className='d-none d-sm-inline-block' style={{ color: 'white' }}>
+                                                            Loading
+                                                        </span>) : (<span className='d-none d-sm-inline-block' style={{ color: 'white' }}>
+                                                            Download
+                                                        </span>)
+                                                    }
+                                                </PDFDownloadLink>
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             </tbody>

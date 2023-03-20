@@ -21,24 +21,44 @@ const HcView = () => {
     }, [user])
 
     const handleApproval = (id, perdin_id) => {
-        axios.post('http://localhost:4001/user/approved-hc', {
-            id: id,
-            perdin_id: perdin_id
-        }, {
-            headers: {
-                'Authorization': `Bearer ${user['token']}`
-            }
-        }).then(res => {
-            console.log(res)
-            Swal.fire({
-                title: 'Success',
-                text: 'Approved',
-                icon: 'success'
-            })
-            getPerdin(user, setPerdin, setLoading)
-        }).catch(error => {
-            console.log(error)
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Approved'
+        }).then((result) => {
+            if (result.isConfirmed)
+                try {
+                    axios.post('http://localhost:4001/user/approved-hc', {
+                        id: id,
+                        perdin_id: perdin_id
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${user['token']}`
+                        }
+                    }).then(res => {
+                        console.log(res)
+                        Swal.fire({
+                            title: 'Success',
+                            text: 'Approved',
+                            icon: 'success'
+                        })
+                        getPerdin(user, setPerdin, setLoading)
+                    })
+                } catch (error) {
+                    console.log(error)
+                }
         })
+
+    }
+
+    const formatDate = (dates) => {
+        const date = new Date(dates)
+        const format = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear()
+        return format
     }
     if (loading) {
         return <Spinner />
@@ -61,6 +81,7 @@ const HcView = () => {
                         <th scope="colSpan">#</th>
                         <th scope="colSpan">Nama</th>
                         <th scope="colSpan">PRJ</th>
+                        <th scope='colSpan'>Date</th>
                         <th scope='colSpan'>Official Travel</th>
                         <th scope="colSpan">Total Cash</th>
                         <th scope='colSpan'>Status</th>
@@ -74,11 +95,12 @@ const HcView = () => {
                                 <th scope='row'>{index + 1}</th>
                                 <td>{item.name}</td>
                                 <td>{item.prj_name}</td>
+                                <td>{formatDate(item.start_date)} - {formatDate(item.end_date)}</td>
                                 <td>{item.official_travel_site}</td>
                                 <td>{IDRCurrency.format(item.total_received)}</td>
                                 <td>{item.proses}</td>
                                 <td>
-                                    <button disabled={item.status_id === 1 ? false : true} onClick={() => handleApproval(item.id, item.perdin_id)} className='btn btn-success'>Approve</button>
+                                    <button disabled={item.status_id === 1 ? true : false} onClick={() => handleApproval(item.id, item.perdin_id)} className='btn btn-success'>Approve</button>
                                 </td>
                             </tr>
                         </tbody>
