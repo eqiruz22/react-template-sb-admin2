@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import Select from 'react-select'
+import { useAuthContext } from '../../../hooks/useAuthContext';
 
 const Create = () => {
 
@@ -19,6 +20,7 @@ const Create = () => {
     const [errPassword, setErrPassword] = useState('')
     const [divisi, setDivisi] = useState([])
     const [divisiVal, setDivisiVal] = useState('')
+    const { user } = useAuthContext()
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -34,7 +36,11 @@ const Create = () => {
     }, [])
 
     const getDivisi = async () => {
-        await axios.get('http://localhost:4001/user/divisi')
+        await axios.get('http://localhost:4001/user/divisi', {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
             .then(res => {
                 console.log(res)
                 const opt = res.data.result.map(item => ({ value: item.id, label: item.divisi_name }))
@@ -53,6 +59,10 @@ const Create = () => {
             role: op,
             title_id: titles,
             divisi: divisiVal['value']
+        }, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
         }).then(res => {
             console.log(res.data.message)
             if (res.status === 201) {
@@ -80,7 +90,11 @@ const Create = () => {
     }
 
     const getTitle = async () => {
-        await axios.get('http://localhost:4001/user/title')
+        await axios.get('http://localhost:4001/user/title', {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
             .then(res => {
                 setTitle(res.data.value)
             }).catch(error => {
@@ -89,7 +103,11 @@ const Create = () => {
     }
 
     const getRole = async () => {
-        await axios.get('http://localhost:4001/user/role')
+        await axios.get('http://localhost:4001/user/role', {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
             .then(result => {
                 setRole(result.data.value)
             })

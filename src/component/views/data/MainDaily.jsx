@@ -8,6 +8,7 @@ import ReportDaily from '../../ReportDaily'
 import ReactPaginate from 'react-paginate'
 import Spinner from '../../layout/Spinner'
 import { getPerdinAllUser, getPerdinDailyById } from '../../../http/HttpConsume'
+import Swal from 'sweetalert2'
 
 const MainDaily = ({ selectedUser }) => {
 
@@ -44,6 +45,45 @@ const MainDaily = ({ selectedUser }) => {
         setkeyword(query)
     }
 
+    const handleDelete = (id) => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await fetch(`http://localhost:4001/user/perdin-daily/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${user['token']}`
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(response => {
+                            console.log(response)
+                            Swal.fire(
+                                'Deleted!',
+                                'Your data has been deleted.',
+                                'success'
+                            )
+                            if (user['role'] === 1) {
+                                getPerdinAllUser(user, keyword, page, limit, setPerdin, setPage, setLimit, setRows, setPages, setLoading)
+                            } else {
+                                getPerdinDailyById(user, keyword, page, limit, setUserdaily, setPage, setLimit, setRows, setPages, setLoading)
+                            }
+                        })
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+        })
+    }
+
     if (loading) {
         return <Spinner />
     }
@@ -56,8 +96,17 @@ const MainDaily = ({ selectedUser }) => {
                         <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} className="form-control" placeholder="Search for" />
                     </form>
                 </div>
-                <Link to={`/data/create/${user['id']}`} className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                    className="fas fa-plus fa-sm text-white-50"></i> Create Perdin</Link>
+                {user['role'] === 1 ? (
+                    <div>
+                        <Link to={`/data/create/daily`} className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                            className="fas fa-plus fa-sm text-white-50"></i> Create Perdin</Link>
+                    </div>
+                ) : (
+                    <div>
+                        <Link to={`/data/create/${user['id']}`} className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                            className="fas fa-plus fa-sm text-white-50"></i> Create Perdin</Link>
+                    </div>
+                )}
             </div>
             <table className='table table-hover'>
                 <thead>
@@ -80,7 +129,7 @@ const MainDaily = ({ selectedUser }) => {
                                     <td>{item.name}</td>
                                     <td>{item.prj_name}</td>
                                     <td>{item.divisi_name}</td>
-                                    <td>{item.total_received}</td>
+                                    <td>{item.jumlah_advance}</td>
                                     <td>
                                         {item.status_id === 1 ? (
                                             <div>{item.proses}</div>
@@ -99,7 +148,7 @@ const MainDaily = ({ selectedUser }) => {
                                     </td>
                                     <td>
                                         <button disabled={item.status_id === 1 ? false : true} className='btn btn-warning'>Edit</button>
-                                        <button disabled={item.status_id !== 1 ? true : false} className='btn btn-danger ml-1 mr-1'>Delete</button>
+                                        <button disabled={item.status_id !== 1 ? true : false} onClick={() => handleDelete(item.id)} className='btn btn-danger ml-1 mr-1'>Delete</button>
                                         {item.status_id === 2 && item.approved_hc !== 'waiting approval' && (
                                             <button className='btn btn-success'>
                                                 <PDFDownloadLink key={`pdf-link-${item.id}-${index}`} document={<ReportDaily selectedUser={item} />} fileName={`perdin_${item.name}-${item.prj_name}.pdf`}>
@@ -126,13 +175,13 @@ const MainDaily = ({ selectedUser }) => {
                 {user['role'] !== 1 && (
                     userdaily.length > 0 ?
                         userdaily.map((item, index) =>
-                            <tbody>
+                            <tbody key={`tbody-key-${item.id}+${index}`}>
                                 <tr key={index}>
                                     <td>{index + 1}</td>
                                     <td>{item.name}</td>
                                     <td>{item.prj_name}</td>
                                     <td>{item.divisi_name}</td>
-                                    <td>{item.total_received}</td>
+                                    <td>{item.jumlah_advance}</td>
                                     <td>
                                         {item.status_id === 1 ? (
                                             <div>{item.proses}</div>

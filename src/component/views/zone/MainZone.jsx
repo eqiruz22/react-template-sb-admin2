@@ -148,10 +148,6 @@ const MainZone = () => {
     const handleSubmit = async (event) => {
         event.preventDefault()
         await axios.post('http://localhost:4001/user/zone', {
-            headers: {
-                'Authorization': `Bearer ${user['token']}`
-            }
-        }, {
             zone_name: zone,
             title_id: levelVal['value'],
             transport_non_airplane: transport.toString().split('.').join(''),
@@ -159,6 +155,10 @@ const MainZone = () => {
             hotel: hotel.toString().split('.').join(''),
             meal_allowance: mealAllowance.toString().split('.').join(''),
             allowance: allowance.toString().split('.').join('')
+        }, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
         }).then(res => {
             setZone('')
             setTransport('')
@@ -340,7 +340,7 @@ const MainZone = () => {
                 {data.length > 0 ?
                     data.map((item, index) =>
                         <tbody>
-                            <tr key={item.id}>
+                            <tr key={`tr-key-${item.id}`}>
                                 <th>{index + 1}</th>
                                 <td>{item.name}</td>
                                 <td>{item.airplane.toLocaleString().split(',').join('.')}</td>
@@ -430,7 +430,7 @@ const MainZone = () => {
                 </form>
             </Modal>
 
-            {/* Modal Create */}
+            {/* Modal Edit */}
             <Modal backdrop='static' show={showEdit} size='lg' onHide={closeModalEdit}>
                 <Modal.Header closeButton>
                     <Modal.Title>Edit Zone</Modal.Title>

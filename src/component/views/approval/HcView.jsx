@@ -4,12 +4,19 @@ import Swal from 'sweetalert2'
 import { useAuthContext } from '../../../hooks/useAuthContext'
 import Spinner from '../../layout/Spinner'
 import { getPerdin } from '../../../http/HttpConsume'
+import ReactPaginate from 'react-paginate'
 
 const HcView = () => {
 
     const [perdin, setPerdin] = useState([])
     const [loading, setLoading] = useState(true)
     const { user } = useAuthContext()
+    const [pages, setPages] = useState(0)
+    const [rows, setRows] = useState([])
+    const [query, setQuery] = useState('')
+    const [page, setPage] = useState(0)
+    const [limit, setLimit] = useState(10)
+    const [keyword, setkeyword] = useState('')
 
     let IDRCurrency = new Intl.NumberFormat('id-ID', {
         style: 'currency',
@@ -17,8 +24,8 @@ const HcView = () => {
     })
 
     useEffect(() => {
-        getPerdin(user, setPerdin, setLoading)
-    }, [user])
+        getPerdin(user, keyword, page, limit, setPerdin, setPage, setLimit, setRows, setPages, setLoading)
+    }, [user, page, keyword, limit])
 
     const handleApproval = (id, perdin_id) => {
         Swal.fire({
@@ -29,12 +36,15 @@ const HcView = () => {
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Approved'
-        }).then((result) => {
+        }).then(async (result) => {
             if (result.isConfirmed)
                 try {
-                    axios.post('http://localhost:4001/user/approved-hc', {
+                    await axios.post('http://localhost:4001/user/approved-hc', {
                         id: id,
-                        perdin_id: perdin_id
+                        perdin_id: perdin_id,
+                        approved_hc: user['id'],
+                        divisi: user['divisi'],
+                        title: user['title']
                     }, {
                         headers: {
                             'Authorization': `Bearer ${user['token']}`
@@ -46,13 +56,29 @@ const HcView = () => {
                             text: 'Approved',
                             icon: 'success'
                         })
-                        getPerdin(user, setPerdin, setLoading)
+                        getPerdin(user, keyword, page, limit, setPerdin, setPage, setLimit, setRows, setPages, setLoading)
                     })
                 } catch (error) {
-                    console.log(error)
+                    console.log(error.response.data)
+                    if (error.response.data.message === 'you dont have permission to perform this action') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: `${error.response.data.message}`
+                        })
+                    }
                 }
         })
+    }
 
+    const changePage = ({ selected }) => {
+        setPage(selected)
+    }
+
+    const searchData = (e) => {
+        e.preventDefault()
+        setPage(0)
+        setkeyword(query)
     }
 
     const formatDate = (dates) => {
@@ -69,8 +95,8 @@ const HcView = () => {
             <div className="d-sm-flex align-items-center justify-content-between mb-4">
                 <h1 className="h3 mb-0 text-gray-800">Data</h1>
                 <div className='d-sm-flex align-items-center mr-5'>
-                    <form>
-                        <input type="text" className="form-control" placeholder="Search for" />
+                    <form onSubmit={searchData}>
+                        <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} className="form-control" placeholder="Search for" />
                     </form>
                 </div>
                 <div></div>
@@ -82,34 +108,52 @@ const HcView = () => {
                         <th scope="colSpan">Nama</th>
                         <th scope="colSpan">PRJ</th>
                         <th scope='colSpan'>Date</th>
-                        <th scope='colSpan'>Official Travel</th>
-                        <th scope="colSpan">Total Cash</th>
+                        <th scope='colSpan'>Maksud Perjalanan</th>
+                        <th scope="colSpan">Jumlah Advance</th>
                         <th scope='colSpan'>Status</th>
                         <th scope='colSpan'>Action</th>
                     </tr>
                 </thead>
                 {perdin.length > 0 ?
                     perdin.map((item, index) =>
-                        <tbody>
+                        <tbody key={`tbody-${item.id}+${index}`}>
                             <tr key={item.id}>
                                 <th scope='row'>{index + 1}</th>
                                 <td>{item.name}</td>
                                 <td>{item.prj_name}</td>
                                 <td>{formatDate(item.start_date)} - {formatDate(item.end_date)}</td>
-                                <td>{item.official_travel_site}</td>
-                                <td>{IDRCurrency.format(item.total_received)}</td>
+                                <td>{item.maksud_perjalanan}</td>
+                                <td>{IDRCurrency.format(item.jumlah_advance)}</td>
                                 <td>{item.proses}</td>
                                 <td>
-                                    <button disabled={item.status_id === 1 ? true : false} onClick={() => handleApproval(item.id, item.perdin_id)} className='btn btn-success'>Approve</button>
+                                    <button disabled={item.status_id !== 1} onClick={() => handleApproval(item.id, item.perdin_id)} className='btn btn-success'>Approve</button>
+                                    <button className='btn btn-primary ml-1'><i className='fas fa-eye'></i></button>
                                 </td>
                             </tr>
                         </tbody>
                     ) : <tbody>
                         <tr>
-                            <td className='text-center' colSpan='7'>Data tidak tersedia</td>
+                            <td className='text-center' colSpan='8'>Data tidak tersedia</td>
                         </tr>
                     </tbody>}
             </table>
+            <div className='d-sm-flex align-items-center justify-content-between'>
+                <p>Total Data : {rows}</p>
+                <nav aria-label="Page navigation example" key={rows}>
+                    <ReactPaginate
+                        previousLabel={"<<"}
+                        nextLabel={">>"}
+                        pageCount={pages}
+                        onPageChange={changePage}
+                        containerClassName={"pagination"}
+                        pageLinkClassName={"page-link"}
+                        previousLinkClassName={"page-link"}
+                        nextLinkClassName={"page-link"}
+                        activeLinkClassName={"page-item active"}
+                        disabledLinkClassName={"page-item disabled"}
+                    />
+                </nav>
+            </div>
         </div>
     )
 }

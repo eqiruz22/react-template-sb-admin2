@@ -5,7 +5,8 @@ import { useAuthContext } from '../../../hooks/useAuthContext'
 import Spinner from '../../layout/Spinner'
 import { showPerdin, perdinDetails } from '../../../http/HttpConsume'
 import { Modal } from 'react-bootstrap'
-//import ReactPaginate from 'react-paginate'
+import { showWaitingToDivisiById } from '../../../http/HttpConsume'
+import ReactPaginate from 'react-paginate'
 
 const DivisiView = () => {
     const [perdin, setPerdin] = useState([])
@@ -14,28 +15,52 @@ const DivisiView = () => {
     const [show, setShow] = useState(false)
     const [name, setName] = useState('')
     const [title, setTitle] = useState('')
-    const [oft, setOft] = useState('')
-    const [purposes, setPurposes] = useState('')
-    const [hotel, setHotel] = useState(0)
+    const handleClose = () => setShow(false)
+    const [pages, setPages] = useState(0)
+    const [rows, setRows] = useState([])
+    const [query, setQuery] = useState('')
+    const [page, setPage] = useState(0)
+    const [limit, setLimit] = useState(10)
+    const [keyword, setkeyword] = useState('')
+    const [waiting, setWaiting] = useState([])
+    const [mPerjalanan, setMPerjalanan] = useState('')
+    const [tujuan, setTujuan] = useState('')
+    const [lamaPerjalanan, setLamaPerjalanan] = useState(0)
     const [start, setStart] = useState('')
     const [end, setEnd] = useState('')
-    const [day, setDay] = useState(0)
-    const [transport, setTransport] = useState(0)
+    const [penginapan, setPenginapan] = useState(0)
+    const [meals, setMeals] = useState(0)
+    const [prj, setPrj] = useState('')
+    const [lain, setLain] = useState(0)
+    const [rapid, setRapid] = useState(0)
     const [local, setLocal] = useState(0)
-    const [airfare, setAirfare] = useState(0)
-    const [airport, setAirport] = useState(0)
-    const [entertainment, setEntertainment] = useState(0)
-    const [tools, setTools] = useState(0)
-    const [others, setOthers] = useState(0)
-    const [received, setReceived] = useState(0)
-    const handleClose = () => setShow(false)
+    const [transTujuan, setTransTujuan] = useState(0)
+    const [advance, setAdvance] = useState(0)
     useEffect(() => {
-        showPerdin(user, setPerdin, setLoading)
-    }, [user])
+        if (user['role'] === 1) {
+            showPerdin(user, keyword, page, limit, setPage, setLimit, setRows, setPages, setPerdin, setLoading)
+        }
+    }, [user, page, keyword, limit])
+
+    useEffect(() => {
+        if (user['role'] !== 1) {
+            showWaitingToDivisiById(user, keyword, page, limit, setWaiting, setPages, setPage, setRows, setLimit, setLoading)
+        }
+    }, [user, page, keyword, limit])
+
+    const changePage = ({ selected }) => {
+        setPage(selected)
+    }
+
+    const searchData = (e) => {
+        e.preventDefault()
+        setPage(0)
+        setkeyword(query)
+    }
 
     const handleView = (perdin_id) => {
         setShow(true)
-        perdinDetails(user, perdin_id, setName, setTitle, setOft, setPurposes, setHotel, setStart, setEnd, setDay, setTransport, setLocal, setAirfare, setAirport, setEntertainment, setTools, setOthers, setReceived)
+        perdinDetails(user, perdin_id, setName, setTitle, setMPerjalanan, setTujuan, setLamaPerjalanan, setStart, setEnd, setPenginapan, setMeals, setPrj, setLain, setRapid, setLocal, setTransTujuan, setAdvance)
     }
 
     let IDRCurrency = new Intl.NumberFormat('id-ID', {
@@ -52,13 +77,15 @@ const DivisiView = () => {
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Approved'
-        }).then((result) => {
+        }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    axios.post('http://localhost:4001/user/approved-divisi', {
+                    await axios.post('http://localhost:4001/user/approved-divisi', {
                         id: id,
                         perdin_id: perdin_id,
-                        approved_divisi: user['id']
+                        approved_divisi: user['id'],
+                        divisi_check: user['id'],
+                        dv_name: user['divisi']
                     }, {
                         headers: {
                             'Authorization': `Bearer ${user['token']}`
@@ -70,10 +97,21 @@ const DivisiView = () => {
                             text: 'Approved',
                             icon: 'success'
                         })
-                        showPerdin(user, setPerdin, setLoading)
+                        if (user['role'] === 1) {
+                            showPerdin(user, keyword, page, limit, setPage, setLimit, setRows, setPages, setPerdin, setLoading)
+                        } else {
+                            showWaitingToDivisiById(user, keyword, page, limit, setWaiting, setPages, setPage, setRows, setLimit, setLoading)
+                        }
                     })
                 } catch (error) {
                     console.log(error)
+                    if (error.response.data.message === 'you dont have permission to perform this action') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: `${error.response.data.message}`
+                        })
+                    }
                 }
             }
         })
@@ -94,8 +132,8 @@ const DivisiView = () => {
             <div className="d-sm-flex align-items-center justify-content-between mb-4">
                 <h1 className="h3 mb-0 text-gray-800">Data</h1>
                 <div className='d-sm-flex align-items-center mr-5'>
-                    <form>
-                        <input type="text" className="form-control" placeholder="Search for" />
+                    <form onSubmit={searchData}>
+                        <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} className="form-control" placeholder="Search for" />
                     </form>
                 </div>
                 <div></div>
@@ -113,29 +151,72 @@ const DivisiView = () => {
                         <th scope='colSpan'>Action</th>
                     </tr>
                 </thead>
-                {perdin.length > 0 ?
-                    perdin.map((item, index) =>
-                        <tbody>
-                            <tr key={item.id}>
-                                <th>{index + 1}</th>
-                                <td>{item.name}</td>
-                                <td>{item.prj_name}</td>
-                                <td>{formatDate(item.start_date)} - {formatDate(item.end_date)}</td>
-                                <td>{item.official_travel_site}</td>
-                                <td>{IDRCurrency.format(item.total_received)}</td>
-                                <td>{item.proses}</td>
-                                <td>
-                                    <button disabled={item.status_id !== 1 ? true : false} onClick={() => updateApproval(item.id, item.perdin_id)} className='btn btn-success'>Approve</button>
-                                    <button className='btn btn-primary ml-1' onClick={() => handleView(item.perdin_id)}><i className='fas fa-eye'></i></button>
-                                </td>
+                {user['role'] === 1 && (
+                    perdin.length > 0 ?
+                        perdin.map((item, index) =>
+                            <tbody key={`tbody-${item.id}+${index}`}>
+                                <tr key={`trx-${item.id}`}>
+                                    <th>{index + 1}</th>
+                                    <td>{item.name}</td>
+                                    <td>{item.prj_name}</td>
+                                    <td>{formatDate(item.start_date)} - {formatDate(item.end_date)}</td>
+                                    <td>{item.maksud_perjalanan}</td>
+                                    <td>{IDRCurrency.format(item.jumlah_advance)}</td>
+                                    <td>{item.proses}</td>
+                                    <td>
+                                        <button disabled={item.status_id !== 1} onClick={() => updateApproval(item.id, item.perdin_id)} className='btn btn-success'>Approve</button>
+                                        <button className='btn btn-primary ml-1' onClick={() => handleView(item.perdin_id)}><i className='fas fa-eye'></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        ) : <tbody>
+                            <tr>
+                                <td className='text-center' colSpan='8'>Data tidak tersedia</td>
                             </tr>
                         </tbody>
-                    ) : <tbody>
-                        <tr>
-                            <td className='text-center' colSpan='7'>Data tidak tersedia</td>
-                        </tr>
-                    </tbody>}
+                )}
+                {user['role'] !== 1 && (
+                    waiting?.length > 0 ?
+                        waiting?.map((item, index) =>
+                            <tbody key={`tb-${item.id}+${index}`}>
+                                <tr key={`trk-${item.id}`}>
+                                    <th>{index + 1}</th>
+                                    <td>{item.name}</td>
+                                    <td>{item.prj_name}</td>
+                                    <td>{formatDate(item.start_date)} - {formatDate(item.end_date)}</td>
+                                    <td>{item.maksud_perjalanan}</td>
+                                    <td>{IDRCurrency.format(item.jumlah_advance)}</td>
+                                    <td>{item.proses}</td>
+                                    <td>
+                                        <button disabled={item.status_id !== 1} onClick={() => updateApproval(item.id, item.perdin_id)} className='btn btn-success'>Approve</button>
+                                        <button className='btn btn-primary ml-1'><i className='fas fa-eye'></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        ) : <tbody>
+                            <tr>
+                                <td className='text-center' colSpan='8'>Data tidak tersedia</td>
+                            </tr>
+                        </tbody>
+                )}
             </table>
+            <div className='d-sm-flex align-items-center justify-content-between'>
+                <p>Total Data : {rows}</p>
+                <nav aria-label="Page navigation example" key={rows}>
+                    <ReactPaginate
+                        previousLabel={"<<"}
+                        nextLabel={">>"}
+                        pageCount={pages}
+                        onPageChange={changePage}
+                        containerClassName={"pagination"}
+                        pageLinkClassName={"page-link"}
+                        previousLinkClassName={"page-link"}
+                        nextLinkClassName={"page-link"}
+                        activeLinkClassName={"page-item active"}
+                        disabledLinkClassName={"page-item disabled"}
+                    />
+                </nav>
+            </div>
 
             {/* Modal View */}
             <Modal backdrop='static' show={show} onHide={handleClose} centered>
@@ -144,52 +225,46 @@ const DivisiView = () => {
                 </Modal.Header>
                 <Modal.Body>
                     <div>
+                        PRJ : {prj}
+                    </div>
+                    <div>
                         Name : {name}
                     </div>
                     <div>
                         Title : {title}
                     </div>
                     <div>
-                        Official Travel Site : {oft}
+                        Maksud Perjalanan : {mPerjalanan}
                     </div>
                     <div>
-                        Purposes : {purposes}
+                        Tujuan Perjalanan : {tujuan}
                     </div>
                     <div>
-                        Hotel : Rp {hotel.toLocaleString().split(',').join('.')}
+                        Tanggal Berangkat : {formatDate(start)} - {formatDate(end)}
                     </div>
                     <div>
-                        Start Date : {formatDate(start)}
+                        Lama Perjalanan : {lamaPerjalanan}
                     </div>
                     <div>
-                        End Date : {formatDate(end)}
+                        Transport Local : {local}
                     </div>
                     <div>
-                        Days : {day}
+                        Transport Tujuan : {transTujuan}
                     </div>
                     <div>
-                        Transport : Rp {transport.toLocaleString().split(',').join('.')}
+                        Penginapan : {penginapan}
                     </div>
                     <div>
-                        Local Transport : Rp {local.toLocaleString().split(',').join('.')}
+                        Meals : {meals}
                     </div>
                     <div>
-                        Airplane : Rp {airfare.toLocaleString().split(',').join('.')}
+                        Rapid Test : {rapid}
                     </div>
                     <div>
-                        Airport Tax : Rp {airport.toLocaleString().split(',').join('.')}
+                        Lain Lain : {lain}
                     </div>
                     <div>
-                        Entertainment : Rp {entertainment.toLocaleString().split(',').join('.')}
-                    </div>
-                    <div>
-                        Tools : Rp {tools.toLocaleString().split(',').join('.')}
-                    </div>
-                    <div>
-                        Others : Rp {others.toLocaleString().split(',').join('.')}
-                    </div>
-                    <div>
-                        Total Received : Rp {received.toLocaleString().split(',').join('.')}
+                        Jumlah Advance : {advance}
                     </div>
                 </Modal.Body>
             </Modal>

@@ -166,15 +166,19 @@ export const getPerdinDailyById = async (user, keyword, page, limit, setUserdail
     }
 }
 
-export const getPerdin = async (user, setPerdin, setLoading) => {
+export const getPerdin = async (user, keyword, page, limit, setPerdin, setPage, setLimit, setRows, setPages, setLoading) => {
     try {
-        await axios.get('http://localhost:4001/user/waiting-approve-hc', {
+        await axios.get(`http://localhost:4001/user/waiting-approve-hc?query=${keyword}&page=${page}&limit=${limit}`, {
             headers: {
                 'Authorization': `Bearer ${user['token']}`
             }
         }).then(res => {
-
-            setPerdin(res.data.result[0])
+            console.log(res.data)
+            setPerdin(res.data.result)
+            setPage(res.data.page)
+            setLimit(res.data.limit)
+            setRows(res.data.row)
+            setPages(res.data.totalPage)
             setLoading(false)
         })
     } catch (error) {
@@ -182,15 +186,19 @@ export const getPerdin = async (user, setPerdin, setLoading) => {
     }
 }
 
-export const showPerdin = async (user, setPerdin, setLoading) => {
+export const showPerdin = async (user, keyword, page, limit, setPage, setLimit, setRows, setPages, setPerdin, setLoading) => {
     try {
-        await axios('http://localhost:4001/user/waiting-approve-divisi', {
+        await axios(`http://localhost:4001/user/waiting-approve-divisi?query=${keyword}&page=${page}&limit=${limit}`, {
             headers: {
                 'Authorization': `Bearer ${user['token']}`
             }
         }).then(res => {
             console.log(res.data.result)
             setPerdin(res.data.result)
+            setPage(res.data.page)
+            setLimit(res.data.limit)
+            setRows(res.data.row)
+            setPages(res.data.totalPage)
             setLoading(false)
         })
     } catch (error) {
@@ -265,31 +273,100 @@ export const getZoneById = async (user, zone, setHotel, setMeal, setAirfare, set
     }
 }
 
-export const perdinDetails = async (user, perdin_id, setName, setTitle, setOft, setPurposes, setHotel, setStart, setEnd, setDay, setTransport, setLocal, setAirfare, setAirport, setEntertainment, setTools, setOthers, setReceived) => {
+export const perdinDetails = async (user, perdin_id, setName, setTitle, setMPerjalanan, setTujuan, setLamaPerjalanan, setStart, setEnd, setPenginapan, setMeals, setPrj, setLain, setRapid, setLocal, setTransTujuan, setAdvance) => {
     try {
         await axios.get(`http://localhost:4001/user/perdin-daily/${perdin_id}`, {
             headers: {
                 'Authorization': `Bearer ${user['token']}`
             }
         }).then(res => {
-            console.log(res.data.result)
-            setName(res.data.result['name'])
-            setTitle(res.data.result['title_name'])
-            setOft(res.data.result['official_travel_site'])
-            setPurposes(res.data.result['purposes'])
-            setHotel(res.data.result['hotel'])
-            setStart(res.data.result['start_date'])
-            setEnd(res.data.result['end_date'])
-            setDay(res.data.result['days'])
-            setTransport(res.data.result['transport'])
-            setLocal(res.data.result['local_transport'])
-            setAirfare(res.data.result['airfare'])
-            setAirport(res.data.result['airport_tax'])
-            setEntertainment(res.data.result['entertainment'])
-            setTools(res.data.result['tools'])
-            setOthers(res.data.result['others'])
-            setReceived(res.data.result['total_received'])
+            console.log(res.data?.result)
+            setPrj(res.data?.result['prj_name'])
+            setName(res.data?.result['name'])
+            setTitle(res.data?.result['title_name'])
+            setMPerjalanan(res.data?.result['maksud_perjalanan'])
+            setTujuan(res.data?.result['tempat_tujuan'])
+            setLamaPerjalanan(res.data?.result['lama_perjalanan'])
+            setStart(res.data?.result['start_date'])
+            setEnd(res.data?.result['end_date'])
+            setLocal(res.data?.result['transport_local'])
+            setTransTujuan(res.data?.result['transport_tujuan'])
+            setPenginapan(res.data?.result['penginapan'])
+            setMeals(res.data?.result['meals'])
+            setLain(res.data?.result['lain_lain'])
+            setRapid(res.data?.result['rapid_test'])
+            setAdvance(res.data?.result['jumlah_advance'])
         })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const getZones = async (user, title, setZoneByTitle) => {
+    try {
+        await axios.get(`http://localhost:4001/user/zone/${title}`, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        }).then(res => {
+            console.log(res.data)
+            const opt = res.data.result.map(item => ({ value: item.id, label: item.zone_name }))
+            setZoneByTitle(opt)
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const getTitle = async (user, name, setTitle) => {
+    try {
+        await axios.get(`http://localhost:4001/user/show/${name['value']}`, {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        }).then(res => {
+            console.log(res.data.value)
+            setTitle(res.data.value[0]['title_name'])
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const getUser = async (user, setOptName) => {
+    try {
+        await axios.get('http://localhost:4001/user/show', {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        }).then(res => {
+            console.log(res.data)
+            const opt = res.data?.result?.map(item => ({ value: item.id, label: item.name }))
+            setOptName(opt)
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const showWaitingToDivisiById = async (user, keyword, page, limit, setWaiting, setPages, setPage, setRows, setLimit, setLoading) => {
+    try {
+        await fetch(`http://localhost:4001/user/waiting-approve-divisi/${user['id']}?query=${keyword}&page=${page}&limit=${limit}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${user['token']}`
+            }
+        }).then(response => response.json())
+            .then(response => {
+                console.log(response)
+                setWaiting(response?.result)
+                setPages(response.totalPage)
+                setPage(response.page)
+                setRows(response.row)
+                setLimit(response.limit)
+                setLoading(false)
+            })
     } catch (error) {
         console.log(error)
     }

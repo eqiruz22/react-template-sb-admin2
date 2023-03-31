@@ -186,7 +186,7 @@ const CreateDataById = () => {
     }
     const handleSubmit = async (e) => {
         e.preventDefault()
-        await axios.post('http://10.80.7.94:4001/user/perdin-daily', {
+        await axios.post('http://localhost:4001/user/perdin-daily', {
             prj_id: prjval['value'],
             user_id: user['id'],
             title_name: title,
@@ -263,7 +263,7 @@ const CreateDataById = () => {
                     </div>
                     <div className="col-md-3">
                         <label htmlFor="end_date" className="form-label">Days</label>
-                        <input type="text" value={days} className="form-control" readOnly />
+                        <div className='form-control'>{days}</div>
                     </div>
                     <div className="col-md-3">
                         <label htmlFor="purposes" className="form-label">Purposes Business Trip</label>
@@ -330,7 +330,7 @@ const CreateDataById = () => {
                     </div>
                     <div className="col-md-3">
                         <label htmlFor="Others" className="form-label">Total Received</label>
-                        <input type='text' className='form-control' value={total.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })} readOnly />
+                        <div className='form-control'>{total.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</div>
                     </div>
                     <div>
                         <button type='submit' className='btn btn-primary'>Submit</button>

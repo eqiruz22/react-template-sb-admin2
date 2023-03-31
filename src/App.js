@@ -7,8 +7,6 @@ import User from "./component/views/user/User";
 import MainData from "./component/views/data/Main";
 import CreateData from "./component/views/data/CreateData";
 import MainTitle from "./component/views/title/Main";
-import CreateTitle from "./component/views/title/CreateTitle";
-import EditTitle from "./component/views/title/EditTitle";
 import DivisiView from "./component/views/approval/DivisiView";
 import HcView from "./component/views/approval/HcView";
 import Login from "./component/views/Login";
@@ -18,6 +16,7 @@ import MainDaily from "./component/views/data/MainDaily";
 import MainPrj from "./component/views/prj/MainPrj";
 import MainDivisi from "./component/views/divisi/MainDivisi";
 import MainZone from "./component/views/zone/MainZone";
+import CreateDataDaily from "./component/views/data/CreateDataDaily";
 
 
 function App() {
@@ -32,13 +31,12 @@ function App() {
           <Route path='data' element={user ? <MainData /> : <Navigate to='/login' />} />
           <Route path='data/harian' element={user ? <MainDaily /> : <Navigate to='/login' />} />
           <Route path='data/create' element={user ? <CreateData /> : <Navigate to='/login' />} />
+          <Route path='data/create/daily' element={user ? <CreateDataDaily /> : <Navigate to='/login' />} />
           <Route path='data/create/:id' element={user ? <CreateDataById /> : <Navigate to='/login' />} />
           <Route path='user' element={user ? <User /> : <Navigate to='/login' />} />
           <Route path='user/create' element={user ? <Create /> : <Navigate to='/login' />} />
           <Route path='user/edit/:id' element={user ? <Edit /> : <Navigate to='/login' />} />
           <Route path='title' element={user ? <MainTitle /> : <Navigate to='/login' />} />
-          <Route path='title/create' element={user ? <CreateTitle /> : <Navigate to='/login' />} />
-          <Route path='title/edit/:id' element={user ? <EditTitle /> : <Navigate to='/login' />} />
           <Route path='prj' element={user ? <MainPrj /> : <Navigate to='/login' />} />
           <Route path='waiting-to-approve-divisi' element={user ? <DivisiView /> : <Navigate to='/login' />} />
           <Route path='waiting-to-approve-hc' element={user ? <HcView /> : <Navigate to='/login' />} />

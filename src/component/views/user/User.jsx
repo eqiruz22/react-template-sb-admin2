@@ -35,7 +35,7 @@ const User = ({ selectedUser }) => {
         setkeyword(query)
     }
 
-    const deleteUser = async (id) => {
+    const deleteUser = (id) => {
         Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
@@ -44,17 +44,27 @@ const User = ({ selectedUser }) => {
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
+        }).then(async (result) => {
             if (result.isConfirmed) {
-                Swal.fire(
-                    'Deleted!',
-                    'Your data has been deleted.',
-                    'success'
-                )
-                getData(user, keyword, page, limit, setUsers, setPage, setLimit, setRows, setPages, setLoading)
+                try {
+                    await axios.delete(`http://localhost:4001/user/delete/${id}`, {
+                        headers: {
+                            'Authorization': `Bearer ${user['token']}`
+                        }
+                    }).then(res =>
+                        console.log(res),
+                        Swal.fire(
+                            'Deleted!',
+                            'Your data has been deleted.',
+                            'success'
+                        ),
+                        getData(user, keyword, page, limit, setUsers, setPage, setLimit, setRows, setPages, setLoading)
+                    )
+                } catch (error) {
+                    console.log(error)
+                }
             }
         })
-        await axios.delete(`http://localhost:4001/user/delete/${id}`)
     }
 
     if (loading) {

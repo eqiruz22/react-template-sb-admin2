@@ -85,7 +85,7 @@ const Sidebar = () => {
                         </li>
                     </div>
                 )}
-                {user['role'] === 2 && user['title_id'] === 3 && (
+                {user['role'] === 2 && (['Manager', 'Sr Manager', 'Director', 'Managing Director'].includes(user['title'])) && (
                     <div>
                         <li className={activeNav === '/waiting-to-approve-divisi' ? 'nav-item active' : 'nav-item'}
                             onClick={() => handleActive('/waiting-to-approve-divisi')}
@@ -96,18 +96,7 @@ const Sidebar = () => {
                         </li>
                     </div>
                 )}
-                {user['role'] === 2 && user['title_id'] === 4 && (
-                    <div>
-                        <li className={activeNav === '/waiting-to-approve-divisi' ? 'nav-item active' : 'nav-item'}
-                            onClick={() => handleActive('/waiting-to-approve-divisi')}
-                        >
-                            <Link className="nav-link" to="/waiting-to-approve-divisi">
-                                <i className="fas fa-solid fa-clipboard" />
-                                <span> Perdin list Divisi</span></Link>
-                        </li>
-                    </div>
-                )}
-                {user['role'] === 2 && user['title_id'] === 19 && (
+                {user['role'] === 2 && user['divisi'] === 'HCGA' && (
                     <div>
                         <li className={activeNav === '/waiting-to-approve-hc' ? 'nav-item active' : 'nav-item'}
                             onClick={() => handleActive('/waiting-to-approve-hc')}
