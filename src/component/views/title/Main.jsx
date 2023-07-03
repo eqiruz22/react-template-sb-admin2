@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Table } from 'react-bootstrap'
-import Swal from 'sweetalert2'
-import axios from 'axios'
 import Spinner from '../../layout/Spinner'
 import ReactPaginate from 'react-paginate'
 import { useAuthContext } from '../../../hooks/useAuthContext'
 import { showTitle } from '../../../http/HttpConsume'
-import { Modal } from "react-bootstrap";
+import { CreateTitle } from './CreateTitle'
+import { EditTitle } from './EditTitle'
+import { DeleteTitle } from './DeleteTitle'
 const Main = () => {
 
     const [title, setTitle] = useState([])
@@ -15,63 +14,15 @@ const Main = () => {
     const [page, setPage] = useState(0)
     const [limit, setLimit] = useState(10)
     const [query, setQuery] = useState('')
-    const [row, setRow] = useState([])
+    const [pages, setPages] = useState(0)
+    const [rows, setRows] = useState([])
     const { user } = useAuthContext()
-    const [show, setShow] = useState(false)
-    const [titleName, setTitleName] = useState('')
-    const [error, setError] = useState('')
-    const [titleVal, setTitleVal] = useState('')
-    const [errorEdit, setErrorEdit] = useState('')
-    const [idTitle, setIdTitle] = useState('')
+
     useEffect(() => {
-        showTitle(user, keyword, page, limit, setTitle, setLoading, setLimit, setRow)
+        showTitle(user, keyword, page, limit, setTitle, setLoading, setLimit, setRows, setPage, setPages)
     }, [user, limit, keyword, page])
 
-    const handleOpen = () => setShow(true)
-    const handleClose = () => setShow(false)
-    const handleCloseEdit = () => setShow(false)
-    const handleEdit = async (id) => {
-        setShow(true)
-        try {
-            await fetch(`http://localhost:4001/user/title/${id}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${user['token']}`
-                }
-            }).then(response => response.json())
-                .then(response => {
-                    console.log(response)
-                    setIdTitle(response.value[0]['id'])
-                    setTitleVal(response.value[0]['title_name'])
-                })
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    const deleteTitle = async (id) => {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire(
-                    'Deleted!',
-                    'Your data has been deleted.',
-                    'success'
-                )
-                showTitle(user, keyword, page, limit, setTitle, setLoading, setLimit, setRow)
-            }
-        })
-        await axios.delete(`http://localhost:4001/user/title/${id}`)
-    }
-
+    if (!user) return null
 
     const changePage = ({ selected }) => {
         setPage(selected)
@@ -81,81 +32,6 @@ const Main = () => {
         e.preventDefault()
         setPage(0)
         setkeyword(query)
-    }
-
-    const handleChangeTitle = (event) => {
-        setTitleName(event.target.value)
-        if (!event.target.value) {
-            setError('Title name is required!')
-        } else {
-            setError('')
-        }
-    }
-
-    const handleEditTitle = (event) => {
-        setTitleVal(event.target.value)
-        if (!event.target.value) {
-            setErrorEdit('Title name is required!')
-        } else {
-            setErrorEdit('')
-        }
-    }
-
-    const handleSubmit = async (event) => {
-        event.preventDefault()
-        try {
-            await fetch('http://localhost:4001/user/title', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${user['token']}`
-                },
-                body: JSON.stringify({
-                    title_name: titleName
-                })
-            }).then(response => response.json())
-                .then(response => {
-                    console.log(response)
-                    Swal.fire(
-                        'Success!',
-                        'New title has been created.',
-                        'success'
-                    )
-                    setShow(false)
-                    setTitleName('')
-                    showTitle(user, keyword, page, limit, setTitle, setLoading, setLimit, setRow)
-                })
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    const handleUpdate = async (event) => {
-        event.preventDefault()
-        try {
-            await fetch(`http://localhost:4001/user/title/${idTitle}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${user['token']}`
-                },
-                body: JSON.stringify({
-                    title_name: titleVal
-                })
-            }).then(response => response.json())
-                .then(response => {
-                    console.log(response)
-                    Swal.fire(
-                        'Success!',
-                        'Update success.',
-                        'success'
-                    )
-                    setShow(false)
-                    showTitle(user, keyword, page, limit, setTitle, setLoading, setLimit, setRow)
-                })
-        } catch (error) {
-            console.log(error)
-        }
     }
 
     if (loading) {
@@ -171,11 +47,10 @@ const Main = () => {
                         <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} className="form-control" placeholder="Search for" />
                     </form>
                 </div>
-                <Button onClick={handleOpen} className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                    className="fas fa-plus fa-sm text-white-50"></i> Create Title</Button>
+                <CreateTitle keyword={keyword} page={page} limit={limit} onDataUpdate={setTitle} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
             </div>
 
-            <Table className='table table-striped'>
+            <table className='table table-striped'>
                 <thead>
                     <tr>
                         <th scope="colSpan">#</th>
@@ -189,20 +64,20 @@ const Main = () => {
                             <th scope="row">{index + 1}</th>
                             <td>{item.title_name}</td>
                             <td>
-                                <Button className='btn btn-warning' onClick={() => handleEdit(item.id)}>Edit</Button>
-                                <Button className='btn btn-danger ml-1' onClick={() => deleteTitle(item.id)}>Delete</Button>
+                                <EditTitle id={item.id} keyword={keyword} page={page} limit={limit} onDataUpdate={setTitle} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
+                                <DeleteTitle id={item.id} keyword={keyword} page={page} limit={limit} onDataUpdate={setTitle} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
                             </td>
                         </tr>
                     )}
                 </tbody>
-            </Table>
+            </table>
             <div className='d-sm-flex align-items-center justify-content-between'>
-                <p>Total Data : {row}</p>
-                <nav aria-label="Page navigation example" key={row}>
+                <p>Total Data : {rows}</p>
+                <nav aria-label="Page navigation example" key={rows}>
                     <ReactPaginate
                         previousLabel={"<<"}
                         nextLabel={">>"}
-                        pageCount={page}
+                        pageCount={pages}
                         onPageChange={changePage}
                         containerClassName={"pagination"}
                         pageLinkClassName={"page-link"}
@@ -213,47 +88,6 @@ const Main = () => {
                     />
                 </nav>
             </div>
-            {/* Modal Create */}
-            <Modal backdrop='static' show={show} onHide={handleClose} centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>Create Title</Modal.Title>
-                </Modal.Header>
-                <form onSubmit={handleSubmit}>
-                    <Modal.Body>
-                        <div className="mb-3 mt-3">
-                            <label>Title Name</label>
-                            <input className='form-control' value={titleName} onChange={handleChangeTitle} type="text" />
-                            {error && <span className='text-danger'>{error}</span>}
-                        </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <button type="submit" className="btn btn-success">
-                            Save
-                        </button>
-                    </Modal.Footer>
-                </form>
-            </Modal>
-
-            {/* Modal Edit */}
-            <Modal backdrop='static' show={show} onHide={handleCloseEdit} centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>Edit Title</Modal.Title>
-                </Modal.Header>
-                <form onSubmit={handleUpdate}>
-                    <Modal.Body>
-                        <div className="mb-3 mt-3">
-                            <label>Title Name</label>
-                            <input className='form-control' value={titleVal} onChange={handleEditTitle} type="text" />
-                            {errorEdit && <span className='text-danger'>{errorEdit}</span>}
-                        </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <button type="submit" className="btn btn-success">
-                            Save
-                        </button>
-                    </Modal.Footer>
-                </form>
-            </Modal>
         </div>
     )
 }

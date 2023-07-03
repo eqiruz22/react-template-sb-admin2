@@ -8,12 +8,11 @@ import ReportDaily from '../../ReportDaily'
 import ReactPaginate from 'react-paginate'
 import Spinner from '../../layout/Spinner'
 import { getPerdinAllUser, getPerdinDailyById } from '../../../http/HttpConsume'
-import Swal from 'sweetalert2'
+import { DeletePerdinDaily } from './DeletePerdinDaily'
 
 const MainDaily = ({ selectedUser }) => {
 
     const [perdin, setPerdin] = useState([])
-    const [userdaily, setUserdaily] = useState([])
     const { user } = useAuthContext()
     const [pages, setPages] = useState(0)
     const [rows, setRows] = useState([])
@@ -26,14 +25,12 @@ const MainDaily = ({ selectedUser }) => {
     useEffect(() => {
         if (user['role'] === 1) {
             getPerdinAllUser(user, keyword, page, limit, setPerdin, setPage, setLimit, setRows, setPages, setLoading)
+        } else {
+            getPerdinDailyById(user, keyword, page, limit, setPerdin, setPage, setLimit, setRows, setPages, setLoading)
         }
     }, [page, keyword, user, limit])
 
-    useEffect(() => {
-        if (user['role'] !== 1) {
-            getPerdinDailyById(user, keyword, page, limit, setUserdaily, setPage, setLimit, setRows, setPages, setLoading)
-        }
-    }, [page, keyword, user, limit])
+    if (!user) return null
 
     const changePage = ({ selected }) => {
         setPage(selected)
@@ -43,45 +40,6 @@ const MainDaily = ({ selectedUser }) => {
         e.preventDefault()
         setPage(0)
         setkeyword(query)
-    }
-
-    const handleDelete = (id) => {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    await fetch(`http://localhost:4001/user/perdin-daily/${id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Authorization': `Bearer ${user['token']}`
-                        }
-                    })
-                        .then(response => response.json())
-                        .then(response => {
-                            console.log(response)
-                            Swal.fire(
-                                'Deleted!',
-                                'Your data has been deleted.',
-                                'success'
-                            )
-                            if (user['role'] === 1) {
-                                getPerdinAllUser(user, keyword, page, limit, setPerdin, setPage, setLimit, setRows, setPages, setLoading)
-                            } else {
-                                getPerdinDailyById(user, keyword, page, limit, setUserdaily, setPage, setLimit, setRows, setPages, setLoading)
-                            }
-                        })
-                } catch (error) {
-                    console.log(error)
-                }
-            }
-        })
     }
 
     if (loading) {
@@ -129,7 +87,7 @@ const MainDaily = ({ selectedUser }) => {
                                     <td>{item.name}</td>
                                     <td>{item.prj_name}</td>
                                     <td>{item.divisi_name}</td>
-                                    <td>{item.jumlah_advance}</td>
+                                    <td>Rp {item.jumlah_advance.toLocaleString().split(',').join('.')}</td>
                                     <td>
                                         {item.status_id === 1 ? (
                                             <div>{item.proses}</div>
@@ -147,8 +105,10 @@ const MainDaily = ({ selectedUser }) => {
                                         )}
                                     </td>
                                     <td>
-                                        <button disabled={item.status_id === 1 ? false : true} className='btn btn-warning'>Edit</button>
-                                        <button disabled={item.status_id !== 1 ? true : false} onClick={() => handleDelete(item.id)} className='btn btn-danger ml-1 mr-1'>Delete</button>
+                                        <Link to={`/data/edit/${item.id}`}>
+                                            <button disabled={item.status_id === 1 ? false : true} className='btn btn-warning'>Edit</button>
+                                        </Link>
+                                        <DeletePerdinDaily disabled={item.status_id !== 1} id={item.id} keyword={keyword} page={page} limit={limit} onDataUpdate={setPerdin} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
                                         {item.status_id === 2 && item.approved_hc !== 'waiting approval' && (
                                             <button className='btn btn-success'>
                                                 <PDFDownloadLink key={`pdf-link-${item.id}-${index}`} document={<ReportDaily selectedUser={item} />} fileName={`perdin_${item.name}-${item.prj_name}.pdf`}>
@@ -168,13 +128,13 @@ const MainDaily = ({ selectedUser }) => {
                         ) :
                         <tbody key={'no-data'}>
                             <tr>
-                                <td className='text-center' colSpan='6'>Data tidak tersedia</td>
+                                <td className='text-center' colSpan='7'>Data tidak tersedia</td>
                             </tr>
                         </tbody>
                 )}
                 {user['role'] !== 1 && (
-                    userdaily.length > 0 ?
-                        userdaily.map((item, index) =>
+                    perdin?.length > 0 ?
+                        perdin?.map((item, index) =>
                             <tbody key={`tbody-key-${item.id}+${index}`}>
                                 <tr key={index}>
                                     <td>{index + 1}</td>
@@ -199,8 +159,10 @@ const MainDaily = ({ selectedUser }) => {
                                         )}
                                     </td>
                                     <td>
-                                        <button disabled={item.status_id === 1 ? false : true} className='btn btn-warning'>Edit</button>
-                                        <button disabled={item.status_id !== 1 ? true : false} className='btn btn-danger ml-1 mr-1'>Delete</button>
+                                        <Link to={`/data/edit/${item.id}`}>
+                                            <button disabled={item.status_id === 1 ? false : true} className='btn btn-warning'>Edit</button>
+                                        </Link>
+                                        <DeletePerdinDaily disabled={item.status_id !== 1} id={item.id} keyword={keyword} page={page} limit={limit} onDataUpdate={setPerdin} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
                                         {item.status_id === 3 && (
                                             <button className='btn btn-success'>
                                                 <PDFDownloadLink key={`pdf_download_${item.id}`} document={<ReportDaily selectedUser={item} />} fileName={`perdin_${item.name}-${item.prj_name}.pdf`}>
@@ -219,7 +181,7 @@ const MainDaily = ({ selectedUser }) => {
                             </tbody>
                         ) : <tbody>
                             <tr>
-                                <td className='text-center' colSpan='6'>Data tidak tersedia</td>
+                                <td className='text-center' colSpan='7'>Data tidak tersedia</td>
                             </tr>
                         </tbody>
                 )}

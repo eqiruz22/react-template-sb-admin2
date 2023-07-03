@@ -10,6 +10,8 @@ const Main = ({ selectedUser }) => {
     const [perdin, setPerdin] = useState([])
     const { user } = useAuthContext()
     const [loading, setLoading] = useState(true)
+
+
     useEffect(() => {
         const showPerdin = async () => {
             await fetch('http://localhost:4001/user/perdin-show', {
@@ -28,6 +30,8 @@ const Main = ({ selectedUser }) => {
         }
         showPerdin()
     }, [user])
+
+    if (!user) return null
 
     let IDRCurrency = new Intl.NumberFormat('id-ID', {
         style: 'currency',

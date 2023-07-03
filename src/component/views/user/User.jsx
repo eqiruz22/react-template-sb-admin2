@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import axios from 'axios'
-import Swal from 'sweetalert2'
 import ReactPaginate from 'react-paginate'
 import { useAuthContext } from '../../../hooks/useAuthContext.js'
 import Spinner from '../../layout/Spinner'
 import { getData } from '../../../http/HttpConsume.js'
+import { DeleteUser } from './DeleteUser.js'
 
 const User = ({ selectedUser }) => {
 
@@ -25,6 +24,8 @@ const User = ({ selectedUser }) => {
         }
     }, [page, keyword, user, limit])
 
+    if (!user) return null
+
     const changePage = ({ selected }) => {
         setPage(selected)
     }
@@ -33,38 +34,6 @@ const User = ({ selectedUser }) => {
         e.preventDefault()
         setPage(0)
         setkeyword(query)
-    }
-
-    const deleteUser = (id) => {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    await axios.delete(`http://localhost:4001/user/delete/${id}`, {
-                        headers: {
-                            'Authorization': `Bearer ${user['token']}`
-                        }
-                    }).then(res =>
-                        console.log(res),
-                        Swal.fire(
-                            'Deleted!',
-                            'Your data has been deleted.',
-                            'success'
-                        ),
-                        getData(user, keyword, page, limit, setUsers, setPage, setLimit, setRows, setPages, setLoading)
-                    )
-                } catch (error) {
-                    console.log(error)
-                }
-            }
-        })
     }
 
     if (loading) {
@@ -97,7 +66,7 @@ const User = ({ selectedUser }) => {
                 </thead>
                 {users.length > 0 ?
                     users.map((item, index) =>
-                        <tbody>
+                        <tbody key={`body-user_${index * 2}`}>
                             <tr key={item.id}>
                                 <th scope="row">{index + 1}</th>
                                 <td>{item.email}</td>
@@ -111,13 +80,13 @@ const User = ({ selectedUser }) => {
                                     >
                                         <button className='btn btn-warning'>Edit</button>
                                     </Link>
-                                    <button className='btn btn-danger ml-1' onClick={() => deleteUser(item.id)}>Delete</button>
+                                    <DeleteUser id={item.id} keyword={keyword} page={page} limit={limit} onDataUpdate={setUsers} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
                                 </td>
                             </tr>
                         </tbody>
                     ) : <tbody>
                         <tr>
-                            <td className='text-center' colSpan='6'>Data tidak tersedia</td>
+                            <td className='text-center' colSpan='7'>Data tidak tersedia</td>
                         </tr>
                     </tbody>}
             </table>

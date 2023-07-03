@@ -1,10 +1,10 @@
-import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import Swal from 'sweetalert2'
 import { useAuthContext } from '../../../hooks/useAuthContext'
 import Spinner from '../../layout/Spinner'
 import { getPerdin } from '../../../http/HttpConsume'
 import ReactPaginate from 'react-paginate'
+import { PerdinHcDetail } from './PerdinHcDetail'
+import { UpdatePerdinHc } from './UpdatePerdinHc'
 
 const HcView = () => {
 
@@ -27,50 +27,6 @@ const HcView = () => {
         getPerdin(user, keyword, page, limit, setPerdin, setPage, setLimit, setRows, setPages, setLoading)
     }, [user, page, keyword, limit])
 
-    const handleApproval = (id, perdin_id) => {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Approved'
-        }).then(async (result) => {
-            if (result.isConfirmed)
-                try {
-                    await axios.post('http://localhost:4001/user/approved-hc', {
-                        id: id,
-                        perdin_id: perdin_id,
-                        approved_hc: user['id'],
-                        divisi: user['divisi'],
-                        title: user['title']
-                    }, {
-                        headers: {
-                            'Authorization': `Bearer ${user['token']}`
-                        }
-                    }).then(res => {
-                        console.log(res)
-                        Swal.fire({
-                            title: 'Success',
-                            text: 'Approved',
-                            icon: 'success'
-                        })
-                        getPerdin(user, keyword, page, limit, setPerdin, setPage, setLimit, setRows, setPages, setLoading)
-                    })
-                } catch (error) {
-                    console.log(error.response.data)
-                    if (error.response.data.message === 'you dont have permission to perform this action') {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: `${error.response.data.message}`
-                        })
-                    }
-                }
-        })
-    }
-
     const changePage = ({ selected }) => {
         setPage(selected)
     }
@@ -86,6 +42,9 @@ const HcView = () => {
         const format = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear()
         return format
     }
+
+    if (!user) return null
+
     if (loading) {
         return <Spinner />
     }
@@ -126,8 +85,8 @@ const HcView = () => {
                                 <td>{IDRCurrency.format(item.jumlah_advance)}</td>
                                 <td>{item.proses}</td>
                                 <td>
-                                    <button disabled={item.status_id !== 1} onClick={() => handleApproval(item.id, item.perdin_id)} className='btn btn-success'>Approve</button>
-                                    <button className='btn btn-primary ml-1'><i className='fas fa-eye'></i></button>
+                                    <UpdatePerdinHc disabled={item.status_id !== 1} id={item.id} perdin_id={item.perdin_id} keyword={keyword} page={page} limit={limit} onDataUpdate={setPerdin} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
+                                    <PerdinHcDetail id={item.id} />
                                 </td>
                             </tr>
                         </tbody>

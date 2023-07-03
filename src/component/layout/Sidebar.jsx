@@ -15,10 +15,7 @@ const Sidebar = () => {
         <div>
             <ul className="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
                 <Link className="sidebar-brand d-flex align-items-center justify-content-center" to="/">
-                    <div className="sidebar-brand-icon rotate-n-15">
-                        <i className="fas fa-laugh-wink" />
-                    </div>
-                    <div className="sidebar-brand-text mx-3">SB Admin <sup>2</sup></div>
+                    <div className="sidebar-brand-text mx-3">Perdin</div>
                 </Link>
                 <hr className="sidebar-divider my-0" />
                 <li className={activeNav === '' ? 'nav-item active' : 'nav-item'}
@@ -42,8 +39,8 @@ const Sidebar = () => {
                             <h6 className="collapse-header">List</h6>
                             {user['role'] === 1 && (
                                 <div>
-                                    <Link className={activeNav === '/data' ? 'collapse-item active' : 'collapse-item'}
-                                        onClick={() => handleActive('/data')} to="/data">Perdin Bulanan</Link>
+                                    {/* <Link className={activeNav === '/data' ? 'collapse-item active' : 'collapse-item'}
+                                        onClick={() => handleActive('/data')} to="/data">Perdin Bulanan</Link> */}
                                     <Link className={activeNav === '/data/harian' ? 'collapse-item active' : 'collapse-item'}
                                         onClick={() => handleActive('/data/harian')} to="/data/harian">Perdin Harian</Link>
                                     <Link className={activeNav === '/user' ? 'collapse-item active' : 'collapse-item'}

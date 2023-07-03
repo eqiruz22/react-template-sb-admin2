@@ -4,6 +4,7 @@ export const getDivisiData = async (user, keyword, page, limit, setGetDivisi, se
     try {
         await axios.get(`http://localhost:4001/user/divisi-head?query=${keyword}&page=${page}&limit=${limit}`, {
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user['token']}`
             }
         }).then(res => {
@@ -24,6 +25,7 @@ export const getAllUser = async (user, setGetName) => {
     try {
         await axios.get('http://localhost:4001/user/name', {
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user['token']}`
             }
         }).then(res => {
@@ -39,6 +41,7 @@ export const getZone = async (user, keyword, page, limit, setData, setPage, setR
     try {
         await axios.get(`http://localhost:4001/user/zone?query=${keyword}&page=${page}&limit=${limit}`, {
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user['token']}`
             }
         }).then(res => {
@@ -59,6 +62,7 @@ export const getLevel = async (user, setLevel) => {
     try {
         await axios.get('http://localhost:4001/user/title-name', {
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user['token']}`
             }
         }).then(res => {
@@ -74,10 +78,11 @@ export const getData = async (user, keyword, page, limit, setUsers, setPage, set
     try {
         await axios.get(`http://localhost:4001/user/show?query=${keyword}&page=${page}&limit=${limit}`, {
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user['token']}`
             }
         }).then(res => {
-            console.log(res.data)
+            console.log(res)
             setUsers(res.data.result)
             setPage(res.data.page)
             setLimit(res.data.limit)
@@ -90,37 +95,44 @@ export const getData = async (user, keyword, page, limit, setUsers, setPage, set
     }
 }
 
-export const showTitle = async (user, keyword, page, limit, setTitle, setLoading, setLimit, setRow) => {
+export const showTitle = async (user, keyword, page, limit, setTitle, setLoading, setLimit, setRows, setPage, setPages) => {
     try {
-        await axios(`http://localhost:4001/user/title?query=${keyword}&page=${page}&limit=${limit}`, {
+        await axios.get(`http://localhost:4001/user/title?query=${keyword}&page=${page}&limit=${limit}`, {
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user['token']}`
             }
         }).then(res => {
             setTitle(res.data.value)
-            setLoading(false)
+            setPage(res.data.page)
             setLimit(res.data.limit)
-            setRow(res.data.row)
+            setRows(res.data.row)
+            setPages(res.data.totalPage)
+            setLoading(false)
         })
     } catch (error) {
         console.log(error)
     }
 }
 
-export const getPrj = async (user, keyword, page, limit, setData, setPage, setLimit, setRow, setLoading) => {
+export const getPrj = async (user, keyword, page, limit, setData, setPage, setLimit, setRows, setPages, setLoading) => {
     try {
-        await axios.get(`http://localhost:4001/user/prj?query=${keyword}&page=${page}&limit=${limit}`, {
+        setLoading(true)
+        await fetch(`http://localhost:4001/user/prj?query=${keyword}&page=${page}&limit=${limit}`, {
+            method: "GET",
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user['token']}`
             }
-        }).then(res => {
-            console.log(res)
-            setData(res.data.result)
-            setPage(res.data.page)
-            setLimit(res.data.limit)
-            setRow(res.data.row)
-            setLoading(false)
-        })
+        }).then(response => response.json())
+            .then(res => {
+                setData(res.result)
+                setPage(res.page)
+                setLimit(res.limit)
+                setRows(res.row)
+                setPages(res.totalPage)
+                setLoading(false)
+            })
     } catch (error) {
         console.log(error)
     }
@@ -130,6 +142,7 @@ export const getPerdinAllUser = async (user, keyword, page, limit, setPerdin, se
     try {
         await axios.get(`http://localhost:4001/user/perdin-show-daily?query=${keyword}&page=${page}&limit=${limit}`, {
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user['token']}`
             }
         }).then(res => {
@@ -150,6 +163,7 @@ export const getPerdinDailyById = async (user, keyword, page, limit, setUserdail
     try {
         await axios.get(`http://localhost:4001/user/perdin-show-daily/${user['id']}?query=${keyword}&page=${page}&limit=${limit}`, {
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user['token']}`
             }
         }).then(res => {
@@ -170,6 +184,7 @@ export const getPerdin = async (user, keyword, page, limit, setPerdin, setPage, 
     try {
         await axios.get(`http://localhost:4001/user/waiting-approve-hc?query=${keyword}&page=${page}&limit=${limit}`, {
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user['token']}`
             }
         }).then(res => {
@@ -190,6 +205,7 @@ export const showPerdin = async (user, keyword, page, limit, setPage, setLimit, 
     try {
         await axios(`http://localhost:4001/user/waiting-approve-divisi?query=${keyword}&page=${page}&limit=${limit}`, {
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user['token']}`
             }
         }).then(res => {
@@ -210,13 +226,13 @@ export const getById = async (user, id, setName, setTitle) => {
     try {
         await axios.get(`http://localhost:4001/user/show/title-user/${id}`, {
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user['token']}`
             }
+        }).then(res => {
+            setName(res.data.name)
+            setTitle(res.data.title_name)
         })
-            .then(res => {
-                setName(res.data.name)
-                setTitle(res.data.title_name)
-            })
     } catch (error) {
         console.log(error)
     }
@@ -226,13 +242,30 @@ export const getPrjList = async (user, setPrj) => {
     try {
         await axios.get('http://localhost:4001/user/prj', {
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user['token']}`
             }
+        }).then(res => {
+            const opt = res.data.result.map(item => ({ value: item.id, label: item.prj_name }))
+            setPrj(opt)
         })
-            .then(res => {
-                const opt = res.data.result.map(item => ({ value: item.id, label: item.prj_name }))
-                setPrj(opt)
-            })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const getPrjDetail = async (user, id, setProjectName) => {
+    try {
+        await axios.get(`http://localhost:4001/user/prj/${id}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${user['token']}`
+            }
+        }).then(response => {
+            console.log(response)
+            setProjectName(response.data.result[0]['project_name'])
+        })
+
     } catch (error) {
         console.log(error)
     }
@@ -242,6 +275,7 @@ export const getZoneList = async (user, title, setZoneByTitle) => {
     try {
         await axios.get(`http://localhost:4001/user/zone/${title}`, {
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user['token']}`
             }
         }).then(res => {
@@ -258,6 +292,7 @@ export const getZoneById = async (user, zone, setHotel, setMeal, setAirfare, set
     try {
         await axios.get(`http://localhost:4001/user/zone-by/${zone['value']}`, {
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user['token']}`
             }
         }).then(res => {
@@ -273,10 +308,11 @@ export const getZoneById = async (user, zone, setHotel, setMeal, setAirfare, set
     }
 }
 
-export const perdinDetails = async (user, perdin_id, setName, setTitle, setMPerjalanan, setTujuan, setLamaPerjalanan, setStart, setEnd, setPenginapan, setMeals, setPrj, setLain, setRapid, setLocal, setTransTujuan, setAdvance) => {
+export const perdinDetails = async (user, id, setName, setTitle, setMPerjalanan, setTujuan, setLamaPerjalanan, setStart, setEnd, setPenginapan, setMeals, setPrj, setLain, setRapid, setLocal, setTransTujuan, setAdvance) => {
     try {
-        await axios.get(`http://localhost:4001/user/perdin-daily/${perdin_id}`, {
+        await axios.get(`http://localhost:4001/user/perdin-daily/${id}`, {
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user['token']}`
             }
         }).then(res => {
@@ -306,6 +342,7 @@ export const getZones = async (user, title, setZoneByTitle) => {
     try {
         await axios.get(`http://localhost:4001/user/zone/${title}`, {
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user['token']}`
             }
         }).then(res => {
@@ -322,6 +359,7 @@ export const getTitle = async (user, name, setTitle) => {
     try {
         await axios.get(`http://localhost:4001/user/show/${name['value']}`, {
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user['token']}`
             }
         }).then(res => {
@@ -337,6 +375,7 @@ export const getUser = async (user, setOptName) => {
     try {
         await axios.get('http://localhost:4001/user/show', {
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user['token']}`
             }
         }).then(res => {
@@ -367,6 +406,37 @@ export const showWaitingToDivisiById = async (user, keyword, page, limit, setWai
                 setLimit(response.limit)
                 setLoading(false)
             })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const PerdinEdit = async (user, id, setName, setTitle, setZone, setPrj, setMaksudPerjalanan, setStartDate, setEndDate, setTempatTujuan, setTransportTujuan, setTransportLocal, setPenginapan, setMeal, setAllowance, setRapid, setLain) => {
+    try {
+        const res = await fetch(`http://localhost:4001/user/perdin-daily/${id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${user['token']}`
+            }
+        })
+        const response = await res.json()
+        console.log(response)
+        setName({ value: response.result['user_id'], label: response.result['name'] })
+        setTitle(response.result['title_name'])
+        setZone({ value: response.result['zone_id'], label: response.result['zone_name'] })
+        setPrj({ value: response.result['prj_id'], label: response.result['prj_name'] })
+        setMaksudPerjalanan(response.result['maksud_perjalanan'])
+        setStartDate(response.result['start_date'])
+        setEndDate(response.result['end_date'])
+        setTempatTujuan(response.result['tempat_tujuan'])
+        setTransportTujuan(response.result['transport_tujuan'])
+        setTransportLocal(response.result['transport_local'])
+        setPenginapan(response.result['penginapan'])
+        setMeal(response.result['meals'])
+        setAllowance(response.result['allowance'])
+        setRapid(response.result['rapid'])
+        setLain(response.result['lain'])
     } catch (error) {
         console.log(error)
     }

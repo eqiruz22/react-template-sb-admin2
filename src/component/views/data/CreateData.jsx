@@ -1,5 +1,5 @@
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import Swal from 'sweetalert2'
 import { useNavigate } from 'react-router-dom'
 import { useAuthContext } from '../../../hooks/useAuthContext'
@@ -35,22 +35,56 @@ const CreateData = () => {
     const { user } = useAuthContext()
     const navigate = useNavigate()
 
-    let IDRCurrency = new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR'
+    // let IDRCurrency = new Intl.NumberFormat('id-ID', {
+    //     style: 'currency',
+    //     currency: 'IDR'
+    // })
+
+    const getUser = useCallback(async () => {
+        await axios.get('http://localhost:4001/user/show', {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
+            .then(res => {
+                console.log(res.data.result)
+                setUserName(res.data.result)
+            }).catch(error => {
+                console.log(error)
+            })
+    }, [user])
+
+    const getManager = useCallback(async () => {
+        await axios.get('http://localhost:4001/user/show-manager')
+            .then(res => {
+                setUserM(res.data.result)
+            }).catch(error => {
+                console.log(error)
+            })
+    }, [])
+
+    const getPrj = useCallback(async (event) => {
+        await axios.get(`http://localhost:4001/user/prj`)
+            .then(res => {
+                setPrj(res.data.result)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }, [])
+
+    useEffect(() => {
+        getUser()
     })
 
     useEffect(() => {
-        const getManager = async () => {
-            await axios.get('http://localhost:4001/user/show-manager')
-                .then(res => {
-                    setUserM(res.data.result)
-                }).catch(error => {
-                    console.log(error)
-                })
-        }
         getManager()
-    }, [])
+    })
+
+    useEffect(() => {
+        getPrj()
+    })
+
 
     const handleChangeTravel = (event) => {
         const data = event.target.value
@@ -135,19 +169,6 @@ const CreateData = () => {
         setDelegate(data)
     }
 
-    useEffect(() => {
-        const getPrj = async (event) => {
-            await axios.get(`http://localhost:4001/user/prj`)
-                .then(res => {
-                    setPrj(res.data.result)
-                })
-                .catch(error => {
-                    console.log(error)
-                })
-        }
-        getPrj()
-    }, [])
-
     const handlePrjChange = (event) => {
         const id = event.target.value
         setVlPrj(id)
@@ -178,22 +199,7 @@ const CreateData = () => {
             })
     }
 
-    useEffect(() => {
-        const getUser = async () => {
-            await axios.get('http://localhost:4001/user/show', {
-                headers: {
-                    'Authorization': `Bearer ${user['token']}`
-                }
-            })
-                .then(res => {
-                    console.log(res.data.result)
-                    setUserName(res.data.result)
-                }).catch(error => {
-                    console.log(error)
-                })
-        }
-        getUser()
-    }, [])
+
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -240,6 +246,8 @@ const CreateData = () => {
             }
         })
     }
+
+    if (!user) return null
 
     return (
         <div>

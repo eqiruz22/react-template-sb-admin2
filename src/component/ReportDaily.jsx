@@ -119,7 +119,7 @@ const ReportDaily = ({ selectedUser }) => {
                         <Text style={styles.head}>PENERIMAAN DIMUKA(ADVANCE)</Text>
                         <View style={styles.tableRow}>
                             <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Transport ke tujuan : {selectedUser.transport.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</Text>
+                                <Text style={styles.tableCell}>Transport ke tujuan : {selectedUser.transport}</Text>
                             </View>
                             <View style={styles.tableCol}>
                                 <Text style={styles.tableCell}></Text>
@@ -127,7 +127,7 @@ const ReportDaily = ({ selectedUser }) => {
                         </View>
                         <View style={styles.tableRow}>
                             <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Transport Local : {selectedUser.local_transport.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</Text>
+                                <Text style={styles.tableCell}>Transport Local : {selectedUser.local_transport}</Text>
                             </View>
                             <View style={styles.tableCol}>
                                 <Text style={styles.tableCell}></Text>
@@ -135,7 +135,7 @@ const ReportDaily = ({ selectedUser }) => {
                         </View>
                         <View style={styles.tableRow}>
                             <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Penginapan : {selectedUser.days} Malam {selectedUser.hotel.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</Text>
+                                <Text style={styles.tableCell}>Penginapan : {selectedUser.days} Malam {selectedUser.hotel}</Text>
                             </View>
                             <View style={styles.tableCol}>
                                 <Text style={styles.tableCell}></Text>
@@ -143,7 +143,7 @@ const ReportDaily = ({ selectedUser }) => {
                         </View>
                         <View style={styles.tableRow}>
                             <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Meals : {selectedUser.days} Hari {selectedUser.meal_allowance.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</Text>
+                                <Text style={styles.tableCell}>Meals : {selectedUser.days} Hari {selectedUser.meal_allowance}</Text>
                             </View>
                             <View style={styles.tableCol}>
                                 <Text style={styles.tableCell}></Text>
@@ -151,7 +151,7 @@ const ReportDaily = ({ selectedUser }) => {
                         </View>
                         <View style={styles.tableRow}>
                             <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Allowance : {selectedUser.days} Hari {selectedUser.hardship_allowance.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</Text>
+                                <Text style={styles.tableCell}>Allowance : {selectedUser.days} Hari {selectedUser.hardship_allowance}</Text>
                             </View>
                             <View style={styles.tableCol}>
                                 <Text style={styles.tableCell}></Text>
@@ -167,7 +167,7 @@ const ReportDaily = ({ selectedUser }) => {
                         </View>
                         <View style={styles.tableRow}>
                             <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Lain-lain : {selectedUser.others.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</Text>
+                                <Text style={styles.tableCell}>Lain-lain : {selectedUser.others}</Text>
                             </View>
                             <View style={styles.tableCol}>
                                 <Text style={styles.tableCell}></Text>
@@ -178,7 +178,7 @@ const ReportDaily = ({ selectedUser }) => {
                                 <Text style={styles.tableCell}></Text>
                             </View>
                             <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Jumlah Advance : {selectedUser.total_received.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</Text>
+                                <Text style={styles.tableCell}>Jumlah Advance : {selectedUser.total_received}</Text>
                             </View>
                         </View>
                         <View style={styles.tableRow}>

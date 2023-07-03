@@ -39,6 +39,7 @@ const CreateDataById = () => {
     const [zoneByTitle, setZoneByTitle] = useState([])
     const { user } = useAuthContext()
     const navigate = useNavigate()
+
     useEffect(() => {
         getPrjList(user, setPrj)
     }, [user])
@@ -56,6 +57,8 @@ const CreateDataById = () => {
             getZoneById(user, zone, setHotel, setMeal, setAirfare, setTransportation, setHardship)
         }
     }, [user, zone])
+
+    if (!user) return null
 
     const handleChangeHotel = (event) => {
         setHotel(event.target.value)

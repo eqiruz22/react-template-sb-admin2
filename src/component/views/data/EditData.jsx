@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import Select from 'react-select'
 import { useAuthContext } from '../../../hooks/useAuthContext'
-import { getPrjList, getUser, getTitle, getZones, getZoneById } from '../../../http/HttpConsume'
-import { useNavigate } from 'react-router-dom'
+import { getPrjList, getUser, getTitle, getZones, getZoneById, PerdinEdit, getPrjDetail } from '../../../http/HttpConsume'
+import { useNavigate, useParams } from 'react-router-dom'
 import Swal from 'sweetalert2'
-const CreateDataDaily = () => {
+const EditData = () => {
     const { user } = useAuthContext()
     const [optName, setOptName] = useState([])
     const [name, setName] = useState('')
@@ -22,11 +22,18 @@ const CreateDataDaily = () => {
     const [penginapan, setPenginapan] = useState(0)
     const [meal, setMeal] = useState(0)
     const [allowance, setAllowance] = useState(0)
-    const [rapidTest, setRapidTest] = useState(0)
-    const [lainLain, setLainLain] = useState(0)
+    const [rapid, setRapid] = useState(0)
+    const [lain, setLain] = useState(0)
     const [errorMP, setErrorMP] = useState('')
     const [errorTempatTujuan, setErrorTempatTujuan] = useState('')
+    const [projectName, setProjectName] = useState('')
+    const { id } = useParams()
     const navigate = useNavigate()
+
+    useEffect(() => {
+        PerdinEdit(user, id, setName, setTitle, setZone, setPrj, setMaksudPerjalanan, setStartDate, setEndDate, setTempatTujuan, setTransportTujuan, setTransportLocal, setPenginapan, setMeal, setAllowance, setRapid, setLain)
+    }, [id, user])
+
     useEffect(() => {
         getUser(user, setOptName)
     }, [user])
@@ -52,6 +59,10 @@ const CreateDataDaily = () => {
             getZoneById(user, zone, setTransportTujuan, setTransportLocal, setPenginapan, setMeal, setAllowance)
         }
     }, [user, zone])
+
+    useEffect(() => {
+        getPrjDetail(user, prj['value'], setProjectName)
+    }, [user, prj])
 
     if (!user) return null
 
@@ -117,48 +128,51 @@ const CreateDataDaily = () => {
         setAllowance(event.target.value)
     }
 
-    const handleChangeRapidTest = (event) => {
-        setRapidTest(event.target.value)
+    const handleChangeRapid = (event) => {
+        setRapid(event.target.value)
     }
 
-    const handleChangeLainLain = (event) => {
-        setLainLain(event.target.value)
+    const handleChangeLain = (event) => {
+        setLain(event.target.value)
     }
 
     let total = 0
     if (days === 0) {
-        total += parseFloat(meal) + parseFloat(lainLain) + parseFloat(rapidTest) + parseFloat(allowance) + parseFloat(transportTujuan) + parseFloat(penginapan) + parseFloat(transportLocal)
+        total += parseFloat(meal) + parseFloat(lain) + parseFloat(rapid) + parseFloat(allowance) + parseFloat(transportTujuan) + parseFloat(penginapan) + parseFloat(transportLocal)
     } else {
-        total += parseFloat(meal * days) + parseFloat(lainLain * days) + parseFloat(rapidTest * days) + parseFloat(allowance * days) + parseFloat(transportTujuan * days) + parseFloat(penginapan * days) + parseFloat(transportLocal * days)
+        total += parseFloat(meal * days) + parseFloat(lain * days) + parseFloat(rapid * days) + parseFloat(allowance * days) + parseFloat(transportTujuan * days) + parseFloat(penginapan * days) + parseFloat(transportLocal * days)
     }
 
     const handleSubmit = async (event) => {
         event.preventDefault()
+        const data = {
+            prj_id: prj['value'],
+            user_id: name['value'],
+            title_name: title,
+            zone_id: zone['value'],
+            maksud_perjalanan: maksudPerjalan,
+            tempat_tujuan: tempatTujuan,
+            start_date: startDate,
+            end_date: endDate,
+            lama_perjalanan: days,
+            transport_tujuan: transportTujuan,
+            transport_local: transportLocal,
+            penginapan: penginapan,
+            meals: meal,
+            allowance: allowance,
+            rapid: rapid,
+            lain: lain,
+            jumlah_advance: total,
+            id: id
+        }
         try {
             const res = await fetch('http://localhost:4001/user/perdin-daily', {
-                method: 'POST',
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${user['token']}`
                 },
-                body: JSON.stringify({
-                    prj_id: prj['value'],
-                    user_id: name['value'],
-                    title_name: title,
-                    maksud_perjalanan: maksudPerjalan,
-                    tempat_tujuan: tempatTujuan,
-                    start_date: startDate,
-                    end_date: endDate,
-                    lama_perjalanan: days,
-                    transport_tujuan: transportTujuan,
-                    transport_local: transportLocal,
-                    penginapan: penginapan,
-                    meals: meal,
-                    allowance: allowance,
-                    rapid_test: rapidTest,
-                    lain_lain: lainLain,
-                    jumlah_advance: total
-                })
+                body: JSON.stringify(data)
             })
             const response = await res.json()
             if (res.ok) {
@@ -178,6 +192,7 @@ const CreateDataDaily = () => {
         } catch (error) {
             console.log(error)
         }
+
     }
 
     return (
@@ -199,6 +214,10 @@ const CreateDataDaily = () => {
                     <div className='col-md-3'>
                         <label htmlFor="prj">PRJ</label>
                         <Select options={prjOpt} value={prj} onChange={(selectedOption) => setPrj(selectedOption)} />
+                    </div>
+                    <div className="col-md-3">
+                        <label htmlFor="project" className="form-label">Project Name</label>
+                        <input type="text" value={projectName} className="form-control" id="project" readOnly />
                     </div>
                     <div className="col-md-3">
                         <label htmlFor="maksudPerjalan" className="form-label">Maksud Perjalanan</label>
@@ -243,12 +262,12 @@ const CreateDataDaily = () => {
                         <input type="text" value={allowance} onChange={handleChangeAllowance} className="form-control" id="allowance" />
                     </div>
                     <div className="col-md-3">
-                        <label htmlFor="rented" className="form-label">Rapid Test</label>
-                        <input type="text" value={rapidTest} onChange={handleChangeRapidTest} className="form-control" id="rented" />
+                        <label htmlFor="rapid" className="form-label">Rapid Test</label>
+                        <input type="text" value={rapid} onChange={handleChangeRapid} className="form-control" id="rapid" />
                     </div>
                     <div className="col-md-3">
-                        <label htmlFor="pulse" className="form-label">Lain-Lain</label>
-                        <input type="text" className="form-control" id="pulse" value={lainLain} onChange={handleChangeLainLain} />
+                        <label htmlFor="lain" className="form-label">Lain-Lain</label>
+                        <input type="text" className="form-control" id="lain" value={lain} onChange={handleChangeLain} />
                     </div>
                     <div className="col-md-3">
                         <label htmlFor="Others" className="form-label">Jumlah Advance</label>
@@ -263,4 +282,4 @@ const CreateDataDaily = () => {
     )
 }
 
-export default CreateDataDaily
+export default EditData

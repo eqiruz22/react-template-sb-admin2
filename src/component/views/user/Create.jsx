@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -23,19 +23,7 @@ const Create = () => {
     const { user } = useAuthContext()
     const navigate = useNavigate()
 
-    useEffect(() => {
-        getTitle()
-    }, [])
-
-    useEffect(() => {
-        getRole()
-    }, [])
-
-    useEffect(() => {
-        getDivisi()
-    }, [])
-
-    const getDivisi = async () => {
+    const getDivisi = useCallback(async () => {
         await axios.get('http://localhost:4001/user/divisi', {
             headers: {
                 'Authorization': `Bearer ${user['token']}`
@@ -48,7 +36,47 @@ const Create = () => {
             }).catch(error => {
                 console.log(error)
             })
-    }
+    }, [user])
+
+    const getTitle = useCallback(async () => {
+        await axios.get('http://localhost:4001/user/title', {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
+            .then(res => {
+                setTitle(res.data.value)
+            }).catch(error => {
+                console.log(error)
+            })
+    }, [user])
+
+    const getRole = useCallback(async () => {
+        await axios.get('http://localhost:4001/user/role', {
+            headers: {
+                'Authorization': `Bearer ${user['token']}`
+            }
+        })
+            .then(result => {
+                setRole(result.data.value)
+            })
+    }, [user])
+
+    useEffect(() => {
+        getTitle()
+    })
+
+    useEffect(() => {
+        getRole()
+    })
+
+    useEffect(() => {
+        getDivisi()
+    })
+
+    if (!user) return null
+
+
 
     const submitData = async (e) => {
         e.preventDefault()
@@ -87,30 +115,6 @@ const Create = () => {
             }
 
         })
-    }
-
-    const getTitle = async () => {
-        await axios.get('http://localhost:4001/user/title', {
-            headers: {
-                'Authorization': `Bearer ${user['token']}`
-            }
-        })
-            .then(res => {
-                setTitle(res.data.value)
-            }).catch(error => {
-                console.log(error)
-            })
-    }
-
-    const getRole = async () => {
-        await axios.get('http://localhost:4001/user/role', {
-            headers: {
-                'Authorization': `Bearer ${user['token']}`
-            }
-        })
-            .then(result => {
-                setRole(result.data.value)
-            })
     }
 
     const handleEmailChange = (e) => {
