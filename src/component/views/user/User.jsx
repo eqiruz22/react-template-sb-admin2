@@ -86,7 +86,7 @@ const User = ({ selectedUser }) => {
                         </tbody>
                     ) : <tbody>
                         <tr>
-                            <td className='text-center' colSpan='7'>Data tidak tersedia</td>
+                            <td className='text-center' colSpan='7'>Data not found</td>
                         </tr>
                     </tbody>}
             </table>

@@ -14,40 +14,44 @@ export const DeletePrj = ({ id, onDataUpdate, onPage, onLimit, onRow, onTotalpag
             confirmButtonText: 'Yes, delete it!'
         }).then(async (result) => {
             if (result.isConfirmed) {
-                const res = await fetch(`http://localhost:4001/user/prj/delete/${id}`, {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${user['token']}`
-                    }
-                })
-                const response = await res.json()
-                if (res.ok) {
-                    await fetch(`http://localhost:4001/user/prj?query=${keyword}&page=${page}&limit=${limit}`, {
-                        method: "GET",
+                try {
+                    const res = await fetch(`http://localhost:4001/user/prj/delete/${id}`, {
+                        method: "DELETE",
                         headers: {
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${user['token']}`
                         }
-                    }).then(response => response.json())
-                        .then(response => {
-                            onDataUpdate(response.result)
-                            onPage(response.page)
-                            onLimit(response.limit)
-                            onRow(response.row)
-                            onTotalpage(response.totalPage)
-                        })
-                    Swal.fire(
-                        'Success',
-                        `${response.message}`,
-                        'success'
-                    )
-                } else {
-                    Swal.fire(
-                        'Something wrong?',
-                        `${response.message}`,
-                        'error'
-                    )
+                    })
+                    const response = await res.json()
+                    if (res.ok) {
+                        await fetch(`http://localhost:4001/user/prj?query=${keyword}&page=${page}&limit=${limit}`, {
+                            method: "GET",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${user['token']}`
+                            }
+                        }).then(response => response.json())
+                            .then(response => {
+                                onDataUpdate(response.result)
+                                onPage(response.page)
+                                onLimit(response.limit)
+                                onRow(response.row)
+                                onTotalpage(response.totalPage)
+                            })
+                        Swal.fire(
+                            'Success',
+                            `${response.message}`,
+                            'success'
+                        )
+                    } else {
+                        Swal.fire(
+                            'Something wrong?',
+                            `${response.message}`,
+                            'error'
+                        )
+                    }
+                } catch (error) {
+                    console.log(error)
                 }
             }
         })

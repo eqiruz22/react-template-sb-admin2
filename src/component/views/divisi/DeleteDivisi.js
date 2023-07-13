@@ -1,10 +1,10 @@
 import React from 'react'
 import { useAuthContext } from '../../../hooks/useAuthContext'
 import Swal from 'sweetalert2'
-export const DeleteDivisi = () => {
+export const DeleteDivisi = ({ id, onDataUpdate, onPage, onLimit, onRow, onTotalpage, keyword, page, limit }) => {
     const { user } = useAuthContext()
 
-    const handleDelete = ({ id, onDataUpdate, onPage, onLimit, onRow, onTotalpage, keyword, page, limit }) => {
+    const handleDelete = () => {
         Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",

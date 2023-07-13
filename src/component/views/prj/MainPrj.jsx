@@ -57,18 +57,23 @@ const MainPrj = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {data.map((item, index) =>
-                            <tr key={item.id}>
-                                <th scope="row">{index + 1}</th>
-                                <td>{item.prj_name}</td>
-                                <td>{item.project_name}</td>
-                                <td>{item.status}</td>
-                                <td>
-                                    <EditPrj id={item.id} keyword={keyword} page={page} limit={limit} onDataUpdate={setData} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
-                                    <DeletePrj id={item.id} keyword={keyword} page={page} limit={limit} onDataUpdate={setData} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
-                                </td>
-                            </tr>
-                        )}
+                        {data.length > 0 ?
+                            data.map((item, index) =>
+                                <tr key={item.id}>
+                                    <th scope="row">{index + 1}</th>
+                                    <td>{item.prj_name}</td>
+                                    <td>{item.project_name}</td>
+                                    <td>{item.status}</td>
+                                    <td>
+                                        <EditPrj id={item.id} keyword={keyword} page={page} limit={limit} onDataUpdate={setData} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
+                                        <DeletePrj id={item.id} keyword={keyword} page={page} limit={limit} onDataUpdate={setData} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
+                                    </td>
+                                </tr>
+                            ) : <tbody key={'no-data'}>
+                                <tr>
+                                    <td className='text-center' colSpan='5'>Data not found</td>
+                                </tr>
+                            </tbody>}
                     </tbody>
                 </table>
                 <div className='d-sm-flex align-items-center justify-content-between'>

@@ -2,7 +2,7 @@ import React from 'react'
 import { useAuthContext } from '../../../hooks/useAuthContext'
 import Swal from 'sweetalert2'
 
-export const UpdatePerdinDivisi = ({ id, perdin_id, keyword, page, limit, onDataUpdate, onPage, onLimit, onRow, onTotalpage }) => {
+export const UpdatePerdinDivisi = ({ id, perdin_id, keyword, page, limit, onDataUpdate, onPage, onLimit, onRow, onTotalpage, disabled }) => {
 
     const { user } = useAuthContext()
 
@@ -87,7 +87,7 @@ export const UpdatePerdinDivisi = ({ id, perdin_id, keyword, page, limit, onData
     }
     return (
         <>
-            <button className='btn btn-success' onClick={updateApproval}>Approve</button>
+            <button className='btn btn-success' onClick={updateApproval} disabled={disabled}>Approve</button>
         </>
     )
 }

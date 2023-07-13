@@ -141,6 +141,7 @@ const CreateZone = ({ onDataUpdate, onPage, onLimit, onRow, onTotalpage, keyword
                 setZone('')
                 setTransport(0)
                 setTransportAirplane(0)
+                setLevel('')
                 setHotel(0)
                 setAllowance(0)
                 setMealAllowance(0)

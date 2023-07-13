@@ -93,7 +93,7 @@ const Sidebar = () => {
                         </li>
                     </div>
                 )}
-                {user['role'] === 2 && user['divisi'] === 'HCGA' && (
+                {user['role'] === 2 && user['divisi'] === 'HC' && (
                     <div>
                         <li className={activeNav === '/waiting-to-approve-hc' ? 'nav-item active' : 'nav-item'}
                             onClick={() => handleActive('/waiting-to-approve-hc')}

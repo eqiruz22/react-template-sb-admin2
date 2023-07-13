@@ -82,7 +82,7 @@ const MainZone = () => {
                         </tbody>
                     ) : <tbody>
                         <tr>
-                            <td className='text-center' colSpan='9'>Data tidak tersedia</td>
+                            <td className='text-center' colSpan='9'>Data not found</td>
                         </tr>
                     </tbody>
                 }

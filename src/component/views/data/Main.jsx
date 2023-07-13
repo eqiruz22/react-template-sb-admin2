@@ -88,7 +88,7 @@ const Main = ({ selectedUser }) => {
                         </tbody>
                     ) : <tbody>
                         <tr>
-                            <td className='text-center' colSpan='6'>Data tidak tersedia</td>
+                            <td className='text-center' colSpan='6'>Data not found</td>
                         </tr>
                     </tbody>}
             </table>

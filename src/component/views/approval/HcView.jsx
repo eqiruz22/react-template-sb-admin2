@@ -85,14 +85,14 @@ const HcView = () => {
                                 <td>{IDRCurrency.format(item.jumlah_advance)}</td>
                                 <td>{item.proses}</td>
                                 <td>
-                                    <UpdatePerdinHc disabled={item.status_id !== 1} id={item.id} perdin_id={item.perdin_id} keyword={keyword} page={page} limit={limit} onDataUpdate={setPerdin} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
-                                    <PerdinHcDetail id={item.id} />
+                                    <UpdatePerdinHc disabled={item.status_id !== 1 ? true : false} id={item.id} perdin_id={item.perdin_id} keyword={keyword} page={page} limit={limit} onDataUpdate={setPerdin} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
+                                    <PerdinHcDetail id={item.perdin_id} />
                                 </td>
                             </tr>
                         </tbody>
                     ) : <tbody>
                         <tr>
-                            <td className='text-center' colSpan='8'>Data tidak tersedia</td>
+                            <td className='text-center' colSpan='8'>Data not found</td>
                         </tr>
                     </tbody>}
             </table>

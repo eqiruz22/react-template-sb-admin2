@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { useAuthContext } from '../../../hooks/useAuthContext';
-
+import Select from 'react-select'
 const Edit = () => {
 
     const [email, setEmail] = useState('')
@@ -22,86 +22,86 @@ const Edit = () => {
     const navigate = useNavigate()
 
     useEffect(() => {
+        const showById = async () => {
+            try {
+                const res = await fetch(`http://localhost:4001/user/show/${id}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${user['token']}`
+                    }
+                })
+                const response = await res.json()
+                console.log(response.value)
+                setEmail(response?.value[0]['email'])
+                setName(response?.value[0]['name'])
+                setRole({ value: response?.value[0]['role'], label: response?.value[0]['role_name'] })
+                setTitle({ value: response?.value[0]['title_id'], label: response?.value[0]['title_name'] })
+                setDivisi({ value: response?.value[0]['divisi_id'], label: response?.value[0]['divisi_name'] })
+            } catch (error) {
+                console.log(error)
+            }
+        }
         showById()
     }, [user, id])
 
     useEffect(() => {
+        const getDivisi = async () => {
+            try {
+                const res = await fetch('http://localhost:4001/user/divisi', {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${user['token']}`
+                    }
+                })
+                const response = await res.json()
+                setDivisiOpt(response?.result.map(item => ({ value: item.id, label: item.divisi_name })))
+            } catch (error) {
+                console.log(error)
+            }
+        }
         getDivisi()
     }, [user])
 
     useEffect(() => {
+        const getRole = async () => {
+            try {
+                const res = await fetch('http://localhost:4001/user/role', {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${user['token']}`
+                    }
+                })
+                const response = await res.json()
+                setRoleOpt(response?.value.map(item => ({ value: item.id, label: item.role_name })))
+            } catch (error) {
+                console.log(error)
+            }
+        }
         getRole()
     }, [user])
 
     useEffect(() => {
+        const getTitle = async () => {
+            try {
+                const res = await fetch('http://localhost:4001/user/title-name', {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${user['token']}`
+                    }
+                })
+                const response = await res.json()
+                console.log(response)
+                setTitleOpt(response?.result.map(item => ({ value: item.id, label: item.title_name })))
+            } catch (error) {
+                console.log(error)
+            }
+        }
         getTitle()
     }, [user])
-    const getTitle = async () => {
-        try {
-            const res = await fetch('http://localhost:4001/user/title', {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${user['token']}`
-                }
-            })
-            const response = await res.json()
-            setTitleOpt(response?.value)
-        } catch (error) {
-            console.log(error)
-        }
-    }
-    const getRole = async () => {
-        try {
-            const res = await fetch('http://localhost:4001/user/role', {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${user['token']}`
-                }
-            })
-            const response = await res.json()
-            setRoleOpt(response?.value)
-        } catch (error) {
-            console.log(error)
-        }
-    }
-    const showById = async () => {
-        try {
-            const res = await fetch(`http://localhost:4001/user/show/${id}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${user['token']}`
-                }
-            })
-            const response = await res.json()
-            console.log(response.value)
-            setEmail(response?.value[0]['email'])
-            setName(response?.value[0]['name'])
-            setRole(response?.value[0]['role'])
-            setTitle(response?.value[0]['title_id'])
-            setDivisi(response?.value[0]['divisi_id'])
-        } catch (error) {
-            console.log(error)
-        }
-    }
-    const getDivisi = async () => {
-        try {
-            const res = await fetch('http://localhost:4001/user/divisi', {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${user['token']}`
-                }
-            })
-            const response = await res.json()
-            setDivisiOpt(response?.result)
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
 
     if (!user) return null
 
@@ -123,18 +123,16 @@ const Edit = () => {
         }
     }
 
-    const handleRoleChange = (event) => {
-        const id = event.target.value
-        setRole(id)
-        if (event.target.value === null) {
-            setErrRole('Role must be administrator or user')
-        } else {
-            setErrRole('')
-        }
+    const handleRoleChange = (selectOption) => {
+        setRole(selectOption)
     }
 
-    const handleTitleChange = (event) => {
-        setTitleOpt(event.target.value)
+    const handleTitleChange = (selectOption) => {
+        setTitle(selectOption)
+    }
+
+    const handleDivisiChange = (selectOption) => {
+        setDivisi(selectOption)
     }
 
     const handlePasswordChange = (event) => {
@@ -143,6 +141,15 @@ const Edit = () => {
 
     const updateData = async (event) => {
         event.preventDefault()
+        const data = {
+            email: email,
+            name: name,
+            role: role['value'],
+            title_id: title['value'],
+            password: password,
+            has_role: user['role'],
+            divisi_id: divisi['value']
+        }
         try {
             const res = await fetch(`http://localhost:4001/user/update/${id}`, {
                 method: "PATCH",
@@ -150,15 +157,7 @@ const Edit = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${user['token']}`
                 },
-                body: JSON.stringify({
-                    email: email,
-                    name: name,
-                    role: role,
-                    title_id: title,
-                    password: password,
-                    has_role: user['role'],
-                    divisi_id: divisi
-                })
+                body: JSON.stringify(data)
             })
             const response = await res.json()
             if (res.ok) {
@@ -218,37 +217,15 @@ const Edit = () => {
                         </div>
                         <div className='mb-3'>
                             <label htmlFor="role" className='form-label'>Role</label>
-                            <select
-                                value={role}
-                                onChange={handleRoleChange}
-                                name='role'
-                                className="form-select">
-                                {roleOpt.map(item =>
-                                    <option key={item.id} defaultValue={item.id}>{item.role_name}</option>
-                                )}
-                            </select>
-                            {errRole && <span className='text-danger'>{errRole}</span>}
+                            <Select options={roleOpt} value={role} onChange={handleRoleChange} />
                         </div>
                         <div className='mb-3'>
                             <label htmlFor="role" className='form-label'>Title</label>
-                            <select
-                                value={title}
-                                onChange={handleTitleChange}
-                                name='role'
-                                className="form-select">
-                                {titleOpt.map(item =>
-                                    <option defaultValue={item.id} key={item.id}>{item.title_name}</option>
-                                )}
-                            </select>
-                            {errRole && <span className='text-danger'>{errRole}</span>}
+                            <Select options={titleOpt} value={title} onChange={handleTitleChange} />
                         </div>
                         <div className='mb-3'>
                             <label htmlFor='divisi' className='form-label'>Divisi</label>
-                            <select className='form-select' name="divisi" value={divisi} onChange={(event) => setDivisi(event.target.value)}>
-                                {divisiOpt.map(item =>
-                                    <option defaultValue={item.id} key={item.id}>{item.divisi_name}</option>
-                                )}
-                            </select>
+                            <Select options={divisiOpt} value={divisi} onChange={handleDivisiChange} />
                         </div>
                         <button type="submit" className="btn btn-primary mt-3">Submit</button>
                     </div>

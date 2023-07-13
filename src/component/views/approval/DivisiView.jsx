@@ -18,55 +18,53 @@ const DivisiView = () => {
 
     useEffect(() => {
         if (user['role'] === 1) {
+            const showPerdin = async () => {
+                try {
+                    await fetch(`http://localhost:4001/user/waiting-approve-divisi?query=${keyword}&page=${page}&limit=${limit}`, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${user['token']}`
+                        }
+                    }).then(response => response.json())
+                        .then(response => {
+                            setPerdin(response?.result)
+                            setPage(response.page)
+                            setLimit(response.limit)
+                            setRows(response.row)
+                            setPages(response.totalPage)
+                            setLoading(false)
+                        })
+                } catch (error) {
+                    console.log(error)
+                }
+            }
             showPerdin()
         } else {
+            const showPerdinByUser = async () => {
+                try {
+                    await fetch(`http://localhost:4001/user/waiting-approve-divisi/${user['id']}?query=${keyword}&page=${page}&limit=${limit}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${user['token']}`
+                        }
+                    }).then(response => response.json())
+                        .then(response => {
+                            setPerdin(response?.result)
+                            setPage(response.page)
+                            setLimit(response.limit)
+                            setRows(response.row)
+                            setPages(response.totalPage)
+                            setLoading(false)
+                        })
+                } catch (error) {
+                    console.log(error)
+                }
+            }
             showPerdinByUser()
         }
     }, [user, page, keyword, limit])
-
-    const showPerdin = async () => {
-        try {
-            await fetch(`http://localhost:4001/user/waiting-approve-divisi?query=${keyword}&page=${page}&limit=${limit}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${user['token']}`
-                }
-            }).then(response => response.json())
-                .then(response => {
-                    setPerdin(response.result)
-                    setPage(response.page)
-                    setLimit(response.limit)
-                    setRows(response.row)
-                    setPages(response.totalPage)
-                    setLoading(false)
-                })
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    const showPerdinByUser = async () => {
-        try {
-            await fetch(`http://localhost:4001/user/waiting-approve-divisi/${user['id']}?query=${keyword}&page=${page}&limit=${limit}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${user['token']}`
-                }
-            }).then(response => response.json())
-                .then(response => {
-                    setPerdin(response?.result)
-                    setPage(response.page)
-                    setLimit(response.limit)
-                    setRows(response.row)
-                    setPages(response.totalPage)
-                    setLoading(false)
-                })
-        } catch (error) {
-            console.log(error)
-        }
-    }
 
     const changePage = ({ selected }) => {
         setPage(selected)
@@ -131,14 +129,15 @@ const DivisiView = () => {
                                 <td>{IDRCurrency.format(item.jumlah_advance)}</td>
                                 <td>{item.proses}</td>
                                 <td>
-                                    <UpdatePerdinDivisi disabled={item.status_id !== 1} id={item.id} perdin_id={item.perdin_id} keyword={keyword} page={page} limit={limit} onDataUpdate={setPerdin} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
-                                    <PerdinDivisiDetail id={item.id} />
+
+                                    <UpdatePerdinDivisi disabled={item.status_id !== 1 ? true : false} id={item.id} perdin_id={item.perdin_id} keyword={keyword} page={page} limit={limit} onDataUpdate={setPerdin} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
+                                    <PerdinDivisiDetail id={item.perdin_id} />
                                 </td>
                             </tr>
                         </tbody>
                     ) : <tbody>
                         <tr>
-                            <td className='text-center' colSpan='8'>Data tidak tersedia</td>
+                            <td className='text-center' colSpan='8'>Data not found</td>
                         </tr>
                     </tbody>
                 }

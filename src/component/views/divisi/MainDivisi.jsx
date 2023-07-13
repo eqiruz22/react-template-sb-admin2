@@ -62,18 +62,23 @@ const MainDivisi = () => {
                 </thead>
 
                 <tbody>
-                    {getDivisi.map((item, index) =>
-                        <tr key={item.id}>
-                            <th>{index + 1}</th>
-                            <td>{item.divisi_name}</td>
-                            <td>{item.divisi_manager}</td>
-                            <td>{item.name}</td>
-                            <td>
-                                <EditDivisi id={item.id} keyword={keyword} page={page} limit={limit} onDataUpdate={setGetDivisi} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
-                                <DeleteDivisi id={item.id} keyword={keyword} page={page} limit={limit} onDataUpdate={setGetDivisi} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
-                            </td>
-                        </tr>
-                    )}
+                    {getDivisi.length > 0 ?
+                        getDivisi.map((item, index) =>
+                            <tr key={item.id}>
+                                <th>{index + 1}</th>
+                                <td>{item.divisi_name}</td>
+                                <td>{item.divisi_manager}</td>
+                                <td>{item.name}</td>
+                                <td>
+                                    <EditDivisi id={item.id} keyword={keyword} page={page} limit={limit} onDataUpdate={setGetDivisi} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
+                                    <DeleteDivisi id={item.id} keyword={keyword} page={page} limit={limit} onDataUpdate={setGetDivisi} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
+                                </td>
+                            </tr>
+                        ) : <tbody key={'no-data'}>
+                            <tr>
+                                <td className='text-center' colSpan='5'>Data not found</td>
+                            </tr>
+                        </tbody>}
                 </tbody>
             </table>
             <div className='d-sm-flex align-items-center justify-content-between'>

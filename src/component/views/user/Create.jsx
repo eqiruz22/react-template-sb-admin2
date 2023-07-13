@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import Swal from 'sweetalert2';
 import Select from 'react-select'
 import { useAuthContext } from '../../../hooks/useAuthContext';
@@ -14,7 +13,6 @@ const Create = () => {
     const [role, setRole] = useState([])
     const [title, setTitle] = useState([])
     const [op, setOp] = useState('')
-    const [errRole, setErrRole] = useState('')
     const [errName, setErrName] = useState('')
     const [errEmail, setErrEmail] = useState('')
     const [errPassword, setErrPassword] = useState('')
@@ -23,98 +21,104 @@ const Create = () => {
     const { user } = useAuthContext()
     const navigate = useNavigate()
 
-    const getDivisi = useCallback(async () => {
-        await axios.get('http://localhost:4001/user/divisi', {
-            headers: {
-                'Authorization': `Bearer ${user['token']}`
-            }
-        })
-            .then(res => {
-                console.log(res)
-                const opt = res.data.result.map(item => ({ value: item.id, label: item.divisi_name }))
-                setDivisi(opt)
-            }).catch(error => {
-                console.log(error)
-            })
-    }, [user])
-
-    const getTitle = useCallback(async () => {
-        await axios.get('http://localhost:4001/user/title', {
-            headers: {
-                'Authorization': `Bearer ${user['token']}`
-            }
-        })
-            .then(res => {
-                setTitle(res.data.value)
-            }).catch(error => {
-                console.log(error)
-            })
-    }, [user])
-
-    const getRole = useCallback(async () => {
-        await axios.get('http://localhost:4001/user/role', {
-            headers: {
-                'Authorization': `Bearer ${user['token']}`
-            }
-        })
-            .then(result => {
-                setRole(result.data.value)
-            })
-    }, [user])
-
     useEffect(() => {
+        const getTitle = async () => {
+            try {
+                const res = await fetch('http://localhost:4001/user/title', {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${user['token']}`
+                    }
+                })
+                const response = await res.json()
+                setTitle(response.value.map(item => ({ value: item.id, label: item.title_name })))
+            } catch (error) {
+                console.log(error)
+            }
+        }
         getTitle()
-    })
+    }, [user])
 
     useEffect(() => {
+        const getRole = async () => {
+            try {
+                const res = await fetch('http://localhost:4001/user/role', {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${user['token']}`
+                    }
+                })
+                const response = await res.json()
+                setRole(response.value.map(item => ({ value: item.id, label: item.role_name })))
+            } catch (error) {
+                console.log(error)
+            }
+
+        }
         getRole()
-    })
+    }, [user])
 
     useEffect(() => {
+        const getDivisi = async () => {
+            try {
+                const res = await fetch('http://localhost:4001/user/divisi', {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${user['token']}`
+                    }
+                })
+                const response = await res.json()
+                setDivisi(response.result.map(item => ({ value: item.id, label: item.divisi_name })))
+            } catch (error) {
+                console.log(error)
+            }
+
+        }
         getDivisi()
-    })
+    }, [user])
 
     if (!user) return null
 
-
-
-    const submitData = async (e) => {
-        e.preventDefault()
-        await axios.post('http://localhost:4001/user/create', {
+    const submitData = async (event) => {
+        event.preventDefault()
+        const data = {
             email: email,
             name: name,
             password: password,
-            role: op,
-            title_id: titles,
-            divisi: divisiVal['value']
-        }, {
-            headers: {
-                'Authorization': `Bearer ${user['token']}`
-            }
-        }).then(res => {
-            console.log(res.data.message)
-            if (res.status === 201) {
-                Swal.fire({
-                    title: 'Success',
-                    text: 'Success Create User',
-                    icon: 'success'
-                })
+            role: op['value'],
+            title_id: titles['value'],
+            divisi_id: divisiVal['value']
+        }
+        try {
+            const res = await fetch('http://localhost:4001/user/create', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${user['token']}`
+                },
+                body: JSON.stringify(data)
+            })
+            const response = await res.json()
+            if (res.ok) {
+                Swal.fire(
+                    'Success',
+                    `${response.message}`,
+                    'success'
+                )
                 navigate('/user')
+            } else {
+                Swal.fire(
+                    'Something wrong?',
+                    `${response.message}`,
+                    'error'
+                )
             }
-        }).catch(error => {
+        } catch (error) {
             console.log(error)
-            if (error.response.status === 500) {
-                if (error.response.data.error['errno'] === 1062) {
-                    setErrEmail('Email already created')
-                }
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: `${error.response.data.message}`,
-                })
-            }
-
-        })
+        }
     }
 
     const handleEmailChange = (e) => {
@@ -146,17 +150,12 @@ const Create = () => {
         }
     }
 
-    const handleRoleChange = (e) => {
-        setOp(e.target.value)
-        if (e.target.value === '') {
-            setErrRole('Role must be administrator or user')
-        } else {
-            setErrRole('')
-        }
+    const handleRoleChange = (selectOption) => {
+        setOp(selectOption)
     }
 
-    const handleTitleChange = (e) => {
-        setTitles(e.target.value)
+    const handleTitleChange = (selectOption) => {
+        setTitles(selectOption)
     }
 
     const handleDivisiChange = (selectOption) => {
@@ -197,32 +196,11 @@ const Create = () => {
                 </div>
                 <div className='mb-3'>
                     <label htmlFor="role" className='form-label'>Role</label>
-                    <select
-                        value={op}
-                        className='form-select'
-                        onChange={handleRoleChange}
-                    >
-                        <option value=''>--Select--</option>
-                        {role.map((item, index) =>
-                            <option key={item.id} value={item.id}>{item.role_name}</option>
-                        )}
-                    </select>
-                    {errRole && <span className='text-danger'>{errRole}</span>}
+                    <Select value={op} options={role} onChange={handleRoleChange} />
                 </div>
                 <div className='mb-3'>
                     <label htmlFor="role" className='form-label'>Title</label>
-                    <select
-                        multiple={false}
-                        value={titles}
-                        className='form-select'
-                        onChange={handleTitleChange}
-                    >
-                        <option value=''>--Select--</option>
-                        {title.map((item, index) =>
-                            <option key={item.id} value={item.id}>{item.title_name}</option>
-                        )}
-                    </select>
-                    {errRole && <span className='text-danger'>{errRole}</span>}
+                    <Select value={titles} options={title} onChange={handleTitleChange} />
                 </div>
                 <div className='mb-3'>
                     <label htmlFor='divisi' className='form-label'>Divisi</label>

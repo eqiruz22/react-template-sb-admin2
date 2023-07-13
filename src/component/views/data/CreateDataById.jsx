@@ -1,232 +1,243 @@
-import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuthContext } from '../../../hooks/useAuthContext'
 import Select from 'react-select'
 import Swal from 'sweetalert2'
-import { getZoneList, getPrjList, getById, getZoneById } from '../../../http/HttpConsume'
 
 const CreateDataById = () => {
-    const [title, setTitle] = useState('')
-    const [name, setName] = useState('')
-    const [hardship, setHardship] = useState(0)
-    const [meal, setMeal] = useState(0)
-    const [pulsa, setPulsa] = useState(0)
-    const [rent, setRent] = useState(0)
-    const [car, setCar] = useState(0)
-    const [prjval, setPrjval] = useState('')
-    const [hotel, setHotel] = useState(0)
-    const [travel, setTravel] = useState('')
-    const [start, setStart] = useState(null)
-    const [end, setEnd] = useState(null)
-    const [purposes, setPurposes] = useState('')
-    const [transportation, setTransportation] = useState(0)
-    const [local, setLocal] = useState(0)
-    const [airfare, setAirfare] = useState(0)
-    const [airport, setAirport] = useState(0)
-    const [entertainment, setEntertainment] = useState(0)
-    const [fee, setFee] = useState(0)
-    const [tools, setTools] = useState(0)
-    const [other, setOther] = useState(0)
-    const [prj, setPrj] = useState([])
-    const { id } = useParams()
-    const [errHotel, setErrHotel] = useState('')
-    const [errPurposes, setErrPurposes] = useState('')
-    const [errStart, setErrStart] = useState('')
-    const [errEnd, setErrEnd] = useState('')
-    const [errTravel, setErrTravel] = useState('')
-    const [zone, setZone] = useState('')
-    const [zoneByTitle, setZoneByTitle] = useState([])
     const { user } = useAuthContext()
+    const [name, setName] = useState('')
+    const [title, setTitle] = useState('')
+    const [zoneBytitle, setZoneByTitle] = useState([])
+    const [zone, setZone] = useState('')
+    const [prjOpt, setPrjOpt] = useState([])
+    const [prj, setPrj] = useState('')
+    const [maksudPerjalan, setMaksudPerjalanan] = useState('')
+    const [startDate, setStartDate] = useState('')
+    const [endDate, setEndDate] = useState('')
+    const [tempatTujuan, setTempatTujuan] = useState('')
+    const [transportTujuan, setTransportTujuan] = useState(0)
+    const [transportLocal, setTransportLocal] = useState(0)
+    const [penginapan, setPenginapan] = useState(0)
+    const [meal, setMeal] = useState(0)
+    const [allowance, setAllowance] = useState(0)
+    const [rapidTest, setRapidTest] = useState(0)
+    const [lainLain, setLainLain] = useState(0)
+    const [errorMP, setErrorMP] = useState('')
+    const [errorTempatTujuan, setErrorTempatTujuan] = useState('')
+    const { id } = useParams()
     const navigate = useNavigate()
 
     useEffect(() => {
-        getPrjList(user, setPrj)
+        const getPrjList = async () => {
+            try {
+                const res = await fetch('http://localhost:4001/user/prj-list', {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${user['token']}`
+                    }
+                })
+                const response = await res.json()
+                setPrjOpt(response.result.map(item => ({ value: item.id, label: `${item.prj_name} - ${item.project_name}` })))
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        getPrjList()
     }, [user])
 
     useEffect(() => {
-        getById(user, id, setName, setTitle)
+        const getById = async () => {
+            try {
+                const res = await fetch(`http://localhost:4001/user/show/title-user/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${user['token']}`
+                    }
+                })
+                const response = await res.json()
+                setName(response.name)
+                setTitle(response.title_name)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        getById()
     }, [user, id])
 
     useEffect(() => {
-        getZoneList(user, title, setZoneByTitle)
+        const getZones = async () => {
+            try {
+                const res = await fetch(`http://localhost:4001/user/zone-name?title=${title}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${user['token']}`
+                    }
+                })
+                const response = await res.json()
+                const opt = response.result.map(item => ({ value: item.id, label: item.zone_name }))
+                setZoneByTitle(opt)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        if (title && title !== '') {
+            getZones()
+        }
     }, [user, title])
 
     useEffect(() => {
+        const getZoneById = async () => {
+            try {
+                const res = await fetch(`http://localhost:4001/user/zone-by/${zone['value']}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${user['token']}`
+                    }
+                })
+                const response = await res.json()
+                console.log(response)
+                setTransportLocal(response.result[0]['transport_non_airplane'])
+                setTransportTujuan(response.result[0]['transport_airplane'])
+                setPenginapan(response.result[0]['hotel'])
+                setMeal(response.result[0]['meal_allowance'])
+                setAllowance(response.result[0]['allowance'])
+
+            } catch (error) {
+                console.log(error)
+            }
+        }
         if (zone !== '') {
-            getZoneById(user, zone, setHotel, setMeal, setAirfare, setTransportation, setHardship)
+            getZoneById()
         }
     }, [user, zone])
 
     if (!user) return null
 
-    const handleChangeHotel = (event) => {
-        setHotel(event.target.value)
+    const handleChangeOfficial = (event) => {
+        setMaksudPerjalanan(event.target.value)
         if (!event.target.value) {
-            setErrHotel('this field is required')
+            setErrorMP('this field is required!')
         } else {
-            setErrHotel('')
+            setErrorMP('')
         }
     }
 
-    const handleChangeZone = (selectedOption) => {
-        setZone(selectedOption)
-    }
-
-    const handleChangeRent = (e) => {
-        setRent(e.target.value)
-    }
-
-    const handleChangeName = (e) => {
-        setName(e.target.value)
-    }
-
-    const handleChangeTitle = (e) => {
-        setTitle(e.target.value)
-    }
-
-    const handleChangePrj = (selectedOption) => {
-        setPrjval(selectedOption)
-    }
-
-    const handleChangeTravel = (e) => {
-        setTravel(e.target.value)
-        if (!e.target.value) {
-            setErrTravel('this field is required')
-        } else {
-            setErrTravel('')
+    const handleChangeStart = (event) => {
+        const select = event.target.value
+        if (select <= endDate || !endDate) {
+            setStartDate(select)
         }
     }
 
-    const handleChangeStart = (e) => {
-        const select = e.target.value
-        if (select <= end || !end) {
-            setStart(select)
-            setErrStart('')
-        } else {
-            setErrStart('start date cannot be more than end date')
+    const handleChangeEnd = (event) => {
+        const select = event.target.value
+        if (select >= startDate) {
+            setEndDate(select)
         }
     }
 
-    const handleChangeEnd = (e) => {
-        const select = e.target.value
-        if (select >= start) {
-            setEnd(select)
-            setErrEnd('')
-        } else {
-            setErrEnd('end date cannot be less than start date')
-        }
-    }
-
-    const handleChangePurposes = (e) => {
-        setPurposes(e.target.value)
-        if (!e.target.value) {
-            setErrPurposes('this field is required')
-        } else {
-            setErrPurposes('')
-        }
-    }
-
-    const handleChangeMeal = (e) => {
-        setMeal(e.target.value)
-    }
-
-    const handleChangeHardship = (e) => {
-        setHardship(e.target.value)
-    }
-
-    const handleChangePulsa = (e) => {
-        setPulsa(e.target.value)
-    }
-
-    const handleChangeTransportation = (e) => {
-        setTransportation(e.target.value)
-    }
-
-    const handleChangeLocal = (e) => {
-        setLocal(e.target.value)
-    }
-
-    const handleChangeAirfare = (e) => {
-        setAirfare(e.target.value)
-    }
-
-    const handleChangeAirport = (e) => {
-        setAirport(e.target.value)
-    }
-
-    const handleChangeCar = (e) => {
-        setCar(e.target.value)
-    }
-
-    const handleChangeEntertainment = (e) => {
-        setEntertainment(e.target.value)
-    }
-
-    const handleChangeFee = (e) => {
-        setFee(e.target.value)
-    }
-
-    const handleChangeTools = (e) => {
-        setTools(e.target.value)
-    }
-
-    const handleChangeOther = (e) => {
-        setOther(e.target.value)
-    }
-
-    const date1 = new Date(start)
-    const date2 = new Date(end)
+    const date1 = new Date(startDate)
+    const date2 = new Date(endDate)
     const dtime = date2.getTime() - date1.getTime()
     const diff = dtime / (1000 * 60 * 60 * 24)
     const days = Math.max(diff, 0)
 
+    const handleChangetempatTujuan = (event) => {
+        setTempatTujuan(event.target.value)
+        if (!event.target.value) {
+            setErrorTempatTujuan('this field is required!')
+        } else {
+            setErrorTempatTujuan('')
+        }
+    }
+
+    const handleChangetransportTujuan = (event) => {
+        setTransportTujuan(event.target.value)
+    }
+
+    const handleChangeTransportLocal = (event) => {
+        setTransportLocal(event.target.value)
+    }
+
+    const handleChangePenginapan = (event) => {
+        setPenginapan(event.target.value)
+    }
+
+    const handleChangeMeal = (event) => {
+        setMeal(event.target.value)
+    }
+
+    const handleChangeAllowance = (event) => {
+        setAllowance(event.target.value)
+    }
+
+    const handleChangeRapidTest = (event) => {
+        setRapidTest(event.target.value)
+    }
+
+    const handleChangeLainLain = (event) => {
+        setLainLain(event.target.value)
+    }
+
     let total = 0
     if (days === 0) {
-        total += parseFloat(meal) + parseFloat(car) + parseFloat(pulsa) + parseFloat(rent) + parseFloat(hardship) + parseFloat(hotel) + parseFloat(transportation) + parseFloat(local) + parseFloat(airfare) + parseFloat(airport) + parseFloat(entertainment) + parseFloat(tools) + parseFloat(other)
+        total += parseFloat(meal) + parseFloat(lainLain) + parseFloat(rapidTest) + parseFloat(allowance) + parseFloat(transportTujuan) + parseFloat(penginapan) + parseFloat(transportLocal)
     } else {
-        total += parseFloat(meal * days) + parseFloat(car * days) + parseFloat(pulsa * days) + parseFloat(rent * days) + parseFloat(hardship * days) + parseFloat(hotel * days) + parseFloat(transportation * days) + parseFloat(local * days) + parseFloat(airfare * days) + parseFloat(airport * days) + parseFloat(entertainment * days) + parseFloat(tools * days) + parseFloat(other * days)
+        total += parseFloat(meal * days) + parseFloat(lainLain * days) + parseFloat(rapidTest * days) + parseFloat(allowance * days) + parseFloat(transportTujuan * days) + parseFloat(penginapan * days) + parseFloat(transportLocal * days)
     }
     const handleSubmit = async (e) => {
         e.preventDefault()
-        await axios.post('http://localhost:4001/user/perdin-daily', {
-            prj_id: prjval['value'],
-            user_id: user['id'],
+        const data = {
+            prj_id: prj['value'],
+            user_id: id,
             title_name: title,
-            official_travel_site: travel,
-            purposes: purposes,
-            hotel: hotel,
-            rent_house: rent,
-            meal_allowance: meal,
-            hardship_allowance: hardship,
-            pulsa_allowance: pulsa,
-            car_rent: car,
-            transport: transportation,
-            local_transport: local,
-            airfare: airfare,
-            airport_tax: airport,
-            entertainment: entertainment,
-            start_date: start,
-            end_date: end,
-            days: days,
-            fee_support: fee,
-            tools: tools,
-            others: other,
-            total_received: total
-        }, {
-            headers: {
-                'Authorization': `Bearer ${user['token']}`
-            }
-        }).then(res => {
-            Swal.fire({
-                title: 'Success',
-                text: `${res.data.message}`,
-                icon: 'success'
+            zone_id: zone['value'],
+            maksud_perjalanan: maksudPerjalan,
+            tempat_tujuan: tempatTujuan,
+            start_date: startDate,
+            end_date: endDate,
+            lama_perjalanan: days,
+            transport_tujuan: transportTujuan,
+            transport_local: transportLocal,
+            penginapan: penginapan,
+            meals: meal,
+            allowance: allowance,
+            rapid: rapidTest,
+            lain: lainLain,
+            jumlah_advance: total
+        }
+        try {
+            const res = await fetch('http://localhost:4001/user/perdin-daily', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user['token']}`
+                },
+                body: JSON.stringify(data)
             })
-            navigate('/data/harian')
-        }).catch(err => {
-            console.log(err)
-        })
+            const response = await res.json()
+            if (res.ok) {
+                Swal.fire(
+                    'success',
+                    `${response.message}`,
+                    'success'
+                )
+                navigate('/data/harian')
+            } else {
+                Swal.fire(
+                    'Something wrong?',
+                    `${response.message}`,
+                    'error'
+                )
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     return (
@@ -235,105 +246,73 @@ const CreateDataById = () => {
                 <form onSubmit={handleSubmit} className='row g-3'>
                     <div className="col-md-3">
                         <label htmlFor="title" className="form-label">Name</label>
-                        <input type="text" value={name} className='form-control' onChange={handleChangeName} />
+                        <div className='form-control'>{name}</div>
                     </div>
                     <div className="col-md-3">
                         <label htmlFor="title" className="form-label">Title</label>
-                        <input type="text" value={title} className='form-control' onChange={handleChangeTitle} />
+                        <div className='form-control'>{title}</div>
                     </div>
                     <div className='col-md-3'>
-                        <label htmlFor="zone" className='form-label'>ZONE</label>
-                        <Select options={zoneByTitle} value={zone} onChange={handleChangeZone} />
+                        <label htmlFor="zone">Zone</label>
+                        <Select options={zoneBytitle} value={zone} onChange={(selectedOption) => setZone(selectedOption)} />
+                    </div>
+                    <div className='col-md-3'>
+                        <label htmlFor="prj">PRJ</label>
+                        <Select options={prjOpt} value={prj} onChange={(selectedOption) => setPrj(selectedOption)} />
                     </div>
                     <div className="col-md-3">
-                        <label htmlFor="prj" className="form-label">PRJ</label>
-                        <Select value={prjval} onChange={handleChangePrj} options={prj} />
-                    </div>
-                    <div className="col-md-3">
-                        <label htmlFor="official" className="form-label">Official Travel Site</label>
-                        <input type="text" value={travel} onChange={handleChangeTravel} className="form-control" id="official" />
-                        {errTravel && <span className='text-danger'>{errTravel}</span>}
+                        <label htmlFor="maksudPerjalan" className="form-label">Maksud Perjalanan</label>
+                        <input type="text" value={maksudPerjalan} onChange={handleChangeOfficial} className="form-control" id="maksudPerjalan" />
+                        {errorMP && <span className='text-danger'>{errorMP}</span>}
                     </div>
                     <div className="col-md-3">
                         <label htmlFor="start_date" className="form-label">Start Date</label>
-                        <input type="date" value={start} onChange={handleChangeStart} className="form-control" id="start_date" />
-                        {errStart && <span className='text-danger'>{errStart}</span>}
+                        <input type="date" value={startDate} onChange={handleChangeStart} className="form-control" id="start_date" />
                     </div>
                     <div className="col-md-3">
                         <label htmlFor="end_date" className="form-label">End Date</label>
-                        <input type="date" value={end} onChange={handleChangeEnd} className="form-control" id="end_date" />
-                        {errEnd && <span className='text-danger'>{errEnd}</span>}
+                        <input type="date" value={endDate} onChange={handleChangeEnd} className="form-control" id="end_date" />
                     </div>
                     <div className="col-md-3">
-                        <label htmlFor="end_date" className="form-label">Days</label>
-                        <div className='form-control'>{days}</div>
+                        <label htmlFor="end_date" className="form-label">Lama Perjalanan</label>
+                        <div className='form-control'>{days.toString()}</div>
                     </div>
                     <div className="col-md-3">
-                        <label htmlFor="purposes" className="form-label">Purposes Business Trip</label>
-                        <input type="text" value={purposes} onChange={handleChangePurposes} className="form-control" id="purposes" />
-                        {errPurposes && <span className='text-danger'>{errPurposes}</span>}
-                    </div>
-
-                    <div className="col-md-3">
-                        <label htmlFor="hotel" className="form-label">Hotel</label>
-                        <input type="text" value={hotel} onChange={handleChangeHotel} className="form-control" id="hotel" />
-                        {errHotel && <span className='text-danger'>{errHotel}</span>}
+                        <label htmlFor="tempatTujuan" className="form-label">Tempat Tujuan</label>
+                        <input type="text" value={tempatTujuan} onChange={handleChangetempatTujuan} className="form-control" id="tempatTujuan" />
+                        {errorTempatTujuan && <span className='text-danger'>{errorTempatTujuan}</span>}
                     </div>
                     <div className="col-md-3">
-                        <label htmlFor="rented" className="form-label">Rented House</label>
-                        <input type="text" value={rent} onChange={handleChangeRent} className="form-control" id="rented" />
+                        <label htmlFor="transportTujuan" className="form-label">Transport Tujuan</label>
+                        <input type="text" value={transportTujuan} onChange={handleChangetransportTujuan} className="form-control" id="transportTujuan" />
                     </div>
                     <div className="col-md-3">
-                        <label htmlFor="meals" className="form-label">Meal Allowance</label>
-                        <input type="text" value={meal} onChange={handleChangeMeal} className="form-control" id="meals" />
+                        <label htmlFor="transportLocal" className="form-label">Transport Local</label>
+                        <input type="text" value={transportLocal} onChange={handleChangeTransportLocal} className="form-control" id="meals" />
                     </div>
                     <div className="col-md-3">
-                        <label htmlFor="hardship" className="form-label">Hardship Allowance</label>
-                        <input type="text" value={hardship} onChange={handleChangeHardship} className="form-control" id="hardship" />
+                        <label htmlFor="travel" className="form-label">Penginapan</label>
+                        <input type="text" value={penginapan} onChange={handleChangePenginapan} className="form-control" id="travel" />
                     </div>
                     <div className="col-md-3">
-                        <label htmlFor="pulse" className="form-label">Pulse Allowance</label>
-                        <input type="text" value={pulsa} onChange={handleChangePulsa} className="form-control" id="pulse" />
+                        <label htmlFor="meal" className="form-label">Meal</label>
+                        <input type="text" value={meal} onChange={handleChangeMeal} className="form-control" id="meal" />
                     </div>
                     <div className="col-md-3">
-                        <label htmlFor="transportation" className="form-label">Transportation</label>
-                        <input type="text" value={transportation} onChange={handleChangeTransportation} className="form-control" id="transportation" />
+                        <label htmlFor="allowance" className="form-label">Allowance</label>
+                        <input type="text" value={allowance} onChange={handleChangeAllowance} className="form-control" id="allowance" />
                     </div>
                     <div className="col-md-3">
-                        <label htmlFor="local" className="form-label">Local Transport Area</label>
-                        <input type="text" value={local} onChange={handleChangeLocal} className="form-control" id="local" />
+                        <label htmlFor="rented" className="form-label">Rapid Test</label>
+                        <input type="text" value={rapidTest} onChange={handleChangeRapidTest} className="form-control" id="rented" />
                     </div>
                     <div className="col-md-3">
-                        <label htmlFor="travel" className="form-label">Airfare/Bus/Travel/Train</label>
-                        <input type="text" value={airfare} onChange={handleChangeAirfare} className="form-control" id="travel" />
+                        <label htmlFor="pulse" className="form-label">Lain-Lain</label>
+                        <input type="text" className="form-control" id="pulse" value={lainLain} onChange={handleChangeLainLain} />
                     </div>
                     <div className="col-md-3">
-                        <label htmlFor="pulse" className="form-label">Vehicle Rent</label>
-                        <input type="text" value={car} onChange={handleChangeCar} className="form-control" id="pulse" />
-                    </div>
-                    <div className="col-md-3">
-                        <label htmlFor="airport" className="form-label">Airport Tax</label>
-                        <input type="text" value={airport} onChange={handleChangeAirport} className="form-control" id="airport" />
-                    </div>
-                    <div className="col-md-3">
-                        <label htmlFor="entertainment" className="form-label">Entertainment</label>
-                        <input type="text" value={entertainment} onChange={handleChangeEntertainment} className="form-control" id="entertainment" />
-                    </div>
-                    <div className="col-md-3">
-                        <label htmlFor="support_worker" className="form-label">Fee Support Worker</label>
-                        <input type="text" value={fee} onChange={handleChangeFee} className="form-control" id="support_worker" />
-                    </div>
-                    <div className="col-md-3">
-                        <label htmlFor="tools" className="form-label">Tools</label>
-                        <input type="text" value={tools} onChange={handleChangeTools} className="form-control" id="tools" />
-                    </div>
-                    <div className="col-md-3">
-                        <label htmlFor="Others" className="form-label">Others</label>
-                        <input type="text" value={other} onChange={handleChangeOther} className="form-control" id="Others" />
-                    </div>
-                    <div className="col-md-3">
-                        <label htmlFor="Others" className="form-label">Total Received</label>
-                        <div className='form-control'>{total.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</div>
+                        <label htmlFor="Others" className="form-label">Jumlah Advance</label>
+                        <div className='form-control'>{total.toLocaleString().split(',').join('.')}</div>
                     </div>
                     <div>
                         <button type='submit' className='btn btn-primary'>Submit</button>

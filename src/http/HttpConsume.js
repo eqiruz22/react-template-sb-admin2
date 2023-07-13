@@ -340,7 +340,7 @@ export const perdinDetails = async (user, id, setName, setTitle, setMPerjalanan,
 
 export const getZones = async (user, title, setZoneByTitle) => {
     try {
-        await axios.get(`http://localhost:4001/user/zone/${title}`, {
+        await axios.get(`http://localhost:4001/user/zone-name?title=${title}`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user['token']}`

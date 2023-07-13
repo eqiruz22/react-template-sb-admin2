@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useAuthContext } from '../../../hooks/useAuthContext'
 import { Modal } from 'react-bootstrap'
+import Swal from 'sweetalert2'
 export const PerdinHcDetail = ({ id }) => {
     const { user } = useAuthContext()
     const [show, setShow] = useState(false)
@@ -31,21 +32,30 @@ export const PerdinHcDetail = ({ id }) => {
                 }
             })
             const response = await res.json()
-            setPrj(response.result['prj_name'])
-            setName(response.result['name'])
-            setTitle(response.result['title_name'])
-            setMPerjalanan(response.result['maksud_perjalanan'])
-            setTujuan(response.result['tempat_tujuan'])
-            setLamaPerjalanan(response.result['lama_perjalanan'])
-            setStart(response.result['start_date'])
-            setEnd(response.result['end_date'])
-            setLocal(response.result['transport_local'])
-            setTransTujuan(response.result['transport_tujuan'])
-            setPenginapan(response.result['penginapan'])
-            setMeals(response.result['meals'])
-            setLain(response.result['lain_lain'])
-            setRapid(response.result['rapid_test'])
-            setAdvance(response.result['jumlah_advance'])
+            if (res.ok) {
+                setPrj(response.result['prj_name'])
+                setName(response.result['name'])
+                setTitle(response.result['title_name'])
+                setMPerjalanan(response.result['maksud_perjalanan'])
+                setTujuan(response.result['tempat_tujuan'])
+                setLamaPerjalanan(response.result['lama_perjalanan'])
+                setStart(response.result['start_date'])
+                setEnd(response.result['end_date'])
+                setLocal(response.result['transport_local'])
+                setTransTujuan(response.result['transport_tujuan'])
+                setPenginapan(response.result['penginapan'])
+                setMeals(response.result['meals'])
+                setLain(response.result['lain_lain'])
+                setRapid(response.result['rapid_test'])
+                setAdvance(response.result['jumlah_advance'])
+            } else {
+                setShow(false)
+                Swal.fire(
+                    'Something wrong?',
+                    `${response.message}`,
+                    'error'
+                )
+            }
         } catch (error) {
             console.log(error)
         }
@@ -67,47 +77,49 @@ export const PerdinHcDetail = ({ id }) => {
                     <Modal.Title>Detail</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <div>
-                        PRJ : {prj}
-                    </div>
-                    <div>
-                        Name : {name}
-                    </div>
-                    <div>
-                        Title : {title}
-                    </div>
-                    <div>
-                        Maksud Perjalanan : {mPerjalanan}
-                    </div>
-                    <div>
-                        Tujuan Perjalanan : {tujuan}
-                    </div>
-                    <div>
-                        Tanggal Berangkat : {formatDate(start)} - {formatDate(end)}
-                    </div>
-                    <div>
-                        Lama Perjalanan : {lamaPerjalanan}
-                    </div>
-                    <div>
-                        Transport Local : {local}
-                    </div>
-                    <div>
-                        Transport Tujuan : {transTujuan}
-                    </div>
-                    <div>
-                        Penginapan : {penginapan}
-                    </div>
-                    <div>
-                        Meals : {meals}
-                    </div>
-                    <div>
-                        Rapid Test : {rapid}
-                    </div>
-                    <div>
-                        Lain Lain : {lain}
-                    </div>
-                    <div>
-                        Jumlah Advance : {advance}
+                    <div className='container'>
+                        <div className='mb-1'>
+                            PRJ : {prj}
+                        </div>
+                        <div className='mb-1'>
+                            Nama : {name}
+                        </div>
+                        <div className='mb-1'>
+                            Jabatan : {title}
+                        </div>
+                        <div className='mb-1'>
+                            Maksud Perjalanan : {mPerjalanan}
+                        </div>
+                        <div className='mb-1'>
+                            Tujuan Perjalanan : {tujuan}
+                        </div>
+                        <div className='mb-1'>
+                            Tanggal Berangkat : {formatDate(start)} - {formatDate(end)}
+                        </div>
+                        <div className='mb-1'>
+                            Lama Perjalanan : {lamaPerjalanan}
+                        </div>
+                        <div className='mb-1'>
+                            Transport Local : {local}
+                        </div>
+                        <div className='mb-1'>
+                            Transport Tujuan : {transTujuan}
+                        </div>
+                        <div className='mb-1'>
+                            Penginapan : {penginapan}
+                        </div>
+                        <div className='mb-1'>
+                            Meals : {meals}
+                        </div>
+                        <div className='mb-1'>
+                            Rapid Test : {rapid}
+                        </div>
+                        <div className='mb-1'>
+                            Lain-Lain : {lain}
+                        </div>
+                        <div className='mb-1'>
+                            Jumlah Advance : {advance}
+                        </div>
                     </div>
                 </Modal.Body>
             </Modal>

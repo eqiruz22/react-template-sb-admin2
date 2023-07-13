@@ -12,27 +12,6 @@ export const CreateDivisi = ({ onDataUpdate, onPage, onLimit, onRow, onTotalpage
     const [divisiHead, setDivisiHead] = useState('')
     const [errorName, setErrorName] = useState('')
     const [getName, setGetName] = useState([])
-    const [title, setTitle] = useState([]);
-    useEffect(() => {
-        const fetchSuggestions = async () => {
-            try {
-                const res = await fetch('http://localhost:4001/user/title-name', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${user['token']}`
-                    }
-                });
-                const data = await res.json();
-                console.log(data)
-                setTitle(data.result.map(item => ({ value: item.id, label: item.title_name })));
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        fetchSuggestions();
-    }, []);
 
     useEffect(() => {
         getAllUser(user, setGetName)
@@ -97,6 +76,8 @@ export const CreateDivisi = ({ onDataUpdate, onPage, onLimit, onRow, onTotalpage
                     'success'
                 )
                 setDivisiName('')
+                setDivisiManager('')
+                setDivisiHead('')
                 handleClose(false)
             } else {
                 Swal.fire(
@@ -109,12 +90,6 @@ export const CreateDivisi = ({ onDataUpdate, onPage, onLimit, onRow, onTotalpage
             console.log(error)
         }
     }
-    var options = [
-        { id: 1, name: 'John' },
-        { id: 2, name: 'Miles' },
-        { id: 3, name: 'Charles' },
-        { id: 4, name: 'Herbie' },
-    ];
 
     return (
         <>
@@ -135,7 +110,7 @@ export const CreateDivisi = ({ onDataUpdate, onPage, onLimit, onRow, onTotalpage
                         </div>
                         <div className='mb-3 mt-3'>
                             <label className='form-label'>Divisi Manager</label>
-                            <Select options={title} value={divisiManager} onChange={handleDivisiManager} placeholder='Choose a name..' />
+                            <Select options={getName} value={divisiManager} onChange={handleDivisiManager} placeholder='Choose a name..' />
                         </div>
                         <div className="mb-3 mt-3">
                             <label htmlFor="role" className='form-label'>Divisi Head</label>

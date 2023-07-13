@@ -50,7 +50,7 @@ export const EditDivisi = ({ id, onDataUpdate, onPage, onLimit, onRow, onTotalpa
         }
         try {
             const res = await fetch(`http://localhost:4001/user/divisi/${id}`, {
-                method: "GET",
+                method: "PATCH",
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${user['token']}`

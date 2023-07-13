@@ -81,12 +81,12 @@ const ReportDaily = ({ selectedUser }) => {
                                 <Text style={styles.tableCell}>Departement : {selectedUser.divisi_name}</Text>
                             </View>
                             <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Job Class : </Text>
+                                <Text style={styles.tableCell}>Job Class : {selectedUser.title_name}</Text>
                             </View>
                         </View>
                         <View style={styles.tableRow}>
                             <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Maksud Perjalanan : {selectedUser.official_travel_site}</Text>
+                                <Text style={styles.tableCell}>Maksud Perjalanan : {selectedUser.maksud_perjalanan}</Text>
                             </View>
                             <View style={styles.tableCol}>
                                 <Text style={styles.tableCell}></Text>
@@ -94,7 +94,7 @@ const ReportDaily = ({ selectedUser }) => {
                         </View>
                         <View style={styles.tableRow}>
                             <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Tempat Tujuan : {selectedUser.purposes}</Text>
+                                <Text style={styles.tableCell}>Tempat Tujuan : {selectedUser.tempat_tujuan}</Text>
                             </View>
                             <View style={styles.tableCol}>
                                 <Text style={styles.tableCell}></Text>
@@ -110,7 +110,7 @@ const ReportDaily = ({ selectedUser }) => {
                         </View>
                         <View style={styles.tableRow}>
                             <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Lama Perjalanan : {selectedUser.days} Hari {selectedUser.days} Malam</Text>
+                                <Text style={styles.tableCell}>Lama Perjalanan : {selectedUser.lama_perjalanan} Hari {selectedUser.lama_perjalanan} Malam</Text>
                             </View>
                             <View style={styles.tableCol}>
                                 <Text style={styles.tableCell}></Text>
@@ -119,7 +119,7 @@ const ReportDaily = ({ selectedUser }) => {
                         <Text style={styles.head}>PENERIMAAN DIMUKA(ADVANCE)</Text>
                         <View style={styles.tableRow}>
                             <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Transport ke tujuan : {selectedUser.transport}</Text>
+                                <Text style={styles.tableCell}>Transport ke tujuan : {selectedUser.transport_tujuan}</Text>
                             </View>
                             <View style={styles.tableCol}>
                                 <Text style={styles.tableCell}></Text>
@@ -127,7 +127,7 @@ const ReportDaily = ({ selectedUser }) => {
                         </View>
                         <View style={styles.tableRow}>
                             <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Transport Local : {selectedUser.local_transport}</Text>
+                                <Text style={styles.tableCell}>Transport Local : {selectedUser.transport_local}</Text>
                             </View>
                             <View style={styles.tableCol}>
                                 <Text style={styles.tableCell}></Text>
@@ -135,7 +135,7 @@ const ReportDaily = ({ selectedUser }) => {
                         </View>
                         <View style={styles.tableRow}>
                             <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Penginapan : {selectedUser.days} Malam {selectedUser.hotel}</Text>
+                                <Text style={styles.tableCell}>Penginapan : {selectedUser.penginapan} - {selectedUser.lama_perjalanan} malam</Text>
                             </View>
                             <View style={styles.tableCol}>
                                 <Text style={styles.tableCell}></Text>
@@ -143,7 +143,7 @@ const ReportDaily = ({ selectedUser }) => {
                         </View>
                         <View style={styles.tableRow}>
                             <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Meals : {selectedUser.days} Hari {selectedUser.meal_allowance}</Text>
+                                <Text style={styles.tableCell}>Meals : {selectedUser.lama_perjalanan} Hari {selectedUser.meals}</Text>
                             </View>
                             <View style={styles.tableCol}>
                                 <Text style={styles.tableCell}></Text>
@@ -151,7 +151,7 @@ const ReportDaily = ({ selectedUser }) => {
                         </View>
                         <View style={styles.tableRow}>
                             <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Allowance : {selectedUser.days} Hari {selectedUser.hardship_allowance}</Text>
+                                <Text style={styles.tableCell}>Allowance : {selectedUser.days} Hari {selectedUser.allowance}</Text>
                             </View>
                             <View style={styles.tableCol}>
                                 <Text style={styles.tableCell}></Text>
@@ -159,7 +159,7 @@ const ReportDaily = ({ selectedUser }) => {
                         </View>
                         <View style={styles.tableRow}>
                             <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Rapid Test : Rp -</Text>
+                                <Text style={styles.tableCell}>Rapid Test : {selectedUser.rapid}</Text>
                             </View>
                             <View style={styles.tableCol}>
                                 <Text style={styles.tableCell}></Text>
@@ -167,7 +167,7 @@ const ReportDaily = ({ selectedUser }) => {
                         </View>
                         <View style={styles.tableRow}>
                             <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Lain-lain : {selectedUser.others}</Text>
+                                <Text style={styles.tableCell}>Lain-lain : {selectedUser.lain}</Text>
                             </View>
                             <View style={styles.tableCol}>
                                 <Text style={styles.tableCell}></Text>
@@ -178,7 +178,7 @@ const ReportDaily = ({ selectedUser }) => {
                                 <Text style={styles.tableCell}></Text>
                             </View>
                             <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Jumlah Advance : {selectedUser.total_received}</Text>
+                                <Text style={styles.tableCell}>Jumlah Advance : {selectedUser.jumlah_advance}</Text>
                             </View>
                         </View>
                         <View style={styles.tableRow}>

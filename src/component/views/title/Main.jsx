@@ -59,16 +59,22 @@ const Main = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {title.map((item, index) =>
-                        <tr key={item.id}>
-                            <th scope="row">{index + 1}</th>
-                            <td>{item.title_name}</td>
-                            <td>
-                                <EditTitle id={item.id} keyword={keyword} page={page} limit={limit} onDataUpdate={setTitle} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
-                                <DeleteTitle id={item.id} keyword={keyword} page={page} limit={limit} onDataUpdate={setTitle} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
-                            </td>
-                        </tr>
-                    )}
+                    {title.length > 0 ?
+                        title.map((item, index) =>
+                            <tr key={item.id}>
+                                <th scope="row">{index + 1}</th>
+                                <td>{item.title_name}</td>
+                                <td>
+                                    <EditTitle id={item.id} keyword={keyword} page={page} limit={limit} onDataUpdate={setTitle} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
+                                    <DeleteTitle id={item.id} keyword={keyword} page={page} limit={limit} onDataUpdate={setTitle} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
+                                </td>
+                            </tr>
+                        ) :
+                        <tbody key={'no-data'}>
+                            <tr>
+                                <td className='text-center' colSpan='3'>Data not found</td>
+                            </tr>
+                        </tbody>}
                 </tbody>
             </table>
             <div className='d-sm-flex align-items-center justify-content-between'>

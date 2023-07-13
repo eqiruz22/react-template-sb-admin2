@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Select from 'react-select'
 import { useAuthContext } from '../../../hooks/useAuthContext'
-import { getPrjList, getUser, getTitle, getZones, getZoneById } from '../../../http/HttpConsume'
+import { getZones, getZoneById } from '../../../http/HttpConsume'
 import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
 const CreateDataDaily = () => {
@@ -28,12 +28,44 @@ const CreateDataDaily = () => {
     const [errorTempatTujuan, setErrorTempatTujuan] = useState('')
     const navigate = useNavigate()
     useEffect(() => {
-        getUser(user, setOptName)
+        const getUser = async () => {
+            try {
+                const res = await fetch(`http://localhost:4001/user/name`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${user['token']}`
+                    }
+                })
+                const response = await res.json()
+                console.log(response)
+                setOptName(response.result.map(item => ({ value: item.user_id, label: item.name })))
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        getUser()
     }, [user])
 
     useEffect(() => {
+        const getTitle = async () => {
+            try {
+                const res = await fetch(`http://localhost:4001/user/show/${name['value']}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${user['token']}`
+                    }
+                })
+                const response = await res.json()
+                console.log(response)
+                setTitle(response.value[0]['title_name'])
+            } catch (error) {
+                console.log(error)
+            }
+        }
         if (name && name !== '') {
-            getTitle(user, name, setTitle)
+            getTitle()
         }
     }, [user, name])
 
@@ -44,7 +76,23 @@ const CreateDataDaily = () => {
     }, [user, title])
 
     useEffect(() => {
-        getPrjList(user, setPrjOpt)
+        const getPrjList = async () => {
+            try {
+                const res = await fetch('http://localhost:4001/user/prj-list', {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${user['token']}`
+                    }
+                })
+                const response = await res.json()
+                console.log(response)
+                setPrjOpt(response.result.map(item => ({ value: item.id, label: `${item.prj_name} - ${item.project_name}` })))
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        getPrjList()
     }, [user])
 
     useEffect(() => {
@@ -134,6 +182,25 @@ const CreateDataDaily = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault()
+        const data = {
+            prj_id: prj['value'],
+            user_id: name['value'],
+            title_name: title,
+            zone_id: zone['value'],
+            maksud_perjalanan: maksudPerjalan,
+            tempat_tujuan: tempatTujuan,
+            start_date: startDate,
+            end_date: endDate,
+            lama_perjalanan: days,
+            transport_tujuan: transportTujuan,
+            transport_local: transportLocal,
+            penginapan: penginapan,
+            meals: meal,
+            allowance: allowance,
+            rapid: rapidTest,
+            lain: lainLain,
+            jumlah_advance: total
+        }
         try {
             const res = await fetch('http://localhost:4001/user/perdin-daily', {
                 method: 'POST',
@@ -141,24 +208,7 @@ const CreateDataDaily = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${user['token']}`
                 },
-                body: JSON.stringify({
-                    prj_id: prj['value'],
-                    user_id: name['value'],
-                    title_name: title,
-                    maksud_perjalanan: maksudPerjalan,
-                    tempat_tujuan: tempatTujuan,
-                    start_date: startDate,
-                    end_date: endDate,
-                    lama_perjalanan: days,
-                    transport_tujuan: transportTujuan,
-                    transport_local: transportLocal,
-                    penginapan: penginapan,
-                    meals: meal,
-                    allowance: allowance,
-                    rapid_test: rapidTest,
-                    lain_lain: lainLain,
-                    jumlah_advance: total
-                })
+                body: JSON.stringify(data)
             })
             const response = await res.json()
             if (res.ok) {

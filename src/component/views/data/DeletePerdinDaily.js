@@ -1,7 +1,7 @@
 import React from 'react'
 import Swal from 'sweetalert2'
 import { useAuthContext } from '../../../hooks/useAuthContext'
-export const DeletePerdinDaily = ({ id, onDataUpdate, onPage, onLimit, onRow, onTotalpage, keyword, page, limit }) => {
+export const DeletePerdinDaily = ({ id, onDataUpdate, onPage, onLimit, onRow, onTotalpage, keyword, page, limit, disabled }) => {
     const { user } = useAuthContext()
     const handleDelete = () => {
         Swal.fire({
@@ -36,11 +36,11 @@ export const DeletePerdinDaily = ({ id, onDataUpdate, onPage, onLimit, onRow, on
                                 }
                             }).then(response => response.json())
                                 .then(res => {
-                                    onDataUpdate(res?.data?.result[0])
-                                    onPage(res?.data?.page)
-                                    onLimit(res?.data?.limit)
-                                    onRow(res?.data?.row)
-                                    onTotalpage(res?.data?.totalPage)
+                                    onDataUpdate(res?.result[0])
+                                    onPage(res?.page)
+                                    onLimit(res?.limit)
+                                    onRow(res?.row)
+                                    onTotalpage(res?.totalPage)
                                 })
                         } else {
                             await fetch(`http://localhost:4001/user/perdin-show-daily/${user['id']}?query=${keyword}&page=${page}&limit=${limit}`, {
@@ -50,11 +50,11 @@ export const DeletePerdinDaily = ({ id, onDataUpdate, onPage, onLimit, onRow, on
                                 }
                             }).then(response => response.json())
                                 .then(res => {
-                                    onDataUpdate(res.data.result)
-                                    onPage(res.data.page)
-                                    onLimit(res.data.limit)
-                                    onRow(res.data.row)
-                                    onTotalpage(res.data.totalPage)
+                                    onDataUpdate(res.result)
+                                    onPage(res.page)
+                                    onLimit(res.limit)
+                                    onRow(res.row)
+                                    onTotalpage(res.totalPage)
                                 })
                         }
                     } else {
@@ -73,7 +73,7 @@ export const DeletePerdinDaily = ({ id, onDataUpdate, onPage, onLimit, onRow, on
 
     return (
         <>
-            <button onClick={handleDelete} className='btn btn-danger ml-1 mr-1'>Delete</button>
+            <button onClick={handleDelete} className='btn btn-danger ml-1 mr-1' disabled={disabled}>Delete</button>
         </>
     )
 }
