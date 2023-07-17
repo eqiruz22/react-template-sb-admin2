@@ -6,6 +6,7 @@ import { getZone } from '../../../http/HttpConsume';
 import CreateZone from './CreateZone';
 import { EditZone } from './EditZone';
 import DeleteZone from './DeleteZone';
+import ReportZone from './ReportZone';
 
 const MainZone = () => {
     const [data, setData] = useState([])
@@ -48,6 +49,7 @@ const MainZone = () => {
                 </div>
                 <CreateZone keyword={keyword} page={page} limit={limit} onDataUpdate={setData} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
             </div>
+            <ReportZone />
             <table className='table table-hover'>
                 <thead>
                     <tr>

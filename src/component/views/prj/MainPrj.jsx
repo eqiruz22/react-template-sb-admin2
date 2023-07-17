@@ -6,6 +6,7 @@ import { getPrj } from "../../../http/HttpConsume";
 import { CreatePrj } from "./CreatePrj";
 import { EditPrj } from "./EditPrj";
 import { DeletePrj } from "./DeletePrj";
+import ReportPrj from "./ReportPrj";
 const MainPrj = () => {
 
     const [data, setData] = useState([])
@@ -45,6 +46,7 @@ const MainPrj = () => {
                 </div>
                 <CreatePrj keyword={keyword} page={page} limit={limit} onDataUpdate={setData} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
             </div>
+            <ReportPrj />
             <div className="table-responsive-sm">
                 <table className='table'>
                     <thead>

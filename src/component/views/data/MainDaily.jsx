@@ -8,6 +8,7 @@ import ReportDaily from '../../ReportDaily'
 import ReactPaginate from 'react-paginate'
 import Spinner from '../../layout/Spinner'
 import { DeletePerdinDaily } from './DeletePerdinDaily'
+import ReportPerdinDaily from './ReportPerdinDaily'
 
 const MainDaily = ({ selectedUser }) => {
 
@@ -109,6 +110,9 @@ const MainDaily = ({ selectedUser }) => {
                     </div>
                 )}
             </div>
+            {user['role'] === 1 &&
+                <ReportPerdinDaily />
+            }
             <table className='table table-hover'>
                 <thead>
                     <tr>

@@ -5,6 +5,7 @@ import { useAuthContext } from '../../../hooks/useAuthContext.js'
 import Spinner from '../../layout/Spinner'
 import { getData } from '../../../http/HttpConsume.js'
 import { DeleteUser } from './DeleteUser.js'
+import ReportUser from './ReportUser.jsx'
 
 const User = ({ selectedUser }) => {
 
@@ -52,6 +53,7 @@ const User = ({ selectedUser }) => {
                 <Link to="/user/create" className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
                     className="fas fa-plus fa-sm text-white-50"></i> Create User</Link>
             </div>
+            <ReportUser />
             <table className='table table-hover'>
                 <thead>
                     <tr>
