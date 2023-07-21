@@ -36,7 +36,7 @@ export const DeletePerdinDaily = ({ id, onDataUpdate, onPage, onLimit, onRow, on
                                 }
                             }).then(response => response.json())
                                 .then(res => {
-                                    onDataUpdate(res?.result[0])
+                                    onDataUpdate(res?.result)
                                     onPage(res?.page)
                                     onLimit(res?.limit)
                                     onRow(res?.row)

@@ -7,7 +7,7 @@ const Footer = () => {
         <footer className="sticky-footer bg-white">
             <div className="container my-auto">
                 <div className="copyright text-center my-auto">
-                    <span>Copyright © Your Website 2022-{year}</span>
+                    <span>Copyright © eqiruz22 {year}</span>
                 </div>
             </div>
         </footer>

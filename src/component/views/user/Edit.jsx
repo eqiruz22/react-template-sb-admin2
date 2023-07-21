@@ -15,7 +15,6 @@ const Edit = () => {
     const [titleOpt, setTitleOpt] = useState([])
     const [divisi, setDivisi] = useState('')
     const [divisiOpt, setDivisiOpt] = useState([])
-    const [errRole, setErrRole] = useState('')
     const [password, setPassword] = useState('')
     const { id } = useParams()
     const { user } = useAuthContext()

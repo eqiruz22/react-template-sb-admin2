@@ -68,7 +68,7 @@ const MainDivisi = () => {
                                 <th>{index + 1}</th>
                                 <td>{item.divisi_name}</td>
                                 <td>{item.divisi_manager}</td>
-                                <td>{item.name}</td>
+                                <td>{item.divisi_head}</td>
                                 <td>
                                     <EditDivisi id={item.id} keyword={keyword} page={page} limit={limit} onDataUpdate={setGetDivisi} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />
                                     <DeleteDivisi id={item.id} keyword={keyword} page={page} limit={limit} onDataUpdate={setGetDivisi} onPage={setPage} onLimit={setLimit} onRow={setRows} onTotalpage={setPages} />

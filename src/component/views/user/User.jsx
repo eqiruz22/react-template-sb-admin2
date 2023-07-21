@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import ReactPaginate from 'react-paginate'
 import { useAuthContext } from '../../../hooks/useAuthContext.js'
 import Spinner from '../../layout/Spinner'
-import { getData } from '../../../http/HttpConsume.js'
 import { DeleteUser } from './DeleteUser.js'
 import ReportUser from './ReportUser.jsx'
 
@@ -20,6 +19,26 @@ const User = ({ selectedUser }) => {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
+        const getData = async (user, keyword, page, limit, setUsers, setPage, setLimit, setRows, setPages, setLoading) => {
+            try {
+                const res = await fetch(`http://localhost:4001/user/show?query=${keyword}&page=${page}&limit=${limit}`, {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${user['token']}`
+                    }
+                })
+                const response = await res.json()
+                setUsers(response.result)
+                setPage(response.page)
+                setLimit(response.limit)
+                setRows(response.row)
+                setPages(response.totalPage)
+                setLoading(false)
+            } catch (error) {
+                console.log(error)
+            }
+        }
         if (user) {
             getData(user, keyword, page, limit, setUsers, setPage, setLimit, setRows, setPages, setLoading)
         }
